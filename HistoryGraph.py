@@ -1,4 +1,5 @@
 #A DOOP history graph
+from collections import defaultdict
 
 class HistoryGraph(object):
     def __init__(self):

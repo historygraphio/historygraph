@@ -1,4 +1,7 @@
 #A DOOP document
+from DocumentObject import DocumentObject
+import uuid
+from HistoryGraph import HistoryGraph
 
 class Document(DocumentObject):
     def Clone(self):
@@ -11,7 +14,7 @@ class Document(DocumentObject):
         return ret
 
     def Merge(self, doc2):
-        assert self.id = doc2.id
+        assert self.id == doc2.id
         assert isinstance(doc2, Document)
         #Make a copy of self's history
         history = self.history.Clone()

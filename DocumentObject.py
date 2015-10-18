@@ -1,4 +1,5 @@
 #A DOOP Document Object
+import uuid
 
 class DocumentObject(object):
     def Clone(self):
@@ -18,7 +19,7 @@ class DocumentObject(object):
          self.id = str(uuid.uuid4())
          
     def WasChanged(self, changetype, propertyowner, propertyname, propertyvalue, propertytype):
-         self.parent.WasChanged(changetype, propertyowner, propertyname, propertyvalue, propertytype):
+         self.parent.WasChanged(changetype, propertyowner, propertyname, propertyvalue, propertytype)
 
     def Clone(self):
         pass
