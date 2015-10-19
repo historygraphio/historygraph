@@ -1,5 +1,7 @@
 #A text field in a DOOP object
 
 class FieldText(Field):
-    pass
+    def CreateInstance(self):
+        return ""
+
 

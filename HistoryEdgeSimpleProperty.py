@@ -1,4 +1,5 @@
 #An edge that changes a value in a document
+from HistoryEdge import HistoryEdge
 
 class HistoryEdgeSimpleProperty(HistoryEdge):
     def __init__(self, edgeid, startnodes, endnode, propertyownerid,
@@ -13,8 +14,8 @@ class HistoryEdgeSimpleProperty(HistoryEdge):
         if self.inactive:
             return
         edgeobject = doc.GetDocumentObject(self.propertyownerid)
-        field = edgeobject.GetField(self.propertyname)
-        field.SetFromString(self.propertyvalue)
+        field = edgeobject.doop_field[self.propertyname]
+        setattr(edgeobject, self.propertyname, field.TranslateFromString(self.propertyvalue))
 
     def Clone(self):
         return HistoryEdgeSimpleProperty(self.edgeid, self.startnodes, self.endnode,

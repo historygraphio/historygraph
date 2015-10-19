@@ -4,4 +4,6 @@ from Field import Field
 class FieldList(Field):
     def __init__(self, theclass):
         pass
+    def CreateInstance(self):
+        return list()
 

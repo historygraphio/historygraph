@@ -21,7 +21,7 @@ class HistoryEdge(object):
     def CanReplay(self, graph):
         for node in self.startnodes:
             if node != "":
-                edge = graph.edgebyendnode[node]
+                edge = graph.edgesbyendnode[node]
                 if edge.isplayed == False:
                     return False
         return True
@@ -33,15 +33,15 @@ class HistoryEdge(object):
         return pastedgeid in self.pastedges
 
     def CompareForConflicts(self, edge2):
-	if (self.__class__ != pedge2.__class__)
-		return; #Different edge types can never conflict
-	if (self.inactive || edge2.inactive)
-		return; #Inactive edges can never conflict with active edges
-	conflictwinner = self.GetConflictWinner(edge2)
-	assert conflictwinner == -1 or conflictwinner == 0 or conflictwinner == 1
-	if conflictwinner == 1:
-            self.inactive = True
-	else
-            edge2.inactive = True
+	    if (self.__class__ != pedge2.__class__):
+		    return; #Different edge types can never conflict
+	    if (self.inactive or edge2.inactive):
+		    return; #Inactive edges can never conflict with active edges
+	    conflictwinner = self.GetConflictWinner(edge2)
+	    assert conflictwinner == -1 or conflictwinner == 0 or conflictwinner == 1
+	    if conflictwinner == 1:
+	        self.inactive = True
+	    else:
+	        edge2.inactive = True
         
     

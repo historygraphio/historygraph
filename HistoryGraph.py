@@ -11,20 +11,20 @@ class HistoryGraph(object):
     def AddEdge(self, edge):
         if self.isreplaying:
             return
-        if edge.id in self.edges:
+        if edge.edgeid in self.edges:
             return
-        nodes = edge.GetStartNodes()
+        nodes = edge.startnodes
         for node in nodes:
-            self.edgesbystartnode[node.id].append(node)
-        self.edgesbyendnode[edge.GetEndNode()] = edge
-        self.edges[edge.id] = edge
+            self.edgesbystartnode[node].append(edge)
+        self.edgesbyendnode[edge.endnode] = edge
+        self.edges[edge.edgeid] = edge
 
-    def Replay(doc):
+    def Replay(self, doc):
         self.isreplaying = True
         for k in self.edges:
             edge = self.edges[k]
             edge.isplayed = False
-        l = self.edgesbystartnode
+        l = self.edgesbystartnode[""]
         assert len(l) == 1
         self.ReplayEdges(doc, l[0])
         doc.history = self.Clone()
@@ -37,15 +37,15 @@ class HistoryGraph(object):
             ret.AddEdge(edge.Clone())
         return ret
 
-    def ReplayEdges(self):
-        if edge.CanReplay() == False:
+    def ReplayEdges(self, doc, edge):
+        if edge.CanReplay(self) == False:
             return
         edge.Replay(doc)
         edge.isplayed = True
         edges = self.edgesbystartnode[edge.endnode]
         if len(edges) > 0:
             for edge2 in edges:
-                self.ReplayEdges(edge2)
+                self.ReplayEdges(doc, edge2)
         else:
             doc.currentnode = edge.endnode
 
