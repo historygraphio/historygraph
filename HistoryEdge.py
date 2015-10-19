@@ -9,12 +9,11 @@ class HistoryEdge(object):
         self.played = False
 
         
-    def RecordPastEdges(pastedges, graph):
+    def RecordPastEdges(self, pastedges, graph):
         self.pastedges = set(pastedges)
-        edges = graph.edgesbystartnode(self.endnode)
+        edges = graph.edgesbystartnode[self.endnode]
         pastedges.add(self.edgeid)
-        for k in edges:
-            edge = edges[k]
+        for edge in edges:
             edge.RecordPastEdges(pastedges, graph)
 
     
@@ -33,7 +32,7 @@ class HistoryEdge(object):
         return pastedgeid in self.pastedges
 
     def CompareForConflicts(self, edge2):
-	    if (self.__class__ != pedge2.__class__):
+	    if (self.__class__ != edge2.__class__):
 		    return; #Different edge types can never conflict
 	    if (self.inactive or edge2.inactive):
 		    return; #Inactive edges can never conflict with active edges

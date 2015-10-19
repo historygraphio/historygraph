@@ -12,6 +12,7 @@ class Document(DocumentObject):
         ret = self.__class__(self.id)
         ret.CopyDocumentObject(self)
         ret.history = self.history.Clone()
+        ret.currentnode = self.currentnode
         return ret
 
     def Merge(self, doc2):
@@ -24,8 +25,7 @@ class Document(DocumentObject):
         history.RecordPastEdges()
         history.ProcessConflictWinners()
         #Create the return object and replay the history in to it
-        ret = self.__class__()
-        ret.id = self.id
+        ret = self.__class__(self.id)
         history.Replay(ret)
         return ret
 

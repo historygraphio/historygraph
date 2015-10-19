@@ -1,5 +1,7 @@
 #A DOOP history graph
 from collections import defaultdict
+import uuid
+from HistoryEdgeNull import HistoryEdgeNull
 
 class HistoryGraph(object):
     def __init__(self):
@@ -86,7 +88,7 @@ class HistoryGraph(object):
                 edge2 = self.edges[k2]
 
                 if k1 != k2:
-                    if not edge2.HasPastEdge(k1) and not edge1.HastPastEdge(k2):
+                    if not edge2.HasPastEdge(k1) and not edge1.HasPastEdge(k2):
                         edge1.CompareForConflicts(edge2)
                         
 
