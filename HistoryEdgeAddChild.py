@@ -1,4 +1,5 @@
 #The edge representing adding a child object in DOOP
+from HistoryEdge import HistoryEdge
 
 class HistoryEdgeAddChild(HistoryEdge):
     def __init__(self, edgeid, startnodes, endnode, propertyownerid, propertyname, propertyvalue, propertytype):
@@ -10,9 +11,8 @@ class HistoryEdgeAddChild(HistoryEdge):
 
     def Replay(self, doc):
         parent = self.GetDocumentObject(self.propertyownerid)
-        newobj = HistoryEdgeAddChild(self.edgeid, self.startnodes, self.endnode,
-            self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype)
-        parent.AddChild(newobj)
+        newobj = self.propertytype(self.edgeid)
+        getattr(parent, self.propertyname).add(newobj)
         doc.AddDocumentObject(newobj)
 
     def Clone(self):

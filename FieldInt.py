@@ -2,7 +2,7 @@
 from Field import Field
 
 class FieldInt(Field):
-    def CreateInstance(self):
+    def CreateInstance(self, owner, name):
         return 0
 
     def TranslateFromString(self, s):

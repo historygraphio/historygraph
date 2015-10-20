@@ -4,6 +4,8 @@ import uuid
 from HistoryGraph import HistoryGraph
 from ChangeType import ChangeType
 from HistoryEdgeSimpleProperty import HistoryEdgeSimpleProperty
+from HistoryEdgeAddChild import HistoryEdgeAddChild
+from HistoryEdgeRemoveChild import HistoryEdgeRemoveChild
 
 class Document(DocumentObject):
     def Clone(self):
@@ -38,16 +40,16 @@ class Document(DocumentObject):
         self.currentnode = ""
         self.insetattr = False
         
-    def WasChanged(self, changetype, propertyowner, propertyname, propertyvalue, propertytype):
+    def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
         nextnode  = str(uuid.uuid4())
         nodeset = set()
         nodeset.add(self.currentnode)
         if changetype == ChangeType.SET_PROPERTY_VALUE:
-            edge = HistoryEdgeSimpleProperty(str(uuid.uuid4()), nodeset, nextnode, propertyowner.id, propertyname, propertyvalue, propertytype)
-        elif changetype == ChangeType.ADDCHILD:
-            edge = HistoryEdgeAddChild(str(uuid.uuid4()), nodeset, nextnode, propertyowner.parent.id, propertname, propertyowner.id, propertytype)
-        elif changetype == ChangeType.REMOVECHILD:
-            edge = HistoryEdgeRemoveChild(str(uuid.uuid4()), nodeset, nextnode, propertyowner.parent.id, propertyname, propertyowner.id, propertytype)
+            edge = HistoryEdgeSimpleProperty(str(uuid.uuid4()), nodeset, nextnode, propertyownerid, propertyname, propertyvalue, propertytype)
+        elif changetype == ChangeType.ADD_CHILD:
+            edge = HistoryEdgeAddChild(str(uuid.uuid4()), nodeset, nextnode, propertyownerid, propertyname, propertyvalue, propertytype)
+        elif changetype == ChangeType.REMOVE_CHILD:
+            edge = HistoryEdgeRemoveChild(str(uuid.uuid4()), nodeset, nextnode, propertyownerid, propertyname, propertyvalue, propertytype)
         else:
             assert False
         self.currentnode = nextnode
@@ -56,7 +58,10 @@ class Document(DocumentObject):
     def GetDocumentObject(self, id):
         if id == self.id:
             return self
-        assert False
+        return self.documentobjects[id]
 
+    def GetDocument(self):
+        #Return the document
+        return self
 
     

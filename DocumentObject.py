@@ -28,7 +28,7 @@ class DocumentObject(object):
             var = getattr(self.__class__, k)
             self.doop_field[k] = var
             if isinstance(var, Field):
-                setattr(self, k, var.CreateInstance())
+                setattr(self, k, var.CreateInstance(self, k))
         self.insetattr = False
         
     def __setattr__(self, name, value):
@@ -37,11 +37,12 @@ class DocumentObject(object):
             return
         self.insetattr = True
         if name in self.doop_field:
-            self.WasChanged(ChangeType.SET_PROPERTY_VALUE, self, name, value, type(value))
+            self.WasChanged(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, type(value))
         self.insetattr = False
          
-    def WasChanged(self, changetype, propertyowner, propertyname, propertyvalue, propertytype):
-         self.parent.WasChanged(changetype, propertyowner, propertyname, propertyvalue, propertytype)
+    def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
+        assert isinstance(propertyownerid, basestring)
+        self.parent.WasChanged(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
     def Clone(self):
         pass
@@ -50,5 +51,9 @@ class DocumentObject(object):
         for k in src.doop_field:
             v = src.doop_field[k]
             setattr(self, k, v.Clone(k, src))
+
+    def GetDocument(self):
+        #Return the document
+        return self.parent.GetDocument()
 
     
