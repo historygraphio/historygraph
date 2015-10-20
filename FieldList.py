@@ -12,25 +12,44 @@ class FieldList(Field):
 
         def add(self, obj):
             assert isinstance(obj, self.theclass)
-            self.l.add(obj)
+            self.l.add(obj.id)
             assert obj.parent is None
             obj.parent = self
             self.parent.GetDocument().documentobjects[obj.id] = obj
-            self.WasChanged(ChangeType.ADD_CHILD, self.parent, self.name, obj.id, obj.__class__)
+            self.WasChanged(ChangeType.ADD_CHILD, self.parent.id, self.name, obj.id, obj.__class__)
 
-        def remove(self, obj):
-            self.l.remove(obj)
-            del self.parent.GetDocument().documentobjects[obj.id]
-            self.WasChanged(ChangeType.REMOVE_CHILD, self.parent, self.name, obj.id, obj.__class__)            
+        def remove(self, objid):
+            assert isinstance(objid, basestring)
+            self.l.remove(objid)
+            obj = self.parent.GetDocument().documentobjects[objid]
+            del self.parent.GetDocument().documentobjects[objid]
+            self.WasChanged(ChangeType.REMOVE_CHILD, self.parent.id, self.name, objid, obj.__class__)            
 
-        def WasChanged(self, changetype, propertyowner, propertyname, propertyvalue, propertytype):
-            self.parent.WasChanged(changetype, propertyowner, propertyname, propertyvalue, propertytype)
+        def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
+            assert isinstance(propertyownerid, basestring)
+            self.parent.WasChanged(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
         def __len__(self):
             return len(self.l)
+
+        def __iter__(self):
+            doc = self.parent.GetDocument()
+            for item in self.l:
+                yield doc.documentobjects[item]
+
+        def Clone(self, owner, name):
+            ret = FieldList.FieldListImpl(self.theclass, owner, name)
+            srcdoc = self.parent.GetDocument()
+            for objid in self.l:
+                srcobj = srcdoc.documentobjects[objid]
+                ret.add(srcobj.Clone())
+            return ret
 
     def __init__(self, theclass):
         self.theclass = theclass
     def CreateInstance(self, owner, name):
         return FieldList.FieldListImpl(self.theclass, owner, name)
+
+    def Clone(self, name, src, owner):
+        return getattr(src, name).Clone(owner, name)
 

@@ -12,7 +12,7 @@ class HistoryEdgeRemoveChild(HistoryEdge):
 
     def Replay(self, doc):
         parent = doc.GetDocumentObject(self.propertyownerid)
-        parent.RemoveChild(self.propertyvalue)
+        getattr(parent, self.propertyname).remove(self.propertyvalue)
 
     def Clone(self):
         return HistoryEdgeRemoveChild(self.edgeid, self.startnodes, self.endnode,

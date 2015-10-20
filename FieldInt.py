@@ -8,7 +8,7 @@ class FieldInt(Field):
     def TranslateFromString(self, s):
         return int(s)
 
-    def Clone(self, propertyname, src):
+    def Clone(self, propertyname, src, owner):
         return getattr(src, propertyname)
 
 

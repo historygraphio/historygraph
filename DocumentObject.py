@@ -2,19 +2,19 @@
 import uuid
 from Field import Field
 from ChangeType import *
+from FieldList import FieldList
 
 class DocumentObject(object):
     def Clone(self):
-        ret = self.__class__()
-        ret.id = self.id
-        ret.CopyPropertyOwner(self)
-        for prop in self.properties:
+        ret = self.__class__(self.id)
+        ret.CopyDocumentObject(self)
+        for prop in self.doop_field:
             if isinstance(prop, FieldList):
                 retlist = ret.getattr(prop.name)
                 retlist.empty()
                 for obj in prop:
                     retlist.add(obj.Clone())
-
+        return ret
     
     def __init__(self, id):
         self.insetattr = True
@@ -41,16 +41,14 @@ class DocumentObject(object):
         self.insetattr = False
          
     def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
-        assert isinstance(propertyownerid, basestring)
-        self.parent.WasChanged(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
-
-    def Clone(self):
-        pass
+        if self.parent is not None:
+            assert isinstance(propertyownerid, basestring)
+            self.parent.WasChanged(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
     def CopyDocumentObject(self, src):
         for k in src.doop_field:
             v = src.doop_field[k]
-            setattr(self, k, v.Clone(k, src))
+            setattr(self, k, v.Clone(k, src, self))
 
     def GetDocument(self):
         #Return the document

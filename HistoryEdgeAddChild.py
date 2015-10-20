@@ -4,16 +4,17 @@ from HistoryEdge import HistoryEdge
 class HistoryEdgeAddChild(HistoryEdge):
     def __init__(self, edgeid, startnodes, endnode, propertyownerid, propertyname, propertyvalue, propertytype):
         super(HistoryEdgeAddChild, self).__init__(edgeid, startnodes, endnode)
+        assert isinstance(propertyownerid, basestring)
         self.propertyownerid = propertyownerid
         self.propertyvalue = propertyvalue
         self.propertyname = propertyname
         self.propertytype = propertytype
 
     def Replay(self, doc):
-        parent = self.GetDocumentObject(self.propertyownerid)
-        newobj = self.propertytype(self.edgeid)
+        parent = doc.GetDocumentObject(self.propertyownerid)
+        newobj = self.propertytype(self.propertyvalue)
         getattr(parent, self.propertyname).add(newobj)
-        doc.AddDocumentObject(newobj)
+        doc.documentobjects[newobj.id] = newobj
 
     def Clone(self):
         return HistoryEdgeAddChild(self.edgeid, self.startnodes, self.endnode,
