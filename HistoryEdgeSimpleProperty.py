@@ -26,10 +26,19 @@ class HistoryEdgeSimpleProperty(HistoryEdge):
     def GetConflictWinner(self, edge2):
         if self.propertyownerid != edge2.propertyownerid:
             return 0
+        #print "self.propertyname = " + self.propertyname
+        #print "edge2.propertyname = " + edge2.propertyname
         if self.propertyname != edge2.propertyname:
+            assert False
             return 0
+        #print "self.propertytype = " + str(self.propertytype)
         if self.propertytype == int:
             if int(self.propertyvalue) > int(edge2.propertyvalue):
+                return -1
+            else:
+                return 1
+        elif self.propertytype == str:
+            if self.propertyvalue > edge2.propertyvalue:
                 return -1
             else:
                 return 1
@@ -37,6 +46,10 @@ class HistoryEdgeSimpleProperty(HistoryEdge):
             assert False
             return 0
 
+    def GetEdgeDescription(self):
+        #Return a description of the edgeuseful for debugging purposes
+        return "Edge type = " + self.__class__.__name__ + " edgeid = " + self.edgeid + " start nodes = " + str(self.startnodes) + " end node = " + self.endnode + "  self.propertyname = " +  self.propertyname + " self.propertyvalue = " + self.propertyvalue + " self.propertytype = " + str(self.propertytype)
+    
 
         
         

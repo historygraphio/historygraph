@@ -87,6 +87,8 @@ class HistoryGraph(object):
             for k2 in self.edges:
                 edge2 = self.edges[k2]
 
+                #print "edge1 = " + edge1.GetEdgeDescription()
+                #print "edge2 = " + edge2.GetEdgeDescription()
                 if k1 != k2:
                     if not edge2.HasPastEdge(k1) and not edge1.HasPastEdge(k2):
                         edge1.CompareForConflicts(edge2)

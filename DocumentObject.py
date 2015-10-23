@@ -37,6 +37,8 @@ class DocumentObject(object):
             return
         self.insetattr = True
         if name in self.doop_field:
+            #print "name = " + name
+            #print "type(value) = " + str(type(value))
             self.WasChanged(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, type(value))
         self.insetattr = False
          

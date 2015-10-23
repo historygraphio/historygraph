@@ -10,11 +10,13 @@ class HistoryEdge(object):
 
         
     def RecordPastEdges(self, pastedges, graph):
-        self.pastedges = set(pastedges)
+        #print "edge = " + self.GetEdgeDescription()
+        #print "pastedges = " + str(pastedges)
+        self.pastedges = self.pastedges | set(pastedges)
         edges = graph.edgesbystartnode[self.endnode]
         pastedges.add(self.edgeid)
         for edge in edges:
-            edge.RecordPastEdges(pastedges, graph)
+            edge.RecordPastEdges(set(pastedges), graph)
 
     
     def CanReplay(self, graph):
@@ -40,7 +42,7 @@ class HistoryEdge(object):
 	    assert conflictwinner == -1 or conflictwinner == 0 or conflictwinner == 1
 	    if conflictwinner == 1:
 	        self.inactive = True
-	    else:
+	    elif conflictwinner == -1:
 	        edge2.inactive = True
         
     

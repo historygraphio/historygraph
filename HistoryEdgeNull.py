@@ -11,3 +11,6 @@ class HistoryEdgeNull(HistoryEdge):
     def Replay(self, doc):
         pass
     
+    def GetEdgeDescription(self):
+        #Return a description of the edgeuseful for debugging purposes
+        return "Edge type = " + self.__class__.__name__ + " edgeid = " + self.edgeid + " start nodes = " + str(self.startnodes) + " end node = " + self.endnode
