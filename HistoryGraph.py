@@ -75,7 +75,7 @@ class HistoryGraph(object):
         if len(presentnodes) > 1:
             assert len(presentnodes) == 2
             nextnode = str(uuid.uuid4())
-            nulledge = HistoryEdgeNull(str(uuid.uuid4()), presentnodes, nextnode)
+            nulledge = HistoryEdgeNull(str(uuid.uuid4()), presentnodes, nextnode, "", "", "", None)
             self.AddEdge(nulledge)
 
     def ProcessConflictWinners(self):
