@@ -45,6 +45,7 @@ class FieldList(Field):
                 ret.add(srcobj.Clone())
             return ret
 
+
     def __init__(self, theclass):
         self.theclass = theclass
     def CreateInstance(self, owner, name):
