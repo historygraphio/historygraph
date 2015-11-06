@@ -104,7 +104,6 @@ class DocumentCollection(object):
         for a in variables:
             if isinstance(getattr(documentobject.__class__, a), FieldList):
                 for childobj in getattr(documentobject, a):
-                    print "childobject id = " + childobj.id + " child class name = " + childobj.__class__.__name__
                     self.SaveDocumentObject(childobj, documentobject, foreignkeydict, columndict)
         foreignkeyclassname = ""
         if documentobject.__class__.__name__ in foreignkeydict:
