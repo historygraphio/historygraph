@@ -1,20 +1,19 @@
 #The base class for edges in DOOP
+import md5
 
 class HistoryEdge(object):
-    def __init__(self, edgeid, startnodes, endnode):
-        self.edgeid = edgeid
+    def __init__(self, startnodes, documentid, documentclassname):
         self.startnodes = startnodes
-        self.endnode = endnode
         self.inactive = False
         self.played = False
+        self.documentid = documentid
+        self.documentclassname = documentclassname
 
         
     def RecordPastEdges(self, pastedges, graph):
-        #print "edge = " + self.GetEdgeDescription()
-        #print "pastedges = " + str(pastedges)
         self.pastedges = self.pastedges | set(pastedges)
-        edges = graph.edgesbystartnode[self.endnode]
-        pastedges.add(self.edgeid)
+        edges = graph.edgesbystartnode[self.GetEndNode()]
+        pastedges.add(self.GetEndNode())
         for edge in edges:
             edge.RecordPastEdges(set(pastedges), graph)
 
@@ -45,4 +44,33 @@ class HistoryEdge(object):
 	    elif conflictwinner == -1:
 	        edge2.inactive = True
         
+    def asDict(self):
+        return {"classname":self.__class__.__name__,
+            "startnodes":list(self.startnodes),
+            "endnode":self.GetEndNode(),
+            "propertyownerid":self.propertyownerid,
+            "propertyvalue":self.propertyvalue,
+            "propertyname":self.propertyname,
+            "propertytype":self.propertytype,
+            "documentid":self.documentid,
+            "documentclassname":self.documentclassname,
+         }
+
+    def __str__(self):
+        return str(self.asDict())
+
+    def GetEndNode(self):
+        s = ("classname",self.__class__.__name__,
+            "startnodes",list(self.startnodes),
+            "propertyownerid",self.propertyownerid,
+
+            "propertyvalue",self.propertyvalue,
+            "propertyname",self.propertyname,
+            "propertytype",self.propertytype,
+            "documentid",self.documentid,
+            "documentclassname",self.documentclassname,
+         )
+        return md5.md5(str(s)).hexdigest()
+
+
     

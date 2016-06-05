@@ -11,4 +11,7 @@ class FieldInt(Field):
     def Clone(self, propertyname, src, owner):
         return getattr(src, propertyname)
 
+    def GetTypeName(self):
+        return "int"
+
 

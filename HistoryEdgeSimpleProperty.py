@@ -3,9 +3,13 @@ from HistoryEdge import HistoryEdge
 from FieldInt import FieldInt
 
 class HistoryEdgeSimpleProperty(HistoryEdge):
-    def __init__(self, edgeid, startnodes, endnode, propertyownerid,
-                 propertyname, propertyvalue, propertytype):
-        super(HistoryEdgeSimpleProperty, self).__init__(edgeid, startnodes, endnode)
+    def __init__(self, startnodes, propertyownerid,
+                 propertyname, propertyvalue, propertytype, documentid, documentclassname):
+        super(HistoryEdgeSimpleProperty, self).__init__(startnodes, documentid, documentclassname)
+        assert isinstance(propertyownerid, basestring)
+        assert isinstance(propertytype, basestring)
+        assert propertytype == 'int' or propertytype == 'basestring'
+        #assert isinstance(propertyvalue, basestring)
         self.propertyownerid = propertyownerid
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
@@ -19,9 +23,9 @@ class HistoryEdgeSimpleProperty(HistoryEdge):
         setattr(edgeobject, self.propertyname, field.TranslateFromString(self.propertyvalue))
 
     def Clone(self):
-        return HistoryEdgeSimpleProperty(self.edgeid, self.startnodes, self.endnode,
+        return HistoryEdgeSimpleProperty(self.startnodes, 
                 self.propertyownerid, self.propertyname, self.propertyvalue,
-                self.propertytype)
+                self.propertytype, self.documentid, self.documentclassname)
 
     def GetConflictWinner(self, edge2):
         if self.propertyownerid != edge2.propertyownerid:
@@ -32,12 +36,12 @@ class HistoryEdgeSimpleProperty(HistoryEdge):
             assert False
             return 0
         #print "self.propertytype = " + str(self.propertytype)
-        if self.propertytype == int:
+        if self.propertytype == "int":
             if int(self.propertyvalue) > int(edge2.propertyvalue):
                 return -1
             else:
                 return 1
-        elif self.propertytype == str:
+        elif self.propertytype == "basestring":
             if self.propertyvalue > edge2.propertyvalue:
                 return -1
             else:

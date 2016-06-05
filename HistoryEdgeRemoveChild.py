@@ -2,9 +2,12 @@
 from HistoryEdge import HistoryEdge
 
 class HistoryEdgeRemoveChild(HistoryEdge):
-    def __init__(self, edgeid, startnodes, endnode, propertyownerid,
-                 propertyname, propertyvalue, propertytype):
-        super(HistoryEdgeRemoveChild, self).__init__(edgeid, startnodes, endnode)
+    def __init__(self, startnodes, propertyownerid,
+                 propertyname, propertyvalue, propertytype, documentid, documentclassname):
+        super(HistoryEdgeRemoveChild, self).__init__(startnodes, documentid, documentclassname)
+        assert isinstance(propertyownerid, basestring)
+        assert isinstance(propertytype, basestring)
+        assert isinstance(propertyvalue, basestring)
         self.propertyownerid = propertyownerid
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
@@ -15,8 +18,8 @@ class HistoryEdgeRemoveChild(HistoryEdge):
         getattr(parent, self.propertyname).remove(self.propertyvalue)
 
     def Clone(self):
-        return HistoryEdgeRemoveChild(self.edgeid, self.startnodes, self.endnode,
-            self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype)
+        return HistoryEdgeRemoveChild(self.startnodes, 
+            self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
 
     def GetConflictWinner(self, edge2):
         return 0

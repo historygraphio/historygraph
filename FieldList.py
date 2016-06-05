@@ -16,14 +16,14 @@ class FieldList(Field):
             assert obj.parent is None
             obj.parent = self
             self.parent.GetDocument().documentobjects[obj.id] = obj
-            self.WasChanged(ChangeType.ADD_CHILD, self.parent.id, self.name, obj.id, obj.__class__)
+            self.WasChanged(ChangeType.ADD_CHILD, self.parent.id, self.name, obj.id, obj.__class__.__name__)
 
         def remove(self, objid):
             assert isinstance(objid, basestring)
             self.l.remove(objid)
             obj = self.parent.GetDocument().documentobjects[objid]
             del self.parent.GetDocument().documentobjects[objid]
-            self.WasChanged(ChangeType.REMOVE_CHILD, self.parent.id, self.name, objid, obj.__class__)            
+            self.WasChanged(ChangeType.REMOVE_CHILD, self.parent.id, self.name, objid, obj.__class__.__name__)            
 
         def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             assert isinstance(propertyownerid, basestring)
@@ -53,4 +53,5 @@ class FieldList(Field):
 
     def Clone(self, name, src, owner):
         return getattr(src, name).Clone(owner, name)
+
 

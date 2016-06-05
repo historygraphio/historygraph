@@ -37,9 +37,8 @@ class DocumentObject(object):
             return
         self.insetattr = True
         if name in self.doop_field:
-            #print "name = " + name
-            #print "type(value) = " + str(type(value))
-            self.WasChanged(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, type(value))
+            if type(self.doop_field[name]) != FieldList:
+                self.WasChanged(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self.doop_field[name].GetTypeName())
         self.insetattr = False
          
     def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
@@ -56,4 +55,6 @@ class DocumentObject(object):
         #Return the document
         return self.parent.GetDocument()
 
-    
+    def __str__(self):
+        return '\n'.join([str(k) + ':' + str(getattr(self, k)) for k in self.doop_field])
+

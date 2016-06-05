@@ -41,18 +41,18 @@ class Document(DocumentObject):
         self.insetattr = False
         
     def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
-        nextnode  = str(uuid.uuid4())
         nodeset = set()
         nodeset.add(self.currentnode)
         if changetype == ChangeType.SET_PROPERTY_VALUE:
-            edge = HistoryEdgeSimpleProperty(str(uuid.uuid4()), nodeset, nextnode, propertyownerid, propertyname, propertyvalue, propertytype)
+            edge = HistoryEdgeSimpleProperty(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         elif changetype == ChangeType.ADD_CHILD:
-            edge = HistoryEdgeAddChild(str(uuid.uuid4()), nodeset, nextnode, propertyownerid, propertyname, propertyvalue, propertytype)
+            edge = HistoryEdgeAddChild(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         elif changetype == ChangeType.REMOVE_CHILD:
-            edge = HistoryEdgeRemoveChild(str(uuid.uuid4()), nodeset, nextnode, propertyownerid, propertyname, propertyvalue, propertytype)
+            edge = HistoryEdgeRemoveChild(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         else:
             assert False
-        self.currentnode = nextnode
+        #print "Document edge created = ",edge
+        self.currentnode = edge.GetEndNode()
         self.history.AddEdge(edge)
 
     def GetDocumentObject(self, id):
