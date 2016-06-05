@@ -1,5 +1,5 @@
 #The base class for edges in DOOP
-import md5
+import hashlib
 
 class HistoryEdge(object):
     def __init__(self, startnodes, documentid, documentclassname):
@@ -70,7 +70,7 @@ class HistoryEdge(object):
             "documentid",self.documentid,
             "documentclassname",self.documentclassname,
          )
-        return md5.md5(str(s)).hexdigest()
+        return hashlib.sha256(str(s)).hexdigest()
 
 
     
