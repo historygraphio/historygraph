@@ -21,6 +21,8 @@ class HistoryEdge(object):
     def CanReplay(self, graph):
         for node in self.startnodes:
             if node != "":
+                if node not in graph.edgesbyendnode:
+                    return False
                 edge = graph.edgesbyendnode[node]
                 if edge.isplayed == False:
                     return False

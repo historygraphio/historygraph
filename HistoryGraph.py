@@ -43,11 +43,9 @@ class HistoryGraph(object):
         edge.Replay(doc)
         edge.isplayed = True
         edges = self.edgesbystartnode[edge.GetEndNode()]
-        if len(edges) > 0:
-            for edge2 in edges:
-                self.ReplayEdges(doc, edge2)
-        else:
-            doc.currentnode = edge.GetEndNode()
+        doc.currentnode = edge.GetEndNode()
+        for edge2 in edges:
+            self.ReplayEdges(doc, edge2)
 
     def RecordPastEdges(self):
         if len(self.edgesbyendnode) == 0:

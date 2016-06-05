@@ -6,6 +6,7 @@ from ChangeType import ChangeType
 from HistoryEdgeSimpleProperty import HistoryEdgeSimpleProperty
 from HistoryEdgeAddChild import HistoryEdgeAddChild
 from HistoryEdgeRemoveChild import HistoryEdgeRemoveChild
+from HistoryEdgeNull import HistoryEdgeNull
 
 class Document(DocumentObject):
     def Clone(self):
@@ -64,4 +65,31 @@ class Document(DocumentObject):
         #Return the document
         return self
 
-    
+    def AddEdge(self, edge):
+        #print "Document.AddEdge edge = ",edge
+        fullreplay = False
+        if isinstance(edge, HistoryEdgeNull):
+            #Always perform a full replay on null
+            fullreplay = True
+        startnode = list(edge.startnodes)[0]
+        assert startnode != ''
+        #print "Document.Addedge startnode = ",startnode
+        #print "Document.Addedge self.currentnode = ",self.currentnode
+        if startnode == self.currentnode:
+            self.history.AddEdge(edge)
+            edge.Replay(self)
+            if edge.GetEndNode() in self.history.edgesbystartnode:
+                l = self.history.edgesbystartnode[edge.GetEndNode()]
+                if len(l) == 2:
+                    fullreplay = True
+                else:
+                    assert len(l) == 1
+                    self.AddEdge(l[0])
+        elif startnode in self.history.edgesbyendnode:
+            fullreplay = True
+        else:
+            self.history.AddEdge(edge)
+
+        if fullreplay:
+            history = self.history.Clone()
+            history.Replay(self)
