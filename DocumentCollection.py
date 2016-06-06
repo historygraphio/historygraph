@@ -46,8 +46,7 @@ class DocumentCollection(object):
                         propertytypename = ""
                     else:
                         propertytypename = edge.propertytype
-                    ret.append([document.id, document.__class__.__name__, edge.__class__.__name__, startnode1id, startnode2id, edge.propertyownerid, edge.propertyname, 
-                        str(edge.propertyvalue), propertytypename])
+                    ret.append(edge.asTuple())
                     #print "DocumentCollection edge stored = ",edge
         return JSONEncoder().encode(ret)
 
@@ -99,10 +98,28 @@ class DocumentCollection(object):
             history.AddEdge(edge)
 
         for documentid in historygraphdict:
-            doc = self.classes[documentclassnamedict[documentid]](documentid)
-            history = historygraphdict[documentid]
+            doc = None
+            wasexisting = False
+            if documentclassnamedict[documentid] in self.objects:
+                for d2 in self.objects[documentclassnamedict[documentid]]:
+                    if d2.id == documentid:
+                        doc = d2
+                        wasexisting = True
+            if doc is None:
+                doc = self.classes[documentclassnamedict[documentid]](documentid)
+                assert len(doc.history.edgesbyendnode) == 0
+
+            #Make a copy of self's history
+            history = doc.history.Clone()
+            #Merge doc2's history
+            history.MergeGraphs(historygraphdict[documentid])
+            history.RecordPastEdges()
+            history.ProcessConflictWinners()
+            #Create the return object and replay the history in to it
             history.Replay(doc)
-            self.AddDocumentObject(doc)
+
+            if not wasexisting:
+                self.AddDocumentObject(doc)
             
        
     def GetByClass(self, theclass):

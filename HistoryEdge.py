@@ -74,5 +74,14 @@ class HistoryEdge(object):
          )
         return hashlib.sha256(str(s)).hexdigest()
 
-
+    def asTuple(self):
+        #Return a tuple that represents the edge when it is turned in JSON
+        startnodes = list(self.startnodes)
+        startnode1id = startnodes[0]
+        if len(startnodes) > 1:
+            startnode2id = startnodes[1]
+        else:
+            startnode2id = ""
+        return (self.documentid, self.documentclassname, self.__class__.__name__, startnode1id, startnode2id, self.propertyownerid, self.propertyname, 
+                        str(self.propertyvalue), self.propertytype)
     
