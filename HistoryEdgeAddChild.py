@@ -32,7 +32,7 @@ class HistoryEdgeAddChild(HistoryEdge):
             self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
 
     def GetConflictWinner(self, edge2):
-        return 0 #There can never be a conflict becuase all edges are new
+        return 0 #There can never be a conflict because all edges are new
 
     
         
