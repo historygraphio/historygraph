@@ -200,7 +200,7 @@ def LoadDocumentCollection(dc, filenameedges, filenamedata):
             startnodes = {startnode1id, startnode2id}
         edge = dc.historyedgeclasses[edgeclassname](startnodes, propertyownerid, propertyname, propertyvalue, propertytypestr, documentid, documentclassname)
         history = historygraphdict[documentid]
-        history.AddEdge(edge)
+        history.AddEdges([edge])
 
     #nulledges = list()
     for documentid in historygraphdict:

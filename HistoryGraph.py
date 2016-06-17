@@ -9,15 +9,17 @@ class HistoryGraph(object):
         self.edgesbyendnode = dict()
         self.isreplaying = False
 
-    def AddEdge(self, edge):
+    def AddEdges(self, edges):
         if self.isreplaying:
             return
-        if edge.GetEndNode() in self.edgesbyendnode:
+        edges2 = [edge for edge in edges if edge.GetEndNode() not in self.edgesbyendnode]
+        if len(edges2) == 0:
             return
-        nodes = edge.startnodes
-        for node in nodes:
-            self.edgesbystartnode[node].append(edge)
-        self.edgesbyendnode[edge.GetEndNode()] = edge
+        for edge in edges2:
+            nodes = edge.startnodes
+            for node in nodes:
+                self.edgesbystartnode[node].append(edge)
+            self.edgesbyendnode[edge.GetEndNode()] = edge
 
     def Replay(self, doc):
         self.isreplaying = True
@@ -32,9 +34,11 @@ class HistoryGraph(object):
 
     def Clone(self):
         ret = HistoryGraph()
+        edgeclones = list()
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
-            ret.AddEdge(edge.Clone())
+            edgeclones.append(edge.Clone())
+        ret.AddEdges(edgeclones)
         return ret
 
     def ReplayEdges(self, doc, edge):
@@ -61,7 +65,7 @@ class HistoryGraph(object):
     def MergeGraphs(self, graph):
         for k in graph.edgesbyendnode:
             edge = graph.edgesbyendnode[k]
-            self.AddEdge(edge)
+            self.AddEdges([edge])
         presentnodes = set()
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
@@ -73,7 +77,7 @@ class HistoryGraph(object):
         if len(presentnodes) > 1:
             assert len(presentnodes) == 2
             nulledge = HistoryEdgeNull(presentnodes, "", "", "", "", documentid, documentclassname)
-            self.AddEdge(nulledge)
+            self.AddEdges([nulledge])
 
     def ProcessConflictWinners(self):
         for k in self.edgesbyendnode:

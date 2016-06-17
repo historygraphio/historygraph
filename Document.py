@@ -54,7 +54,7 @@ class Document(DocumentObject):
             assert False
         #print "Document edge created = ",edge
         self.currentnode = edge.GetEndNode()
-        self.history.AddEdge(edge)
+        self.history.AddEdges([edge])
 
     def GetDocumentObject(self, id):
         if id == self.id:
@@ -65,31 +65,75 @@ class Document(DocumentObject):
         #Return the document
         return self
 
-    def AddEdge(self, edge):
-        #print "Document.AddEdge edge = ",edge
+    def AddEdges(self, edges):
+        #print "Document.AddEdges edge = ",edge
         fullreplay = False
-        if isinstance(edge, HistoryEdgeNull):
-            #Always perform a full replay on null
-            fullreplay = True
-        startnode = list(edge.startnodes)[0]
-        assert startnode != ''
-        #print "Document.Addedge startnode = ",startnode
-        #print "Document.Addedge self.currentnode = ",self.currentnode
-        if startnode == self.currentnode:
-            self.history.AddEdge(edge)
-            edge.Replay(self)
-            if edge.GetEndNode() in self.history.edgesbystartnode:
-                l = self.history.edgesbystartnode[edge.GetEndNode()]
-                if len(l) == 2:
-                    fullreplay = True
-                else:
-                    assert len(l) == 1
-                    self.AddEdge(l[0])
-        elif startnode in self.history.edgesbyendnode:
-            fullreplay = True
-        else:
-            self.history.AddEdge(edge)
+        startnodes = set()
+        endnodes = set()
+        for edge in edges:
+            if isinstance(edge, HistoryEdgeNull):
+                #Always perform a full replay on null
+                self.FullReplay(edges)
+                return
+            startnode = list(edge.startnodes)[0]
+            assert startnode != ''
 
-        if fullreplay:
-            history = self.history.Clone()
-            history.Replay(self)
+            #If any of startnodes in the list are in the history but not the current node we need to do a full replay
+            
+            if startnode != self.currentnode and startnode in self.history.edgesbyendnode:
+                self.FullReplay(edges)
+                return
+
+            startnodes.add(startnode)
+            endnodes.add(edge.GetEndNode())
+
+        startnodes_not_in_endnodes = startnodes - endnodes
+        endnodes_not_in_startnodes = endnodes - startnodes
+
+        if len(startnodes_not_in_endnodes) != 1 or len(endnodes_not_in_startnodes) != 1:
+            #If this is a continuous chain there is only one start node and endnode
+            self.FullReplay(edges)
+            return
+
+        if list(startnodes_not_in_endnodes)[0] != self.currentnode:
+            #If the first node in the chain is not the current node 
+            self.FullReplay(edges)
+            return
+
+        #Play each edge in the list in sequence
+        edgesdict = dict([(list(edge.startnodes)[0], edge) for edge in edges])
+        while len(edgesdict) > 0:
+            #print "edgesdict = ",edgesdict
+            #Get the next edge
+            oldnode = self.currentnode
+            edge = edgesdict[self.currentnode]
+            #Play it
+            self.history.AddEdges([edge])
+            #print "Before playing self.currentnode = ",self.currentnode
+            edge.Replay(self)
+            #print "After playing self.currentnode = ",self.currentnode
+            assert self.currentnode == edge.GetEndNode()
+            assert self.currentnode != oldnode
+            if edge.GetEndNode() in self.history.edgesbystartnode:
+                #print "Found in start nodes edge",edge
+                l = self.history.edgesbystartnode[edge.GetEndNode()]
+                if len(l) > 0:
+                    #If multiple edge match this one we need to do a full replay
+                    self.FullReplay(edges)
+                    return
+                #If the end node matches an edge we already have
+                edge2internal = l[0]
+                edge2external = edgesdict[edge.GetEndNode()]
+                if edge2internal.GetEndNode() != edge2external.GetEndNode():
+                    #If the edges are different so do a full replay
+                    self.FullReplay(edges)
+                    return
+            del edgesdict[oldnode]
+            
+            
+        
+        
+    def FullReplay(self, edges):
+        history = self.history.Clone()
+        history.AddEdges(edges)
+        history.Replay(self)

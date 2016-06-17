@@ -95,7 +95,7 @@ class DocumentCollection(object):
             edge = self.historyedgeclasses[edgeclassname](startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname)
             #print "DocumentCollection edge added = ",edge
             history = historygraphdict[documentid]
-            history.AddEdge(edge)
+            history.AddEdges([edge])
 
         for documentid in historygraphdict:
             doc = None
