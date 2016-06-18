@@ -33,7 +33,7 @@ class DocumentObject(object):
         
     def __setattr__(self, name, value):
         super(DocumentObject, self).__setattr__(name, value)
-        if name == "insetattr" or name == "parent" or name == "isreplaying" or name == "doop_field" or self.insetattr:
+        if name == "insetattr" or self.insetattr:
             return
         self.insetattr = True
         if name in self.doop_field:
