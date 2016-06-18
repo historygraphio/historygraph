@@ -40,6 +40,8 @@ class Document(DocumentObject):
         self.documentobjects = dict()
         self.currentnode = ""
         self.insetattr = False
+        self.isfrozen = False
+        self.edges_received_while_frozen = False
         
     def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
         nodeset = set()
@@ -66,7 +68,11 @@ class Document(DocumentObject):
         return self
 
     def AddEdges(self, edges):
-        #print "Document.AddEdges edge = ",edge
+        if self.isfrozen:
+            #If we are frozen just add the edge to the history graph. We will be a full replay on unfreezing
+            self.history.AddEdges(edges)
+            self.edges_received_while_frozen = True
+            return
         fullreplay = False
         startnodes = set()
         endnodes = set()
@@ -76,7 +82,9 @@ class Document(DocumentObject):
                 self.FullReplay(edges)
                 return
             startnode = list(edge.startnodes)[0]
-            assert startnode != ''
+            if startnode == '':
+                #If we received a start edge it's OK as long as it is the same as the one we already have
+                assert edge.GetEndNode() == self.history.edgesbystartnode[''][0].GetEndNode()
 
             #If any of startnodes in the list are in the history but not the current node we need to do a full replay
             
@@ -103,19 +111,15 @@ class Document(DocumentObject):
         #Play each edge in the list in sequence
         edgesdict = dict([(list(edge.startnodes)[0], edge) for edge in edges])
         while len(edgesdict) > 0:
-            #print "edgesdict = ",edgesdict
             #Get the next edge
             oldnode = self.currentnode
             edge = edgesdict[self.currentnode]
             #Play it
             self.history.AddEdges([edge])
-            #print "Before playing self.currentnode = ",self.currentnode
             edge.Replay(self)
-            #print "After playing self.currentnode = ",self.currentnode
             assert self.currentnode == edge.GetEndNode()
             assert self.currentnode != oldnode
             if edge.GetEndNode() in self.history.edgesbystartnode:
-                #print "Found in start nodes edge",edge
                 l = self.history.edgesbystartnode[edge.GetEndNode()]
                 if len(l) > 0:
                     #If multiple edge match this one we need to do a full replay
@@ -137,3 +141,17 @@ class Document(DocumentObject):
         history = self.history.Clone()
         history.AddEdges(edges)
         history.Replay(self)
+
+    def Freeze(self):
+        assert self.isfrozen == False
+        self.isfrozen = True
+        self.edges_received_while_frozen = False
+
+    def Unfreeze(self):
+        assert self.isfrozen == True
+        self.isfrozen = False
+        print "self.edges_received_while_frozen=",self.edges_received_while_frozen
+        if self.edges_received_while_frozen:
+            history = self.history.Clone()
+            history.Replay(self)
+
