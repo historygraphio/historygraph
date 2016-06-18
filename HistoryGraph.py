@@ -66,6 +66,9 @@ class HistoryGraph(object):
         for k in graph.edgesbyendnode:
             edge = graph.edgesbyendnode[k]
             self.AddEdges([edge])
+        self.ProcessGraph()
+
+    def ProcessGraph(self):
         presentnodes = set()
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
@@ -78,6 +81,8 @@ class HistoryGraph(object):
             assert len(presentnodes) == 2
             nulledge = HistoryEdgeNull(presentnodes, "", "", "", "", documentid, documentclassname)
             self.AddEdges([nulledge])
+            if len(presentnodes) > 2:
+                self.ProcessGraph()
 
     def ProcessConflictWinners(self):
         for k in self.edgesbyendnode:
@@ -94,6 +99,12 @@ class HistoryGraph(object):
                     if not edge2.HasPastEdge(k1) and not edge1.HasPastEdge(k2):
                         edge1.CompareForConflicts(edge2)
                         
+    def HasDanglingEdges(self):
+        # A sanity check a graph has dangling edges if there is more than one endnode that does not have a start node
+        # It means that a Merge needs to be run
+        startnodes = set([k for (k, v) in self.edgesbystartnode.iteritems()])
+        endnodes = set([k for (k, v) in self.edgesbyendnode.iteritems()])
+        return len(endnodes - startnodes) > 1
 
 
         

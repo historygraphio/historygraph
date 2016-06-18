@@ -140,6 +140,9 @@ class Document(DocumentObject):
     def FullReplay(self, edges):
         history = self.history.Clone()
         history.AddEdges(edges)
+        history.ProcessGraph()
+        history.RecordPastEdges()
+        history.ProcessConflictWinners()
         history.Replay(self)
 
     def Freeze(self):
@@ -150,8 +153,10 @@ class Document(DocumentObject):
     def Unfreeze(self):
         assert self.isfrozen == True
         self.isfrozen = False
-        print "self.edges_received_while_frozen=",self.edges_received_while_frozen
         if self.edges_received_while_frozen:
             history = self.history.Clone()
+            history.ProcessGraph()
+            history.RecordPastEdges()
+            history.ProcessConflictWinners()
             history.Replay(self)
 
