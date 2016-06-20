@@ -4,6 +4,7 @@ from Field import Field
 from ChangeType import *
 from FieldList import FieldList
 from operator import itemgetter
+import hashlib
 
 
 class ImmutableObject(object):
@@ -33,8 +34,15 @@ class ImmutableObject(object):
 
     def GetHash(self):
         #Immutable objects don't have UUIDs have have SHA1 hashes of their content
-        s = sorted([(k,v) for (k,v) in self.doop_field.iteritems()], key=itemgetter)
+        s = sorted([(k,v) for (k,v) in self.doop_field.iteritems()], key=itemgetter(0))
 
         return hashlib.sha256(str(s)).hexdigest()
         
-
+    def asDict(self):
+        #Return a dict suitable for transport
+        ret = dict()
+        for k in self.doop_field:
+            ret[k] = getattr(self, k)
+        ret["classname"] = self.__class__.__name__
+        ret["hash"] = self.GetHash()
+        return ret

@@ -11,6 +11,8 @@ from json import JSONEncoder, JSONDecoder
 from FieldInt import FieldInt
 from Document import Document
 from HistoryEdgeAddChild import HistoryEdgeAddChild
+from ImmutableObject import ImmutableObject
+import hashlib
 
 class DocumentCollection(object):
     def __init__(self):
@@ -25,36 +27,43 @@ class DocumentCollection(object):
         
 
     def asJSON(self):
-        ret = list()
-        for documentid in self.objects:
-            documentlist = self.objects[documentid]
-            for document in documentlist:
-                history = document.history
-                for edgeid in history.edgesbyendnode:
-                    edge = history.edgesbyendnode[edgeid]
-                    startnodes = list(edge.startnodes)
-                    if len(edge.startnodes) == 1:
-                        startnode1id = startnodes[0]
-                        startnode2id = ""
-                    elif len(edge.startnodes) == 2:
-                        startnode1id = startnodes[0]
-                        startnode2id = startnodes[1]
-                    else:
-                        assert False
-                    
-                    if edge.propertytype is None:
-                        propertytypename = ""
-                    else:
-                        propertytypename = edge.propertytype
-                    ret.append(edge.asTuple())
-                    #print "DocumentCollection edge stored = ",edge
-        return JSONEncoder().encode(ret)
+        historyedges = list()
+        immutableobjects = list()
+        for classname in self.objects:
+            documentlist = self.objects[classname]
+            if issubclass(self.classes[classname], DocumentObject):
+                for document in documentlist:
+                    history = document.history
+                    for edgeid in history.edgesbyendnode:
+                        edge = history.edgesbyendnode[edgeid]
+                        startnodes = list(edge.startnodes)
+                        if len(edge.startnodes) == 1:
+                            startnode1id = startnodes[0]
+                            startnode2id = ""
+                        elif len(edge.startnodes) == 2:
+                            startnode1id = startnodes[0]
+                            startnode2id = startnodes[1]
+                        else:
+                            assert False
+                        
+                        if edge.propertytype is None:
+                            propertytypename = ""
+                        else:
+                            propertytypename = edge.propertytype
+                        historyedges.append(edge.asTuple())
+            elif issubclass(self.classes[classname], ImmutableObject):
+                for obj in documentlist:
+                    immutableobjects.append(obj.asDict())
+            else:
+                assert False
+        return JSONEncoder().encode({"history":historyedges,"immutableobjects":immutableobjects})
 
     def LoadFromJSON(self, jsontext):
         historygraphdict = defaultdict(HistoryGraph)
         documentclassnamedict = dict()
 
-        rows = JSONDecoder().decode(jsontext)
+        rawdc = JSONDecoder().decode(jsontext)
+        rows = rawdc["history"]
 
         for row in rows:
             documentid = str(row[0])
@@ -91,9 +100,7 @@ class DocumentCollection(object):
                 startnodes = {startnode1id}
             else:
                 startnodes = {startnode1id, startnode2id}
-            #print "DocumentCollection propertytype = ",propertytype
             edge = self.historyedgeclasses[edgeclassname](startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname)
-            #print "DocumentCollection edge added = ",edge
             history = historygraphdict[documentid]
             history.AddEdges([edge])
 
@@ -121,6 +128,22 @@ class DocumentCollection(object):
             if not wasexisting:
                 self.AddDocumentObject(doc)
             
+        rows = rawdc["immutableobjects"]
+        for d in rows:
+            classname = d["classname"]
+            theclass = self.classes[classname]
+            assert issubclass(theclass, ImmutableObject)
+            thehash = d["hash"]
+            del d["classname"]
+            del d["hash"]
+            io = theclass(**d)
+            wasexisting = False
+            for io2 in self.objects[classname]:
+                if io2.GetHash() == oi.GetHash():
+                    wasexisting = True
+            if wasexisting == False:
+                self.objects[classname].append(io)
+            
        
     def GetByClass(self, theclass):
         return self.objects[theclass.__name__]
@@ -132,6 +155,11 @@ class DocumentCollection(object):
             if isinstance(propvalue, FieldList):
                 for obj2 in getattr(obj, propname):
                     assert obj2.__class__.__name__  in self.classes
+        self.objects[obj.__class__.__name__].append(obj)
+
+    def AddImmutableObject(self, obj):
+        assert isinstance(obj, ImmutableObject)
+        assert obj.__class__.__name__  in self.classes
         self.objects[obj.__class__.__name__].append(obj)
 
 
