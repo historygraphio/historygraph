@@ -78,7 +78,6 @@ class HistoryGraph(object):
                 documentid = edge.documentid
                 documentclassname = edge.documentclassname
         if len(presentnodes) > 1:
-            assert len(presentnodes) == 2
             nulledge = HistoryEdgeNull(presentnodes, "", "", "", "", documentid, documentclassname)
             self.AddEdges([nulledge])
             if len(presentnodes) > 2:
