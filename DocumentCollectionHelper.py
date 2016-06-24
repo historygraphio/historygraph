@@ -8,6 +8,8 @@ from HistoryEdge import HistoryEdge
 from HistoryGraph import HistoryGraph
 from FieldList import FieldList
 from FieldInt import FieldInt
+from DocumentObject import DocumentObject
+from ImmutableObject import ImmutableObject
 
 def SaveDocumentCollection(dc, filenameedges, filenamedata):
     try:
@@ -28,32 +30,30 @@ def SaveDocumentCollection(dc, filenameedges, filenamedata):
                     propertytype text
                 )''')
     c.execute("DELETE FROM edge")
-    for documentid in dc.objects:
-        documentlist = dc.objects[documentid]
-        for document in documentlist:
-            history = document.history
-            for edgeid in history.edgesbyendnode:
-                edge = history.edgesbyendnode[edgeid]
-                startnodes = list(edge.startnodes)
-                if len(edge.startnodes) == 1:
-                    startnode1id = startnodes[0]
-                    startnode2id = ""
-                elif len(edge.startnodes) == 2:
-                    startnode1id = startnodes[0]
-                    startnode2id = startnodes[1]
-                else:
-                    assert False
-                
-                if edge.propertytype is None:
-                    propertytypename = ""
-                else:
-                    propertytypename = edge.propertytype
-                c.execute("INSERT INTO edge VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (document.id, document.__class__.__name__, 
-                    edge.__class__.__name__, startnode1id, startnode2id, edge.propertyownerid, edge.propertyname,
-                    edge.propertyvalue, propertytypename))
-                #c.execute("INSERT INTO edge VALUES ('" + document.id + "', '" + document.__class__.__name__ + "', '" + edge.__class__.__name__ + "', '" + edge.edgeid + "', " +
-                #    "'" + startnode1id + "', '" + startnode2id + "', '" + edge.endnode + "', '" + edge.propertyownerid + "', '" + edge.propertyname + "', '" + str(edge.propertyvalue) + "', "
-                #    "'" + propertytypename + "')")
+    for classname in dc.objects:
+        if issubclass(dc.classes[classname], DocumentObject):
+            documentlist = dc.objects[classname]
+            for document in documentlist:
+                history = document.history
+                for edgeid in history.edgesbyendnode:
+                    edge = history.edgesbyendnode[edgeid]
+                    startnodes = list(edge.startnodes)
+                    if len(edge.startnodes) == 1:
+                        startnode1id = startnodes[0]
+                        startnode2id = ""
+                    elif len(edge.startnodes) == 2:
+                        startnode1id = startnodes[0]
+                        startnode2id = startnodes[1]
+                    else:
+                        assert False
+                    
+                    if edge.propertytype is None:
+                        propertytypename = ""
+                    else:
+                        propertytypename = edge.propertytype
+                    c.execute("INSERT INTO edge VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (document.id, document.__class__.__name__, 
+                        edge.__class__.__name__, startnode1id, startnode2id, edge.propertyownerid, edge.propertyname,
+                        edge.propertyvalue, propertytypename))
 
     c.commit()
     c.close()
@@ -119,7 +119,13 @@ def SaveDocumentObject(database, documentobject, parentobject, foreignkeydict, c
         else:
             values.append(getattr(documentobject, columnname))
     sql += ")"
-    database.execute(sql, tuple([documentobject.id] + values))
+    if isinstance(documentobject, DocumentObject):
+        database.execute(sql, tuple([documentobject.id] + values))
+    elif isinstance(documentobject, ImmutableObject):
+        database.execute(sql, tuple([documentobject.GetHash()] + values))
+    else:
+        assert False
+
 
 def GetSQLObjects(documentcollection, filenamedata, query):
     database = sqlite3.connect(filenamedata)
@@ -131,8 +137,14 @@ def GetSQLObjects(documentcollection, filenamedata, query):
     for row in rows:
         for classname in documentcollection.objects:
             for obj in documentcollection.objects[classname]:
-                if obj.id == row[0]:
-                    ret.append(obj)
+                if isinstance(obj, DocumentObject):
+                    if obj.id == row[0]:
+                        ret.append(obj)
+                elif isinstance(obj, ImmutableObject):
+                    if obj.GetHash() == row[0]:
+                        ret.append(obj)
+                else:
+                    assert False
     return ret
         
 def LoadDocumentCollection(dc, filenameedges, filenamedata):
@@ -212,6 +224,28 @@ def LoadDocumentCollection(dc, filenameedges, filenamedata):
     #
     #SaveEdges(dc, filenameedges, nulledges)
 
-    return sqlite3.connect(filenamedata) #Return the database that can used for get sql objects
+    #Load all of the immutable objects
 
+    c = sqlite3.connect(filenamedata) #Return the database that can used for get sql objects
 
+    for (classname, theclass) in dc.classes.iteritems():
+        if issubclass(theclass, ImmutableObject):
+            variables = [a for a in dir(theclass.__class__) if not a.startswith('__') and not callable(getattr(theclass.__class__,a))]
+            sql = "SELECT id"
+            for v in variables:
+                sql += ", " + v
+            sql += " FROM " + theclass.__name__
+
+            cur = c.cursor()    
+            cur.execute(sql)
+
+            rows = cur.fetchall()
+            d = dict()
+            for row in rows:
+                for i in range(len(variables)):
+                    d[variables[i]] = row[i + 1]
+            obj = theclass(**d)
+            assert obj.GetHash() == row[0]
+            dc.AddImmutableObject(obj)
+
+    return c

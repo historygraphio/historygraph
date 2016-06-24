@@ -19,6 +19,7 @@ class DocumentObject(object):
     def __init__(self, id):
         self.insetattr = True
         self.doop_field = dict()
+        self.change_handlers = list()
         self.parent = None
         if id is None:
             id = str(uuid.uuid4())
@@ -40,6 +41,8 @@ class DocumentObject(object):
             if type(self.doop_field[name]) != FieldList:
                 self.WasChanged(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self.doop_field[name].GetTypeName())
         self.insetattr = False
+        for h in self.change_handlers:
+            h(self)
          
     def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
         if self.parent is not None:
@@ -57,4 +60,10 @@ class DocumentObject(object):
 
     def __str__(self):
         return '\n'.join([str(k) + ':' + str(getattr(self, k)) for k in self.doop_field])
+
+    def AddHandler(self, h):
+        self.change_handlers.append(h)
+
+    def RemoveHandler(self, h):
+        self.change_handlers.remove(h)
 
