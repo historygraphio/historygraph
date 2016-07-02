@@ -13,14 +13,17 @@ from Document import Document
 from HistoryEdgeAddChild import HistoryEdgeAddChild
 from ImmutableObject import ImmutableObject
 import hashlib
+import uuid
 
 class DocumentCollection(object):
     def __init__(self):
+        self.id = str(uuid.uuid4())
         self.objects = defaultdict(list)
         self.classes = dict()
         self.historyedgeclasses = dict()
         for theclass in HistoryEdge.__subclasses__():
             self.historyedgeclasses[theclass.__name__] = theclass
+        self.listeners = list()
 
     def Register(self, theclass):
         self.classes[theclass.__name__] = theclass
@@ -156,12 +159,31 @@ class DocumentCollection(object):
                 for obj2 in getattr(obj, propname):
                     assert obj2.__class__.__name__  in self.classes
         self.objects[obj.__class__.__name__].append(obj)
+        obj.AddEdgesListener(self)
+        for l in self.listeners:
+            l.AddDocumentObject(self, obj)
 
     def AddImmutableObject(self, obj):
         assert isinstance(obj, ImmutableObject)
         assert obj.__class__.__name__  in self.classes
         self.objects[obj.__class__.__name__].append(obj)
 
+    def AddListener(self, listener):
+        self.listeners.append(listener)
+
+    def GetObjectByID(self, classname, id):
+        matches = [a for a in self.objects[classname] if a.id == id]
+        if len(matches) == 1:
+            return matches[0]
+        elif len(matches) == 0:
+            return None
+        else:
+            assert False
+
+    def EdgesAdded(self, edges):
+        for l in self.listeners:
+            l.EdgesAdded(self, edges)
+        
 
 documentcollection = None
 

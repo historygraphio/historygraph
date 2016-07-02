@@ -42,6 +42,7 @@ class Document(DocumentObject):
         self.insetattr = False
         self.isfrozen = False
         self.edges_received_while_frozen = False
+        self.edgeslistener = list()
         
     def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
         nodeset = set()
@@ -57,6 +58,8 @@ class Document(DocumentObject):
         #print "Document edge created = ",edge
         self.currentnode = edge.GetEndNode()
         self.history.AddEdges([edge])
+        for l in self.edgeslistener:
+            l.EdgesAdded([edge])
 
     def GetDocumentObject(self, id):
         if id == self.id:
@@ -159,4 +162,9 @@ class Document(DocumentObject):
             history.RecordPastEdges()
             history.ProcessConflictWinners()
             history.Replay(self)
+            edges = history.GetAllEdges()
+            for l in self.edgeslistener:
+                l.EdgesAdded(edges)
 
+    def AddEdgesListener(self, listener):
+        self.edgeslistener.append(listener)

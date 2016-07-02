@@ -105,5 +105,8 @@ class HistoryGraph(object):
         endnodes = set([k for (k, v) in self.edgesbyendnode.iteritems()])
         return len(endnodes - startnodes) > 1
 
+    def GetAllEdges(self):
+        return [v for (k, v) in self.edgesbyendnode.iteritems()]
+        
 
         
