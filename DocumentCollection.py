@@ -167,6 +167,8 @@ class DocumentCollection(object):
         assert isinstance(obj, ImmutableObject)
         assert obj.__class__.__name__  in self.classes
         self.objects[obj.__class__.__name__].append(obj)
+        for l in self.listeners:
+            l.ImmutableObjectAdded(self, obj)
 
     def AddListener(self, listener):
         self.listeners.append(listener)
