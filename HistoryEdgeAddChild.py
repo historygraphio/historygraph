@@ -13,19 +13,13 @@ class HistoryEdgeAddChild(HistoryEdge):
         self.propertytype = propertytype
 
     def Replay(self, doc):
-        import DocumentCollection
-        #print "DocumentCollection.documentcollection.classes = ",DocumentCollection.documentcollection.classes
-        newobj = DocumentCollection.documentcollection.classes[self.propertytype](self.propertyvalue)
+        newobj = doc.dc.classes[self.propertytype](self.propertyvalue)
         doc.documentobjects[newobj.id] = newobj
         if isinstance(self, HistoryEdgeAddChild) and self.propertyownerid == "" and self.propertyname == "":
             pass #There is no parent object and this edge is creating a stand alone object
         else:
             parent = doc.GetDocumentObject(self.propertyownerid)
             getattr(parent, self.propertyname).add(newobj)
-        #parent = doc.GetDocumentObject(self.propertyownerid)
-        #newobj = self.propertytype(self.propertyvalue)
-        #getattr(parent, self.propertyname).add(newobj)
-        #doc.documentobjects[newobj.id] = newobj
 
     def Clone(self):
         return HistoryEdgeAddChild(self.startnodes, 

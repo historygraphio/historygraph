@@ -32,8 +32,8 @@ def SaveDocumentCollection(dc, filenameedges, filenamedata):
     c.execute("DELETE FROM edge")
     for classname in dc.objects:
         if issubclass(dc.classes[classname], DocumentObject):
-            documentlist = dc.objects[classname]
-            for document in documentlist:
+            documentdict = dc.objects[classname]
+            for (documentid, document) in documentdict.iteritems():
                 history = document.history
                 for edgeid in history.edgesbyendnode:
                     edge = history.edgesbyendnode[edgeid]
@@ -91,7 +91,8 @@ def SaveDocumentCollection(dc, filenameedges, filenamedata):
         database.execute(sql)
     
     for documentid in dc.objects:
-        SaveDocumentObject(database, dc.objects[documentid][0], None, foreignkeydict, columndict)
+        objlist = [obj for (objid, obj) in dc.objects[documentid].iteritems()]
+        SaveDocumentObject(database, objlist[0], None, foreignkeydict, columndict)
 
     database.commit()
 
@@ -136,7 +137,7 @@ def GetSQLObjects(documentcollection, filenamedata, query):
     rows = cur.fetchall()
     for row in rows:
         for classname in documentcollection.objects:
-            for obj in documentcollection.objects[classname]:
+            for (objid, obj) in documentcollection.objects[classname].iteritems():
                 if isinstance(obj, DocumentObject):
                     if obj.id == row[0]:
                         ret.append(obj)
@@ -148,7 +149,7 @@ def GetSQLObjects(documentcollection, filenamedata, query):
     return ret
         
 def LoadDocumentCollection(dc, filenameedges, filenamedata):
-    dc.objects = defaultdict(list)
+    dc.objects = defaultdict(dict)
     #dc.classes = dict()
     dc.historyedgeclasses = dict()
     for theclass in HistoryEdge.__subclasses__():
@@ -217,6 +218,7 @@ def LoadDocumentCollection(dc, filenameedges, filenamedata):
     #nulledges = list()
     for documentid in historygraphdict:
         doc = dc.classes[documentclassnamedict[documentid]](documentid)
+        doc.dc = dc
         history = historygraphdict[documentid]
     #    nulledges.extend(history.MergeDanglingBranches())
         history.Replay(doc)

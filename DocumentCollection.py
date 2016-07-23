@@ -18,7 +18,7 @@ import uuid
 class DocumentCollection(object):
     def __init__(self):
         self.id = str(uuid.uuid4())
-        self.objects = defaultdict(list)
+        self.objects = defaultdict(dict)
         self.classes = dict()
         self.historyedgeclasses = dict()
         for theclass in HistoryEdge.__subclasses__():
@@ -33,9 +33,9 @@ class DocumentCollection(object):
         historyedges = list()
         immutableobjects = list()
         for classname in self.objects:
-            documentlist = self.objects[classname]
+            documentdict = self.objects[classname]
             if issubclass(self.classes[classname], DocumentObject):
-                for document in documentlist:
+                for (documentid, document) in documentdict.iteritems():
                     history = document.history
                     for edgeid in history.edgesbyendnode:
                         edge = history.edgesbyendnode[edgeid]
@@ -55,7 +55,7 @@ class DocumentCollection(object):
                             propertytypename = edge.propertytype
                         historyedges.append(edge.asTuple())
             elif issubclass(self.classes[classname], ImmutableObject):
-                for obj in documentlist:
+                for (objid, obj) in documentdict.iteritems():
                     immutableobjects.append(obj.asDict())
             else:
                 assert False
@@ -111,12 +111,13 @@ class DocumentCollection(object):
             doc = None
             wasexisting = False
             if documentclassnamedict[documentid] in self.objects:
-                for d2 in self.objects[documentclassnamedict[documentid]]:
+                for (d2id, d2) in self.objects[documentclassnamedict[documentid]].iteritems():
                     if d2.id == documentid:
                         doc = d2
                         wasexisting = True
             if doc is None:
                 doc = self.classes[documentclassnamedict[documentid]](documentid)
+                doc.dc = self
                 assert len(doc.history.edgesbyendnode) == 0
 
             #Make a copy of self's history
@@ -141,24 +142,27 @@ class DocumentCollection(object):
             del d["hash"]
             io = theclass(**d)
             wasexisting = False
-            for io2 in self.objects[classname]:
+            for (io2id, io2) in self.objects[classname].iteritems():
                 if io2.GetHash() == oi.GetHash():
                     wasexisting = True
             if wasexisting == False:
-                self.objects[classname].append(io)
+                self.objects[classname][io.GetHash()] = io
             
        
     def GetByClass(self, theclass):
-        return self.objects[theclass.__name__]
+        return [obj for (objid, obj) in self.objects[theclass.__name__].iteritems()]
+
     def AddDocumentObject(self, obj):
         assert isinstance(obj, DocumentObject)
+        obj.GetDocument().dc = self
         assert obj.__class__.__name__  in self.classes
         for propname in obj.doop_field:
             propvalue = obj.doop_field[propname]
             if isinstance(propvalue, FieldList):
                 for obj2 in getattr(obj, propname):
                     assert obj2.__class__.__name__  in self.classes
-        self.objects[obj.__class__.__name__].append(obj)
+        wasfound = False
+        self.objects[obj.__class__.__name__][obj.id] = obj
         obj.AddEdgesListener(self)
         for l in self.listeners:
             l.AddDocumentObject(self, obj)
@@ -166,7 +170,7 @@ class DocumentCollection(object):
     def AddImmutableObject(self, obj):
         assert isinstance(obj, ImmutableObject)
         assert obj.__class__.__name__  in self.classes
-        self.objects[obj.__class__.__name__].append(obj)
+        self.objects[obj.__class__.__name__][obj.GetHash()] = obj
         for l in self.listeners:
             l.ImmutableObjectAdded(self, obj)
 
@@ -174,6 +178,8 @@ class DocumentCollection(object):
         self.listeners.append(listener)
 
     def GetObjectByID(self, classname, id):
+        return self.objects[classname][id]
+        """
         matches = [a for a in self.objects[classname] if a.id == id]
         if len(matches) == 1:
             return matches[0]
@@ -181,16 +187,11 @@ class DocumentCollection(object):
             return None
         else:
             assert False
+        """
 
     def EdgesAdded(self, edges):
         for l in self.listeners:
             l.EdgesAdded(self, edges)
         
-
-documentcollection = None
-
-def InitialiseDocumentCollection():
-    global documentcollection
-    documentcollection = DocumentCollection()
 
 

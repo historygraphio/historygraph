@@ -15,6 +15,7 @@ class Document(DocumentObject):
         ret = self.__class__(self.id)
         ret.CopyDocumentObject(self)
         ret.history = self.history.Clone()
+        ret.dc = self.dc
         ret.currentnode = self.currentnode
         return ret
 
@@ -29,6 +30,7 @@ class Document(DocumentObject):
         history.ProcessConflictWinners()
         #Create the return object and replay the history in to it
         ret = self.__class__(self.id)
+        ret.dc = self.dc
         history.Replay(ret)
         return ret
 
@@ -39,10 +41,11 @@ class Document(DocumentObject):
         self.history = HistoryGraph()
         self.documentobjects = dict()
         self.currentnode = ""
-        self.insetattr = False
+        self.dc = None #The document collection this document belongs to
         self.isfrozen = False
         self.edges_received_while_frozen = False
         self.edgeslistener = list()
+        self.insetattr = False
         
     def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
         nodeset = set()
