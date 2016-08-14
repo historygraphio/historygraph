@@ -232,7 +232,7 @@ def LoadDocumentCollection(dc, filenameedges, filenamedata):
 
     for (classname, theclass) in dc.classes.iteritems():
         if issubclass(theclass, ImmutableObject):
-            variables = [a for a in dir(theclass.__class__) if not a.startswith('__') and not callable(getattr(theclass.__class__,a))]
+            variables = [a for a in dir(theclass) if not a.startswith('__') and not callable(getattr(theclass,a))]
             sql = "SELECT id"
             for v in variables:
                 sql += ", " + v

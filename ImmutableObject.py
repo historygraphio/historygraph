@@ -20,7 +20,9 @@ class ImmutableObject(object):
             if isinstance(var, Field):
                 setattr(self, k, var.CreateInstance(self, k))
                 if k in kwargs:
-                    setattr(self, k, kwargs[k])         
+                    setattr(self, k, kwargs[k])
+        self._prevhash = kwargs['_prevhash'] if '_prevhash' in kwargs else ''
+            
         self.insetup = False
         
     def __setattr__(self, name, value):
@@ -34,7 +36,7 @@ class ImmutableObject(object):
 
     def GetHash(self):
         #Immutable objects don't have UUIDs have have SHA1 hashes of their content
-        s = sorted([(k,v) for (k,v) in self.doop_field.iteritems()], key=itemgetter(0))
+        s = sorted([(k,str(getattr(self, k))) for (k,v) in self.doop_field.iteritems()], key=itemgetter(0)) + [('_prevhash', str(self._prevhash))]
 
         return hashlib.sha256(str(s)).hexdigest()
         
@@ -43,6 +45,7 @@ class ImmutableObject(object):
         ret = dict()
         for k in self.doop_field:
             ret[k] = getattr(self, k)
+        ret["_prevhash"] = self._prevhash
         ret["classname"] = self.__class__.__name__
         ret["hash"] = self.GetHash()
         return ret
