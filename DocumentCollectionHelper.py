@@ -7,7 +7,7 @@ from collections import defaultdict
 from HistoryEdge import HistoryEdge
 from HistoryGraph import HistoryGraph
 from FieldList import FieldList
-from FieldInt import FieldInt
+from FieldIntRegister import FieldInt
 from DocumentObject import DocumentObject
 from ImmutableObject import ImmutableObject
 

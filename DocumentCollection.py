@@ -8,7 +8,7 @@ from DocumentObject import DocumentObject
 from FieldList import FieldList
 from HistoryGraph import HistoryGraph
 from json import JSONEncoder, JSONDecoder
-from FieldInt import FieldInt
+from FieldIntRegister import FieldInt
 from Document import Document
 from HistoryEdgeAddChild import HistoryEdgeAddChild
 from ImmutableObject import ImmutableObject

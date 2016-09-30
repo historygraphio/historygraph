@@ -1,6 +1,6 @@
 #An edge that changes a value in a document
 from HistoryEdge import HistoryEdge
-from FieldInt import FieldInt
+from FieldIntRegister import FieldInt
 
 class HistoryEdgeSimpleProperty(HistoryEdge):
     def __init__(self, startnodes, propertyownerid,
