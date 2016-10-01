@@ -7,7 +7,7 @@ from collections import defaultdict
 from HistoryEdge import HistoryEdge
 from HistoryGraph import HistoryGraph
 from FieldList import FieldList
-from FieldIntRegister import FieldInt
+from FieldIntRegister import FieldIntRegister
 from DocumentObject import DocumentObject
 from ImmutableObject import ImmutableObject
 
@@ -76,7 +76,7 @@ def SaveDocumentCollection(dc, filenameedges, filenamedata):
         variables = [a for a in dir(theclass) if not a.startswith('__') and not callable(getattr(theclass,a))]
         for a in variables:
             if isinstance(getattr(theclass, a), FieldList) == False:
-                columndict[classname].append((a, "int" if isinstance(getattr(theclass, a), FieldInt) else "text"))
+                columndict[classname].append((a, "int" if isinstance(getattr(theclass, a), FieldIntRegister) else "text"))
     for k in foreignkeydict:
         for (classname, a) in foreignkeydict[k]:
             columndict[k].append((classname + "id", "text"))
@@ -194,7 +194,7 @@ def LoadDocumentCollection(dc, filenameedges, filenamedata):
             historygraph = HistoryGraph()
             historygraphdict[documentid] = historygraph
             documentclassnamedict[documentid] = documentclassname
-        if propertytypestr == "FieldInt" or propertytypestr == "int":
+        if propertytypestr == "FieldIntRegister" or propertytypestr == "int":
             propertytype = int
             propertyvalue = int(propertyvaluestr)
         elif propertytypestr == "FieldText":

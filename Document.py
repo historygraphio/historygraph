@@ -7,6 +7,7 @@ from HistoryEdgeSimpleProperty import HistoryEdgeSimpleProperty
 from HistoryEdgeAddChild import HistoryEdgeAddChild
 from HistoryEdgeRemoveChild import HistoryEdgeRemoveChild
 from HistoryEdgeNull import HistoryEdgeNull
+from HistoryEdgeAddIntCounter import HistoryEdgeAddIntCounter
 
 class Document(DocumentObject):
     def Clone(self):
@@ -56,6 +57,8 @@ class Document(DocumentObject):
             edge = HistoryEdgeAddChild(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         elif changetype == ChangeType.REMOVE_CHILD:
             edge = HistoryEdgeRemoveChild(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
+        elif changetype == ChangeType.ADD_INT_COUNTER:
+            edge = HistoryEdgeAddIntCounter(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         else:
             assert False
         #print "Document edge created = ",edge

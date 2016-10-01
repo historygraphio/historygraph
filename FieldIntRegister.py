@@ -1,7 +1,7 @@
-#An integer field in DOOP
+#An integer register field in DOOP
 from Field import Field
 
-class FieldInt(Field):
+class FieldIntRegister(Field):
     def CreateInstance(self, owner, name):
         return 0
 

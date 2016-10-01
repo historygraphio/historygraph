@@ -8,7 +8,7 @@ from DocumentObject import DocumentObject
 from FieldList import FieldList
 from HistoryGraph import HistoryGraph
 from json import JSONEncoder, JSONDecoder
-from FieldIntRegister import FieldInt
+from FieldIntRegister import FieldIntRegister
 from Document import Document
 from HistoryEdgeAddChild import HistoryEdgeAddChild
 from ImmutableObject import ImmutableObject
@@ -85,7 +85,7 @@ class DocumentCollection(object):
                 historygraph = HistoryGraph()
                 historygraphdict[documentid] = historygraph
                 documentclassnamedict[documentid] = documentclassname
-            if propertytypestr == "int":
+            if propertytypestr == "int" or propertytypestr == "FieldIntCounter":
                 propertytype = int
                 propertyvalue = int(propertyvaluestr)
             elif propertytypestr == "basestring":

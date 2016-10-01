@@ -3,6 +3,7 @@ import uuid
 from Field import Field
 from ChangeType import *
 from FieldList import FieldList
+from FieldIntCounter import FieldIntCounter
 
 class DocumentObject(object):
     def Clone(self):
@@ -38,7 +39,7 @@ class DocumentObject(object):
             return
         self.insetattr = True
         if name in self.doop_field:
-            if type(self.doop_field[name]) != FieldList:
+            if type(self.doop_field[name]) != FieldList and type(self.doop_field[name]) != FieldIntCounter:
                 self.WasChanged(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self.doop_field[name].GetTypeName())
         self.insetattr = False
         for h in self.change_handlers:
