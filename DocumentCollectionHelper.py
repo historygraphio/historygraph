@@ -236,7 +236,7 @@ def LoadDocumentCollection(dc, filenameedges, filenamedata):
             sql = "SELECT id"
             for v in variables:
                 sql += ", " + v
-            sql += " FROM " + theclass.__name__
+            sql += " FROM " + theclass.__name__.lower()
 
             cur = c.cursor()    
             cur.execute(sql)
@@ -246,8 +246,8 @@ def LoadDocumentCollection(dc, filenameedges, filenamedata):
             for row in rows:
                 for i in range(len(variables)):
                     d[variables[i]] = row[i + 1]
-            obj = theclass(**d)
-            assert obj.GetHash() == row[0]
-            dc.AddImmutableObject(obj)
+                obj = theclass(**d)
+                assert obj.GetHash() == row[0]
+                dc.AddImmutableObject(obj)
 
     return c
