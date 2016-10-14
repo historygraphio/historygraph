@@ -10,6 +10,7 @@ from FieldList import FieldList
 from FieldIntRegister import FieldIntRegister
 from DocumentObject import DocumentObject
 from ImmutableObject import ImmutableObject
+from FieldIntCounter import FieldIntCounter
 
 def SaveDocumentCollection(dc, filenameedges, filenamedata):
     try:
@@ -95,6 +96,7 @@ def SaveDocumentCollection(dc, filenameedges, filenamedata):
         SaveDocumentObject(database, objlist[0], None, foreignkeydict, columndict)
 
     database.commit()
+    database.close()
 
 def SaveDocumentObject(database, documentobject, parentobject, foreignkeydict, columndict):
     variables = [a for a in dir(documentobject.__class__) if not a.startswith('__') and not callable(getattr(documentobject.__class__,a))]
@@ -117,10 +119,15 @@ def SaveDocumentObject(database, documentobject, parentobject, foreignkeydict, c
         
         if foreignkeyclassname != "" and foreignkeyclassname + "id" == columnname:
             values.append(parentobject.id)
+        elif type(getattr(documentobject, columnname)) == FieldIntCounter.FieldIntCounterImpl:
+            values.append(getattr(documentobject, columnname).value)
         else:
             values.append(getattr(documentobject, columnname))
     sql += ")"
     if isinstance(documentobject, DocumentObject):
+        #print "values=",values
+        #print "type(values)=",type(values)
+        #print "tuple([documentobject.id] + values)=",tuple([documentobject.id] + values)
         database.execute(sql, tuple([documentobject.id] + values))
     elif isinstance(documentobject, ImmutableObject):
         database.execute(sql, tuple([documentobject.GetHash()] + values))
@@ -197,7 +204,7 @@ def LoadDocumentCollection(dc, filenameedges, filenamedata):
         if propertytypestr == "FieldIntRegister" or propertytypestr == "int":
             propertytype = int
             propertyvalue = int(propertyvaluestr)
-        elif propertytypestr == "FieldText":
+        elif propertytypestr == "FieldText" or propertytypestr == "basestring":
             propertytype = basestring
             propertyvalue = str(propertyvaluestr)
         elif propertytypestr == "" and edgeclassname == "HistoryEdgeNull":
@@ -217,6 +224,7 @@ def LoadDocumentCollection(dc, filenameedges, filenamedata):
 
     #nulledges = list()
     for documentid in historygraphdict:
+        #print "Creating doc id = ",documentid
         doc = dc.classes[documentclassnamedict[documentid]](documentid)
         doc.dc = dc
         history = historygraphdict[documentid]
