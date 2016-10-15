@@ -6,7 +6,7 @@ import os
 from collections import defaultdict
 from HistoryEdge import HistoryEdge
 from HistoryGraph import HistoryGraph
-from FieldList import FieldList
+from FieldCollection import FieldCollection
 from FieldIntRegister import FieldIntRegister
 from DocumentObject import DocumentObject
 from ImmutableObject import ImmutableObject
@@ -70,14 +70,14 @@ def SaveDocumentCollection(dc, filenameedges, filenamedata):
         theclass = dc.classes[classname]
         variables = [a for a in dir(theclass) if not a.startswith('__') and not callable(getattr(theclass,a))]
         for a in variables:
-            if isinstance(getattr(theclass, a), FieldList):
+            if isinstance(getattr(theclass, a), FieldCollection):
                 foreignkeydict[getattr(theclass, a).theclass.__name__].append((classname, a))
     columndict = defaultdict(list)
     for classname in dc.classes:
         theclass = dc.classes[classname]
         variables = [a for a in dir(theclass) if not a.startswith('__') and not callable(getattr(theclass,a))]
         for a in variables:
-            if isinstance(getattr(theclass, a), FieldList) == False:
+            if isinstance(getattr(theclass, a), FieldCollection) == False:
                 columndict[classname].append((a, "int" if isinstance(getattr(theclass, a), FieldIntRegister) else "text"))
     for k in foreignkeydict:
         for (classname, a) in foreignkeydict[k]:
@@ -102,7 +102,7 @@ def SaveDocumentCollection(dc, filenameedges, filenamedata):
 def SaveDocumentObject(database, documentobject, parentobject, foreignkeydict, columndict):
     variables = [a for a in dir(documentobject.__class__) if not a.startswith('__') and not callable(getattr(documentobject.__class__,a))]
     for a in variables:
-        if isinstance(getattr(documentobject.__class__, a), FieldList):
+        if isinstance(getattr(documentobject.__class__, a), FieldCollection):
             for childobj in getattr(documentobject, a):
                 SaveDocumentObject(database, childobj, documentobject, foreignkeydict, columndict)
     foreignkeyclassname = ""

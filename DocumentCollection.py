@@ -5,7 +5,7 @@ from HistoryEdgeRemoveChild import HistoryEdgeRemoveChild
 from HistoryEdgeNull import HistoryEdgeNull
 from HistoryEdge import HistoryEdge
 from DocumentObject import DocumentObject
-from FieldList import FieldList
+from FieldCollection import FieldCollection
 from HistoryGraph import HistoryGraph
 from json import JSONEncoder, JSONDecoder
 from FieldIntRegister import FieldIntRegister
@@ -163,7 +163,7 @@ class DocumentCollection(object):
         assert obj.__class__.__name__  in self.classes
         for propname in obj.doop_field:
             propvalue = obj.doop_field[propname]
-            if isinstance(propvalue, FieldList):
+            if isinstance(propvalue, FieldCollection):
                 for obj2 in getattr(obj, propname):
                     assert obj2.__class__.__name__  in self.classes
         wasfound = False

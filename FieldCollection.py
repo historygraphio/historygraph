@@ -2,8 +2,8 @@
 from Field import Field
 from ChangeType import ChangeType
 
-class FieldList(Field):
-    class FieldListImpl(object):
+class FieldCollection(Field):
+    class FieldCollectionImpl(object):
         def __init__(self, theclass, parent, name):
             self.theclass = theclass
             self.parent = parent
@@ -38,7 +38,7 @@ class FieldList(Field):
                 yield doc.documentobjects[item]
 
         def Clone(self, owner, name):
-            ret = FieldList.FieldListImpl(self.theclass, owner, name)
+            ret = FieldCollection.FieldCollectionImpl(self.theclass, owner, name)
             srcdoc = self.parent.GetDocument()
             for objid in self.l:
                 srcobj = srcdoc.documentobjects[objid]
@@ -49,7 +49,7 @@ class FieldList(Field):
     def __init__(self, theclass):
         self.theclass = theclass
     def CreateInstance(self, owner, name):
-        return FieldList.FieldListImpl(self.theclass, owner, name)
+        return FieldCollection.FieldCollectionImpl(self.theclass, owner, name)
 
     def Clone(self, name, src, owner):
         return getattr(src, name).Clone(owner, name)

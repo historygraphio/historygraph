@@ -2,7 +2,7 @@
 import uuid
 from Field import Field
 from ChangeType import *
-from FieldList import FieldList
+from FieldCollection import FieldCollection
 from operator import itemgetter
 import hashlib
 
@@ -16,7 +16,7 @@ class ImmutableObject(object):
         for k in variables:
             var = getattr(self.__class__, k)
             self.doop_field[k] = var
-            assert isinstance(var, FieldList) == False #Immutable objects not allow references to other objects just use a FieldText as a key
+            assert isinstance(var, FieldCollection) == False #Immutable objects not allow references to other objects just use a FieldText as a key
             if isinstance(var, Field):
                 setattr(self, k, var.CreateInstance(self, k))
                 if k in kwargs:

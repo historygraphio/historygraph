@@ -2,7 +2,7 @@
 import uuid
 from Field import Field
 from ChangeType import *
-from FieldList import FieldList
+from FieldCollection import FieldCollection
 from FieldIntCounter import FieldIntCounter
 
 class DocumentObject(object):
@@ -10,7 +10,7 @@ class DocumentObject(object):
         ret = self.__class__(self.id)
         ret.CopyDocumentObject(self)
         for prop in self.doop_field:
-            if isinstance(prop, FieldList):
+            if isinstance(prop, FieldCollection):
                 retlist = ret.getattr(prop.name)
                 retlist.empty()
                 for obj in prop:
@@ -39,7 +39,7 @@ class DocumentObject(object):
             return
         self.insetattr = True
         if name in self.doop_field:
-            if type(self.doop_field[name]) != FieldList and type(self.doop_field[name]) != FieldIntCounter:
+            if type(self.doop_field[name]) != FieldCollection and type(self.doop_field[name]) != FieldIntCounter:
                 self.WasChanged(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self.doop_field[name].GetTypeName())
         self.insetattr = False
         for h in self.change_handlers:
