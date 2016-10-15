@@ -23,6 +23,7 @@ def SaveDocumentCollection(dc, filenameedges, filenamedata):
                     documentid text, 
                     documentclassname text, 
                     edgeclassname text, 
+                    endnodeid text, 
                     startnode1id text, 
                     startnode2id text, 
                     propertyownerid text, 
@@ -52,8 +53,8 @@ def SaveDocumentCollection(dc, filenameedges, filenamedata):
                         propertytypename = ""
                     else:
                         propertytypename = edge.propertytype
-                    c.execute("INSERT INTO edge VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (document.id, document.__class__.__name__, 
-                        edge.__class__.__name__, startnode1id, startnode2id, edge.propertyownerid, edge.propertyname,
+                    c.execute("INSERT INTO edge VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (document.id, document.__class__.__name__, 
+                        edge.__class__.__name__, edge.GetEndNode(), startnode1id, startnode2id, edge.propertyownerid, edge.propertyname,
                         edge.propertyvalue, propertytypename))
 
     c.commit()
@@ -168,17 +169,16 @@ def LoadDocumentCollection(dc, filenameedges, filenamedata):
                     documentid text, 
                     documentclassname text, 
                     edgeclassname text, 
-                    edgeid text PRIMARY KEY, 
+                    endnodeid text PRIMARY KEY, 
                     startnode1id text, 
                     startnode2id text, 
-                    endnodeid text, 
                     propertyownerid text, 
                     propertyname text, 
                     propertyvalue text, 
                     propertytype text
                 )''')
     c.commit()
-    cur.execute("SELECT documentid, documentclassname, edgeclassname, startnode1id, startnode2id, propertyownerid, propertyname, propertyvalue, propertytype FROM edge")
+    cur.execute("SELECT documentid, documentclassname, edgeclassname, endnodeid, startnode1id, startnode2id, propertyownerid, propertyname, propertyvalue, propertytype FROM edge")
 
     historygraphdict = defaultdict(HistoryGraph)
     documentclassnamedict = dict()
@@ -188,12 +188,13 @@ def LoadDocumentCollection(dc, filenameedges, filenamedata):
         documentid = str(row[0])
         documentclassname = str(row[1])
         edgeclassname = str(row[2])
-        startnode1id = str(row[3])
-        startnode2id = str(row[4])
-        propertyownerid = str(row[5])
-        propertyname = str(row[6])
-        propertyvaluestr = str(row[7])
-        propertytypestr = str(row[8])
+        endnodeid = str(row[3])
+        startnode1id = str(row[4])
+        startnode2id = str(row[5])
+        propertyownerid = str(row[6])
+        propertyname = str(row[7])
+        propertyvaluestr = str(row[8])
+        propertytypestr = str(row[9])
 
         if documentid in historygraphdict:
             historygraph = historygraphdict[documentid]
@@ -201,7 +202,7 @@ def LoadDocumentCollection(dc, filenameedges, filenamedata):
             historygraph = HistoryGraph()
             historygraphdict[documentid] = historygraph
             documentclassnamedict[documentid] = documentclassname
-        if propertytypestr == "FieldIntRegister" or propertytypestr == "int":
+        if propertytypestr == "FieldIntRegister" or propertytypestr == "FieldIntCounter" or propertytypestr == "int":
             propertytype = int
             propertyvalue = int(propertyvaluestr)
         elif propertytypestr == "FieldText" or propertytypestr == "basestring":
@@ -228,7 +229,10 @@ def LoadDocumentCollection(dc, filenameedges, filenamedata):
         doc = dc.classes[documentclassnamedict[documentid]](documentid)
         doc.dc = dc
         history = historygraphdict[documentid]
+        #print ("len(history.edgesbyendnode)=",len(history.edgesbyendnode))
     #    nulledges.extend(history.MergeDanglingBranches())
+        history.RecordPastEdges()
+        history.ProcessConflictWinners()
         history.Replay(doc)
         dc.AddDocumentObject(doc)
     #

@@ -44,6 +44,7 @@ class HistoryGraph(object):
     def ReplayEdges(self, doc, edge):
         if edge.CanReplay(self) == False:
             return
+        #print "Playing edge = ", edge.asDict()
         edge.Replay(doc)
         edge.isplayed = True
         edges = self.edgesbystartnode[edge.GetEndNode()]
