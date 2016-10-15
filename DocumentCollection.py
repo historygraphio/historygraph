@@ -30,7 +30,7 @@ class DocumentCollection(object):
         self.classes[theclass.__name__] = theclass
         
 
-    def asJSON(self):
+    def getAllEdges(self):
         historyedges = list()
         immutableobjects = list()
         for classname in self.objects:
@@ -46,6 +46,7 @@ class DocumentCollection(object):
                             startnode2id = ""
                         elif len(edge.startnodes) == 2:
                             startnode1id = startnodes[0]
+
                             startnode2id = startnodes[1]
                         else:
                             assert False
@@ -60,6 +61,10 @@ class DocumentCollection(object):
                     immutableobjects.append(obj.asDict())
             else:
                 assert False
+        return (historyedges, immutableobjects)
+
+    def asJSON(self):
+        (historyedges, immutableobjects) = self.getAllEdges()
         return JSONEncoder().encode({"history":historyedges,"immutableobjects":immutableobjects})
 
     def LoadFromJSON(self, jsontext):
@@ -107,7 +112,7 @@ class DocumentCollection(object):
             else:
                 startnodes = {startnode1id, startnode2id}
             edge = self.historyedgeclasses[edgeclassname](startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname)
-            #utils.log_output("LoadFromJSON edge.asTuple() = ",edge.asTuple())
+            #print "LoadFromJSON edge.asTuple() = ",edge.asTuple()
             assert edge.GetEndNode() == endnodeid
             history = historygraphdict[documentid]
             history.AddEdges([edge])
@@ -148,7 +153,7 @@ class DocumentCollection(object):
             io = theclass(**d)
             wasexisting = False
             for (io2id, io2) in self.objects[classname].iteritems():
-                if io2.GetHash() == oi.GetHash():
+                if io2.GetHash() == io.GetHash():
                     wasexisting = True
             if wasexisting == False:
                 self.objects[classname][io.GetHash()] = io
