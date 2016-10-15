@@ -1,5 +1,6 @@
 #The base class for edges in DOOP
 import hashlib
+import utils
 
 class HistoryEdge(object):
     def __init__(self, startnodes, documentid, documentclassname):
@@ -64,16 +65,24 @@ class HistoryEdge(object):
         return str(self.asDict())
 
     def GetEndNode(self):
-        s = ("classname",self.__class__.__name__,
-            "startnodes",list(self.startnodes),
-            "propertyownerid",self.propertyownerid,
+        startnodes = list(self.startnodes)
+        startnode1id = startnodes[0]
+        if len(startnodes) > 1:
+            startnode2id = startnodes[1]
+        else:
+            startnode2id = ""
+        s = ("classname",str(self.__class__.__name__),
+            "startnode1",str(startnode1id),
+            "startnode2",str(startnode2id),
+            "propertyownerid",str(self.propertyownerid),
 
-            "propertyvalue",self.propertyvalue,
-            "propertyname",self.propertyname,
-            "propertytype",self.propertytype,
-            "documentid",self.documentid,
-            "documentclassname",self.documentclassname,
+            "propertyvalue",str(self.propertyvalue),
+            "propertyname",str(self.propertyname),
+            "propertytype",str(self.propertytype),
+            "documentid",str(self.documentid),
+            "documentclassname",str(self.documentclassname),
          )
+        #utils.log_output("GetEndNode s = ",str(s))
         return hashlib.sha256(str(s)).hexdigest()
 
     def asTuple(self):
@@ -84,6 +93,14 @@ class HistoryEdge(object):
             startnode2id = startnodes[1]
         else:
             startnode2id = ""
-        return (self.documentid, self.documentclassname, self.__class__.__name__, startnode1id, startnode2id, self.propertyownerid, self.propertyname, 
-                        str(self.propertyvalue), self.propertytype)
+        return (str(self.documentid),
+                str(self.documentclassname),
+                str(self.__class__.__name__),
+                str(self.GetEndNode()),
+                str(startnode1id),
+                str(startnode2id),
+                str(self.propertyownerid),
+                str(self.propertyname), 
+                str(self.propertyvalue),
+                str(self.propertytype))
     

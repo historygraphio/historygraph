@@ -14,6 +14,7 @@ from HistoryEdgeAddChild import HistoryEdgeAddChild
 from ImmutableObject import ImmutableObject
 import hashlib
 import uuid
+import utils
 
 class DocumentCollection(object):
     def __init__(self):
@@ -62,6 +63,7 @@ class DocumentCollection(object):
         return JSONEncoder().encode({"history":historyedges,"immutableobjects":immutableobjects})
 
     def LoadFromJSON(self, jsontext):
+        #utils.log_output("LoadFromJSON jsontext = ", jsontext)
         historygraphdict = defaultdict(HistoryGraph)
         documentclassnamedict = dict()
 
@@ -72,12 +74,13 @@ class DocumentCollection(object):
             documentid = str(row[0])
             documentclassname = str(row[1])
             edgeclassname = str(row[2])
-            startnode1id = str(row[3])
-            startnode2id = str(row[4])
-            propertyownerid = str(row[5])
-            propertyname = str(row[6])
-            propertyvaluestr = str(row[7])
-            propertytypestr = str(row[8])
+            endnodeid = str(row[3])
+            startnode1id = str(row[4])
+            startnode2id = str(row[5])
+            propertyownerid = str(row[6])
+            propertyname = str(row[7])
+            propertyvaluestr = str(row[8])
+            propertytypestr = str(row[9])
 
             if documentid in historygraphdict:
                 historygraph = historygraphdict[documentid]
@@ -104,6 +107,8 @@ class DocumentCollection(object):
             else:
                 startnodes = {startnode1id, startnode2id}
             edge = self.historyedgeclasses[edgeclassname](startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname)
+            #utils.log_output("LoadFromJSON edge.asTuple() = ",edge.asTuple())
+            assert edge.GetEndNode() == endnodeid
             history = historygraphdict[documentid]
             history.AddEdges([edge])
 
