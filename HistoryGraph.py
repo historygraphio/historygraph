@@ -110,5 +110,9 @@ class HistoryGraph(object):
     def GetAllEdges(self):
         return [v for (k, v) in self.edgesbyendnode.iteritems()]
         
-
+    def depth(self, currentnode):
+        if currentnode == '':
+            return 0
+        else:
+            return self.edgesbyendnode[currentnode].depth(self)
         

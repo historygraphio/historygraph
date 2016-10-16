@@ -178,3 +178,6 @@ class Document(DocumentObject):
     def Clean(self):
         for (propname, prop) in self.doop_field.items():
             prop.Clean(self, propname)
+
+    def depth(self):
+        return self.history.depth(self.currentnode)

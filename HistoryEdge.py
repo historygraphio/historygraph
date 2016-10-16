@@ -104,3 +104,17 @@ class HistoryEdge(object):
                 str(self.propertyvalue),
                 str(self.propertytype))
     
+    def depth(self, historygraph):
+        startnodes = list(self.startnodes)
+        if len(startnodes) == 1:
+            if startnodes[0] == '':
+                return 1
+            else:
+                return historygraph.edgesbyendnode[startnodes[0]].depth(historygraph) + 1
+        elif len(self.startnodes) == 2:
+            depth1 = historygraph.edgesbyendnode[startnodes[0]].depth(historygraph) + 1
+            depth2 = historygraph.edgesbyendnode[startnodes[1]].depth(historygraph) + 1
+            return max(depth1, depth2)
+        else:
+            assert False
+
