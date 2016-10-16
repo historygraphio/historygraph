@@ -23,6 +23,7 @@ class HistoryGraph(object):
 
     def Replay(self, doc):
         self.isreplaying = True
+        doc.Clean()
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
             edge.isplayed = False

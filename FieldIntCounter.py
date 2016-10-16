@@ -1,6 +1,7 @@
 #An integer register field in DOOP
 from Field import Field
 from ChangeType import ChangeType
+import utils
 
 class FieldIntCounter(Field):
     class FieldIntCounterImpl(object):
@@ -10,6 +11,7 @@ class FieldIntCounter(Field):
             self.value = 0
 
         def add(self, change):
+            utils.log_output("Add ", change, " to field ", self.name, " in ", self)
             self.value += change
             self.WasChanged(ChangeType.ADD_INT_COUNTER, self.parent.id, self.name, change, "FieldIntCounter")
 
@@ -29,6 +31,9 @@ class FieldIntCounter(Field):
             ret.value = self.value
             return ret
 
+        def Clean(self):
+            self.value = 0
+
 
     def CreateInstance(self, owner, name):
         return FieldIntCounter.FieldIntCounterImpl(owner, name)
@@ -39,5 +44,6 @@ class FieldIntCounter(Field):
     def TranslateFromString(self, s):
         return int(s)
 
-
+    def Clean(self, owner, name):
+        return getattr(owner, name).Clean()
 

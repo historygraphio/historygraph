@@ -14,4 +14,6 @@ class FieldText(Field):
     def GetTypeName(self):
         return "basestring"
 
-
+    def Clean(self, owner, name):
+        pass
+    

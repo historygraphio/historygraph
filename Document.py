@@ -174,3 +174,7 @@ class Document(DocumentObject):
 
     def AddEdgesListener(self, listener):
         self.edgeslistener.append(listener)
+
+    def Clean(self):
+        for (propname, prop) in self.doop_field.items():
+            prop.Clean(self, propname)

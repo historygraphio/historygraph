@@ -14,4 +14,5 @@ class FieldIntRegister(Field):
     def GetTypeName(self):
         return "int"
 
-
+    def Clean(self, owner, name):
+        pass

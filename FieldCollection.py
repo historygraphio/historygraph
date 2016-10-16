@@ -45,6 +45,9 @@ class FieldCollection(Field):
                 ret.add(srcobj.Clone())
             return ret
 
+        def Clean(self):
+            self.l = set()
+
 
     def __init__(self, theclass):
         self.theclass = theclass
@@ -54,4 +57,5 @@ class FieldCollection(Field):
     def Clone(self, name, src, owner):
         return getattr(src, name).Clone(owner, name)
 
-
+    def Clean(self, owner, name):
+        return getattr(owner, name).Clean()
