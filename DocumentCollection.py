@@ -113,7 +113,7 @@ class DocumentCollection(object):
                 startnodes = {startnode1id, startnode2id}
             edge = self.historyedgeclasses[edgeclassname](startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname)
             #print "LoadFromJSON edge.asTuple() = ",edge.asTuple()
-            assert edge.GetEndNode() == endnodeid
+            assert edge.GetEndNode() == endnodeid, "edge.GetEndNode() == endnodeid failed edge.GetEndNode() = " + str(edge.GetEndNode()) + " endnodeid = " + str(endnodeid)
             history = historygraphdict[documentid]
             history.AddEdges([edge])
 

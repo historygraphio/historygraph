@@ -2,6 +2,7 @@
 from Field import Field
 from ChangeType import ChangeType
 import uuid
+from json import JSONEncoder, JSONDecoder
 
 class FieldList(Field):
     class ListNode(object):
@@ -35,10 +36,21 @@ class FieldList(Field):
             if hasattr(self, "_rendered_list"):
                 delattr(self, "_rendered_list")
                 
-            self.WasChanged(ChangeType.ADD_CHILD, self.parent.id, self.name, str((added_node.id, added_node.parent, added_node.data)), obj.__class__.__name__)
+            self.WasChanged(ChangeType.ADD_LISTITEM, self.parent.id, self.name, JSONEncoder().encode((obj.id, added_node.id, added_node.parent, added_node.timestamp, added_node.data)), obj.__class__.__name__)
 
         def remove(self, index):
+            self.Render()
             node = self._rendered_list[index] # Get the node we are deleting
+            self.remove_by_node(node)
+
+        def remove_by_nodeid(self, objid):
+            for node in self._listnodes:
+                if node.id == objid:
+                    self.remove_by_node(node)
+                    return
+            assert False
+
+        def remove_by_node(self, node):
             obj = node.obj
             self._tombstones.add(node.id)
             if hasattr(self, "_rendered_list"):
@@ -46,7 +58,7 @@ class FieldList(Field):
 
             obj = self.parent.GetDocument().documentobjects[obj.id]
             del self.parent.GetDocument().documentobjects[obj.id]
-            self.WasChanged(ChangeType.REMOVE_CHILD, self.parent.id, self.name, node.id, obj.__class__.__name__)            
+            self.WasChanged(ChangeType.REMOVE_LISTITEM, self.parent.id, self.name, node.id, obj.__class__.__name__)            
 
         def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             assert isinstance(propertyownerid, basestring)
@@ -66,12 +78,9 @@ class FieldList(Field):
         #        yield doc.documentobjects[item]
 
         def Clone(self, owner, name):
-            assert False
             ret = FieldList.FieldListImpl(self.theclass, owner, name)
-            srcdoc = self.parent.GetDocument()
-            for objid in self.l:
-                srcobj = srcdoc.documentobjects[objid]
-                ret.add(srcobj.Clone())
+            ret._listnodes = list(self._listnodes)
+            ret._tombstones = set(self._tombstones)
             return ret
 
         def Clean(self):
@@ -111,7 +120,6 @@ class FieldList(Field):
         return FieldList.FieldListImpl(self.theclass, owner, name)
 
     def Clone(self, name, src, owner):
-        assert False
         return getattr(src, name).Clone(owner, name)
 
     def Clean(self, owner, name):

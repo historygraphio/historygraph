@@ -4,6 +4,7 @@ from Field import Field
 from ChangeType import *
 from FieldCollection import FieldCollection
 from FieldIntCounter import FieldIntCounter
+from FieldList import FieldList
 
 class DocumentObject(object):
     def Clone(self):
@@ -39,7 +40,7 @@ class DocumentObject(object):
             return
         self.insetattr = True
         if name in self.doop_field:
-            if type(self.doop_field[name]) != FieldCollection and type(self.doop_field[name]) != FieldIntCounter:
+            if type(self.doop_field[name]) != FieldCollection and type(self.doop_field[name]) != FieldIntCounter and type(self.doop_field[name]) != FieldList:
                 self.WasChanged(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self.doop_field[name].GetTypeName())
         self.insetattr = False
         for h in self.change_handlers:
