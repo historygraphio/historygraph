@@ -24,6 +24,7 @@ class FieldList(Field):
             self._tombstones = set()
 
         def insert(self, index, obj):
+            assert isinstance(obj, self.theclass)
             obj.parent = self
             self.parent.GetDocument().documentobjects[obj.id] = obj
             index = index - 1
