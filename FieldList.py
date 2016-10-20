@@ -18,6 +18,7 @@ class FieldList(Field):
         def __init__(self, theclass, parent, name):
             self.theclass = theclass
             self.parent = parent
+            assert self.parent is not None
             self.name = name
             self._listnodes = list()
             self._tombstones = set()
@@ -110,12 +111,15 @@ class FieldList(Field):
             # Sort the nodes in timestamp then id order
             return sorted(l, key=lambda n: (-n.timestamp, n.id))
 
-            
+        def GetDocument(self):
+            #Return the document
+            return self.parent.GetDocument()
             
 
 
     def __init__(self, theclass):
         self.theclass = theclass
+
     def CreateInstance(self, owner, name):
         return FieldList.FieldListImpl(self.theclass, owner, name)
 

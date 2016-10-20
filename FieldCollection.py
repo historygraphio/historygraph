@@ -48,6 +48,10 @@ class FieldCollection(Field):
         def Clean(self):
             self.l = set()
 
+        def GetDocument(self):
+            #Return the document
+            return self.parent.GetDocument()
+
 
     def __init__(self, theclass):
         self.theclass = theclass
