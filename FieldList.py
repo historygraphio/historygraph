@@ -33,7 +33,7 @@ class FieldList(Field):
                 self._listnodes.append(added_node)
             else:
                 self.Render()
-                added_node = FieldList.ListNode(self._rendered_list[0].id, self.parent.GetDocument().depth(), obj.id, obj)
+                added_node = FieldList.ListNode(self._rendered_list[index].id, self.parent.GetDocument().depth(), obj.id, obj)
                 self._listnodes.append(added_node)
             if hasattr(self, "_rendered_list"):
                 delattr(self, "_rendered_list")

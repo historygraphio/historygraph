@@ -11,6 +11,8 @@ from FieldIntRegister import FieldIntRegister
 from DocumentObject import DocumentObject
 from ImmutableObject import ImmutableObject
 from FieldIntCounter import FieldIntCounter
+from FieldList import FieldList
+from Document import Document
 
 def SaveDocumentCollection(dc, filenameedges, filenamedata):
     try:
@@ -33,7 +35,7 @@ def SaveDocumentCollection(dc, filenameedges, filenamedata):
                 )''')
     c.execute("DELETE FROM edge")
     for classname in dc.objects:
-        if issubclass(dc.classes[classname], DocumentObject):
+        if issubclass(dc.classes[classname], Document):
             documentdict = dc.objects[classname]
             for (documentid, document) in documentdict.iteritems():
                 history = document.history
@@ -70,14 +72,14 @@ def SaveDocumentCollection(dc, filenameedges, filenamedata):
         theclass = dc.classes[classname]
         variables = [a for a in dir(theclass) if not a.startswith('__') and not callable(getattr(theclass,a))]
         for a in variables:
-            if isinstance(getattr(theclass, a), FieldCollection):
+            if isinstance(getattr(theclass, a), FieldCollection) or isinstance(getattr(theclass, a), FieldList):
                 foreignkeydict[getattr(theclass, a).theclass.__name__].append((classname, a))
     columndict = defaultdict(list)
     for classname in dc.classes:
         theclass = dc.classes[classname]
         variables = [a for a in dir(theclass) if not a.startswith('__') and not callable(getattr(theclass,a))]
         for a in variables:
-            if isinstance(getattr(theclass, a), FieldCollection) == False:
+            if isinstance(getattr(theclass, a), FieldCollection) == False and isinstance(getattr(theclass, a), FieldList) == False:
                 columndict[classname].append((a, "int" if isinstance(getattr(theclass, a), FieldIntRegister) else "text"))
     for k in foreignkeydict:
         for (classname, a) in foreignkeydict[k]:
@@ -92,9 +94,14 @@ def SaveDocumentCollection(dc, filenameedges, filenamedata):
 
         database.execute(sql)
     
+    already_saved = set()
     for documentid in dc.objects:
-        objlist = [obj for (objid, obj) in dc.objects[documentid].iteritems()]
-        SaveDocumentObject(database, objlist[0], None, foreignkeydict, columndict)
+        objlist = [obj for (objid, obj) in dc.objects[documentid].iteritems() if (isinstance(obj, Document) or isinstance(obj, ImmutableObject))]
+        for obj in objlist:
+            if isinstance(obj, ImmutableObject):
+                SaveDocumentObject(database, obj, None, foreignkeydict, columndict)
+            else:
+                SaveDocumentObject(database, obj, obj.GetDocument(), foreignkeydict, columndict)
 
     database.commit()
     database.close()
@@ -102,7 +109,7 @@ def SaveDocumentCollection(dc, filenameedges, filenamedata):
 def SaveDocumentObject(database, documentobject, parentobject, foreignkeydict, columndict):
     variables = [a for a in dir(documentobject.__class__) if not a.startswith('__') and not callable(getattr(documentobject.__class__,a))]
     for a in variables:
-        if isinstance(getattr(documentobject.__class__, a), FieldCollection):
+        if isinstance(getattr(documentobject.__class__, a), FieldCollection) or isinstance(getattr(documentobject.__class__, a), FieldList):
             for childobj in getattr(documentobject, a):
                 SaveDocumentObject(database, childobj, documentobject, foreignkeydict, columndict)
     foreignkeyclassname = ""
