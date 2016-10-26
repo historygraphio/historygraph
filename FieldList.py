@@ -40,6 +40,9 @@ class FieldList(Field):
                 
             self.WasChanged(ChangeType.ADD_LISTITEM, self.parent.id, self.name, JSONEncoder().encode((obj.id, added_node.id, added_node.parent, added_node.timestamp, added_node.data)), obj.__class__.__name__)
 
+        def append(self, obj):
+            self.insert(len(self), obj)
+
         def remove(self, index):
             self.Render()
             node = self._rendered_list[index] # Get the node we are deleting
