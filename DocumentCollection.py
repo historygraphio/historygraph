@@ -144,6 +144,7 @@ class DocumentCollection(object):
             
         rows = rawdc["immutableobjects"]
         for d in rows:
+            #print "Docuemnt Collection LoadFromJSON received Imutable Object=",d
             classname = d["classname"]
             theclass = self.classes[classname]
             assert issubclass(theclass, ImmutableObject)
@@ -154,8 +155,11 @@ class DocumentCollection(object):
             wasexisting = False
             for (io2id, io2) in self.objects[classname].iteritems():
                 if io2.GetHash() == io.GetHash():
+                    #print "We already have this object ignoring io2=",io2.asDict()
+                    #print "self.objects[classname]=",self.objects[classname]
                     wasexisting = True
             if wasexisting == False:
+                #print "Object not found adding"
                 self.objects[classname][io.GetHash()] = io
             
        
