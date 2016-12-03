@@ -1,7 +1,7 @@
 #An integer register field in DOOP
 from Field import Field
 from ChangeType import ChangeType
-import utils
+#import utils
 
 class FieldIntCounter(Field):
     class FieldIntCounterImpl(object):

@@ -1,6 +1,6 @@
 #The base class for edges in DOOP
 import hashlib
-import utils
+#import utils
 
 class HistoryEdge(object):
     def __init__(self, startnodes, documentid, documentclassname):

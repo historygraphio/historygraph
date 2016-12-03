@@ -14,7 +14,7 @@ from HistoryEdgeAddChild import HistoryEdgeAddChild
 from ImmutableObject import ImmutableObject
 import hashlib
 import uuid
-import utils
+#import utils
 
 class DocumentCollection(object):
     def __init__(self):
