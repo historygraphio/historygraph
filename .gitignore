@@ -26,3 +26,11 @@ _$*
 *.ln
 core
 # CVS default ignores end
+
+# Virtual env guff
+bin/
+lib/
+include/
+local/
+share/
+pip-selfcheck.json
