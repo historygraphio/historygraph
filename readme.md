@@ -15,7 +15,7 @@ pip install -r requirements.txt
 
 To run the unittests
 
-python -m unittest discover tests
+python -m unittest discover
 
 
 
