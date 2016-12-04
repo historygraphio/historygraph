@@ -1,6 +1,6 @@
 #A list of sub objects in doop
-from Field import Field
-from ChangeType import ChangeType
+from field import Field
+from changetype import ChangeType
 import uuid
 from json import JSONEncoder, JSONDecoder
 

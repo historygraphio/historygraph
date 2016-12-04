@@ -1,5 +1,5 @@
 #A DOOP edge that removes a child
-from HistoryEdge import HistoryEdge
+from historyedge import HistoryEdge
 
 class HistoryEdgeRemoveChild(HistoryEdge):
     def __init__(self, startnodes, propertyownerid,

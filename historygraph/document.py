@@ -1,15 +1,15 @@
 #A DOOP document
-from DocumentObject import DocumentObject
+from documentobject import DocumentObject
 import uuid
-from HistoryGraph import HistoryGraph
-from ChangeType import ChangeType
-from HistoryEdgeSimpleProperty import HistoryEdgeSimpleProperty
-from HistoryEdgeAddChild import HistoryEdgeAddChild
-from HistoryEdgeRemoveChild import HistoryEdgeRemoveChild
-from HistoryEdgeNull import HistoryEdgeNull
-from HistoryEdgeAddIntCounter import HistoryEdgeAddIntCounter
-from HistoryEdgeAddListItem import HistoryEdgeAddListItem
-from HistoryEdgeRemoveListItem import HistoryEdgeRemoveListItem
+from historygraph import HistoryGraph
+from changetype import ChangeType
+from historyedgesimpleproperty import HistoryEdgeSimpleProperty
+from historyedgeaddchild import HistoryEdgeAddChild
+from historyedgeremovechild import HistoryEdgeRemoveChild
+from historyedgenull import HistoryEdgeNull
+from historyedgeaddintcounter import HistoryEdgeAddIntCounter
+from historyedgeaddlistitem import HistoryEdgeAddListItem
+from historyedgeremovelistitem import HistoryEdgeRemoveListItem
 
 class Document(DocumentObject):
     def Clone(self):

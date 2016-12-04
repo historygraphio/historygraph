@@ -1,17 +1,17 @@
 #This module handles storing all documents in the database (and reloading)
 from collections import defaultdict
-from HistoryEdgeSimpleProperty import HistoryEdgeSimpleProperty
-from HistoryEdgeRemoveChild import HistoryEdgeRemoveChild
-from HistoryEdgeNull import HistoryEdgeNull
-from HistoryEdge import HistoryEdge
-from DocumentObject import DocumentObject
-from FieldCollection import FieldCollection
-from HistoryGraph import HistoryGraph
+from historyedgesimpleproperty import HistoryEdgeSimpleProperty
+from historyedgeremovechild import HistoryEdgeRemoveChild
+from historyedgenull import HistoryEdgeNull
+from historyedge import HistoryEdge
+from documentobject import DocumentObject
+from fieldcollection import FieldCollection
+from historygraph import HistoryGraph
 from json import JSONEncoder, JSONDecoder
-from FieldIntRegister import FieldIntRegister
-from Document import Document
-from HistoryEdgeAddChild import HistoryEdgeAddChild
-from ImmutableObject import ImmutableObject
+from fieldintregister import FieldIntRegister
+from document import Document
+from historyedgeaddchild import HistoryEdgeAddChild
+from immutableobject import ImmutableObject
 import hashlib
 import uuid
 #import utils

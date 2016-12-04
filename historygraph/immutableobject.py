@@ -1,8 +1,8 @@
 #A DOOP Immutable Object
 import uuid
-from Field import Field
-from ChangeType import *
-from FieldCollection import FieldCollection
+from field import Field
+from changetype import *
+from fieldcollection import FieldCollection
 from operator import itemgetter
 import hashlib
 

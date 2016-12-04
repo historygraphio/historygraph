@@ -1,5 +1,5 @@
 #A text field in a DOOP object
-from Field import Field
+from field import Field
 
 class FieldText(Field):
     def CreateInstance(self, owner, name):

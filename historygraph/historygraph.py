@@ -1,7 +1,7 @@
 #A DOOP history graph
 from collections import defaultdict
 import uuid
-from HistoryEdgeNull import HistoryEdgeNull
+from historyedgenull import HistoryEdgeNull
 
 class HistoryGraph(object):
     def __init__(self):
@@ -32,13 +32,17 @@ class HistoryGraph(object):
         self.ReplayEdges(doc, l[0])
         doc.history = self.Clone()
         self.isreplaying = False
+        assert doc.currentnode in self.edgesbyendnode, doc.currentnode + ' not found'
+        assert doc.currentnode in doc.history.edgesbyendnode, doc.currentnode + ' not found'
 
     def Clone(self):
         ret = HistoryGraph()
         edgeclones = list()
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
-            edgeclones.append(edge.Clone())
+            edge2 = edge.Clone()
+            edgeclones.append(edge2)
+            assert edge.GetEndNode() == edge2.GetEndNode(), 'Mismatch edge = ' + repr(edge.asDict()) + ', edge2 = ' + repr(edge2.asDict())
         ret.AddEdges(edgeclones)
         return ret
 
@@ -114,5 +118,7 @@ class HistoryGraph(object):
         if currentnode == '':
             return 0
         else:
+            if currentnode not in self.edgesbyendnode:
+                print 'self.edgesbyendnode=',[e.asTuple() for e in self.edgesbyendnode.values()]
             return self.edgesbyendnode[currentnode].depth(self)
         

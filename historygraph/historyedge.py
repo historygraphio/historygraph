@@ -4,7 +4,7 @@ import hashlib
 
 class HistoryEdge(object):
     def __init__(self, startnodes, documentid, documentclassname):
-        self.startnodes = startnodes
+        self.startnodes = sorted(startnodes)
         self.inactive = False
         self.played = False
         self.documentid = documentid

@@ -1,6 +1,6 @@
 #A list of sub objects in doop
-from Field import Field
-from ChangeType import ChangeType
+from field import Field
+from changetype import ChangeType
 
 class FieldCollection(Field):
     class FieldCollectionImpl(object):

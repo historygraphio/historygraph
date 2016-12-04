@@ -1,7 +1,7 @@
 #The edge representing adding a child object in DOOP
-from HistoryEdge import HistoryEdge
+from historyedge import HistoryEdge
 from json import JSONEncoder, JSONDecoder
-from FieldList import FieldList
+from fieldlist import FieldList
 
 class HistoryEdgeRemoveListItem(HistoryEdge):
     def __init__(self, startnodes, propertyownerid,
