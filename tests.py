@@ -1066,5 +1066,55 @@ class FieldListMergeTestCase(unittest.TestCase):
         assert test2.propertyowner2s[0].GetDocument().id == test1.id
         assert test2.propertyowner2s[0].propertyowner2s[0].GetDocument().id == test1.id
 
+class TestColofCols3(DocumentObject):
+    comment = FieldText()
+
+class TestColofCol2(DocumentObject):
+    cover = FieldIntRegister()
+    quantity = FieldIntRegister()
+    propertyowner2s = FieldCollection(TestColofCols3)
+
+class TestColofCol1(Document):
+    covers = FieldIntRegister()
+    propertyowner2s = FieldCollection(TestColofCol2)
 
 
+class FieldCollofCollMergeTestCase(unittest.TestCase):
+    # Test each individual function in the FieldList and FieldListImpl classes
+    def runTest(self):
+        dc = DocumentCollection()
+        dc.Register(TestColofCol1)
+        dc.Register(TestColofCol2)
+        dc.Register(TestColofCols3)
+        test1 = TestColofCol1(None)
+        dc.AddDocumentObject(test1)
+        l0 = TestColofCol2(None)
+        l1 = TestColofCol2(None)
+        test1.propertyowner2s.add(l0)
+        test1.propertyowner2s.add(l1)
+
+        ll0 = TestColofCols3(None)
+        l0.propertyowner2s.add(ll0)
+
+        assert {l.id for l in test1.propertyowner2s} == {l0.id, l1.id}
+        for l in test1.propertyowner2s:
+            assert l.GetDocument().id == test1.id
+            for l2 in l.propertyowner2s:
+                assert l2.GetDocument().id == test1.id
+
+        ll0.comment = 'Hello'
+
+        dc2 = DocumentCollection()
+        dc2.Register(TestColofCol1)
+        dc2.Register(TestColofCol2)
+        dc2.Register(TestColofCols3)
+        test2 = TestColofCol1(test1.id)
+        dc2.AddDocumentObject(test2)
+        test1.history.Replay(test2)
+
+        assert {l.id for l in test1.propertyowner2s} == {l0.id, l1.id}
+        for l in test1.propertyowner2s:
+            assert l.GetDocument().id == test1.id
+            for l2 in l.propertyowner2s:
+                assert l2.GetDocument().id == test1.id
+                assert l2.comment == 'Hello'
