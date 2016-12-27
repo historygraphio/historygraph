@@ -1046,6 +1046,8 @@ class FieldListMergeTestCase(unittest.TestCase):
         assert test1.propertyowner2s[0].id == l0.id
         assert test1.propertyowner2s[1].id == l1.id
         assert test1.propertyowner2s[0].propertyowner2s[0].id == ll0.id
+        assert test1.propertyowner2s[0].propertyowner2s[0].GetDocument().id == test1.id
+        assert test1.propertyowner2s[0].GetDocument().id == test1.id
 
         ll0.comment = 'Hello'
 
@@ -1061,4 +1063,8 @@ class FieldListMergeTestCase(unittest.TestCase):
         assert test2.propertyowner2s[1].id == l1.id
         assert test2.propertyowner2s[0].propertyowner2s[0].id == ll0.id
         assert test2.propertyowner2s[0].propertyowner2s[0].comment == 'Hello'
+        assert test2.propertyowner2s[0].GetDocument().id == test1.id
+        assert test2.propertyowner2s[0].propertyowner2s[0].GetDocument().id == test1.id
+
+
 

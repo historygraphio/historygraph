@@ -27,6 +27,7 @@ class HistoryEdgeAddListItem(HistoryEdge):
             assert False # We can never create stand alone object this way
         else:
             parent = doc.GetDocumentObject(self.propertyownerid)
+            newobj.parent = parent
             flImpl = getattr(parent, self.propertyname)
             if hasattr(flImpl, "_rendered_list"):
                 delattr(flImpl, "_rendered_list")
