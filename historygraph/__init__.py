@@ -8,3 +8,5 @@ from fieldintcounter import FieldIntCounter
 from immutableobject import ImmutableObject
 from fieldlist import FieldList
 from historyedgenull import HistoryEdgeNull
+from historyedge import HistoryEdge
+from historygraph import HistoryGraph
