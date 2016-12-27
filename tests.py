@@ -1013,3 +1013,52 @@ class FieldListMergeTestCase(unittest.TestCase):
         self.assertEqual(test3.propertyowner2s[1].id, l2.id)
         
 
+class TestListofLists3(DocumentObject):
+    comment = FieldText()
+
+class TestListofLists2(DocumentObject):
+    cover = FieldIntRegister()
+    quantity = FieldIntRegister()
+    propertyowner2s = FieldList(TestListofLists3)
+
+class TestListofLists1(Document):
+    covers = FieldIntRegister()
+    propertyowner2s = FieldList(TestListofLists2)
+
+
+class FieldListMergeTestCase(unittest.TestCase):
+    # Test each individual function in the FieldList and FieldListImpl classes
+    def runTest(self):
+        dc = DocumentCollection()
+        dc.Register(TestListofLists1)
+        dc.Register(TestListofLists2)
+        dc.Register(TestListofLists3)
+        test1 = TestListofLists1(None)
+        dc.AddDocumentObject(test1)
+        l0 = TestListofLists2(None)
+        l1 = TestListofLists2(None)
+        test1.propertyowner2s.insert(0, l0)
+        test1.propertyowner2s.insert(1, l1)
+
+        ll0 = TestListofLists3(None)
+        l0.propertyowner2s.insert(0, ll0)
+
+        assert test1.propertyowner2s[0].id == l0.id
+        assert test1.propertyowner2s[1].id == l1.id
+        assert test1.propertyowner2s[0].propertyowner2s[0].id == ll0.id
+
+        ll0.comment = 'Hello'
+
+        dc2 = DocumentCollection()
+        dc2.Register(TestListofLists1)
+        dc2.Register(TestListofLists2)
+        dc2.Register(TestListofLists3)
+        test2 = TestListofLists1(test1.id)
+        dc2.AddDocumentObject(test2)
+        test1.history.Replay(test2)
+
+        assert test2.propertyowner2s[0].id == l0.id
+        assert test2.propertyowner2s[1].id == l1.id
+        assert test2.propertyowner2s[0].propertyowner2s[0].id == ll0.id
+        assert test2.propertyowner2s[0].propertyowner2s[0].comment == 'Hello'
+
