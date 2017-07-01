@@ -1,4 +1,5 @@
 #A list of sub objects in doop
+# From work by Marek Zawirski https://twitter.com/zzzawir/status/757635463536578560
 from field import Field
 from changetype import ChangeType
 import uuid
