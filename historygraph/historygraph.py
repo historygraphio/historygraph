@@ -1,4 +1,4 @@
-#A DOOP history graph
+#A HistoryGraph
 from collections import defaultdict
 import uuid
 from historyedgenull import HistoryEdgeNull

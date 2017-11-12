@@ -1,4 +1,4 @@
-#A DOOP edge that removes a child
+#A HistoryGraph edge that removes a child
 from historyedge import HistoryEdge
 
 class HistoryEdgeRemoveChild(HistoryEdge):

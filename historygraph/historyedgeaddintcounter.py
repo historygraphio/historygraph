@@ -9,7 +9,6 @@ class HistoryEdgeAddIntCounter(HistoryEdge):
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring), "propertytype should be basestring but it actually is " + str(type(propertytype))
         assert propertytype == 'int' or propertytype == 'basestring' or propertytype == 'FieldIntCounter', "Expected int or basestring for property type, actually got " + propertytype
-        #assert isinstance(propertyvalue, basestring)
         self.propertyownerid = propertyownerid
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
@@ -19,7 +18,7 @@ class HistoryEdgeAddIntCounter(HistoryEdge):
         if self.inactive:
             return
         edgeobject = doc.GetDocumentObject(self.propertyownerid)
-        field = edgeobject.doop_field[self.propertyname]
+        field = edgeobject._field[self.propertyname]
         getattr(edgeobject, self.propertyname).add(field.TranslateFromString(self.propertyvalue))
 
     def Clone(self):
@@ -28,7 +27,7 @@ class HistoryEdgeAddIntCounter(HistoryEdge):
                 self.propertytype, self.documentid, self.documentclassname)
 
     def GetConflictWinner(self, edge2):
-        return 0 # Counter CFRDT edges can never conflict
+        return 0 # Counter CRDT edges can never conflict
 
     def GetEdgeDescription(self):
         #Return a description of the edgeuseful for debugging purposes

@@ -170,8 +170,8 @@ class DocumentCollection(object):
         assert isinstance(obj, DocumentObject)
         obj.GetDocument().dc = self
         assert obj.__class__.__name__  in self.classes
-        for propname in obj.doop_field:
-            propvalue = obj.doop_field[propname]
+        for propname in obj._field:
+            propvalue = obj._field[propname]
             if isinstance(propvalue, FieldCollection):
                 for obj2 in getattr(obj, propname):
                     assert obj2.__class__.__name__  in self.classes

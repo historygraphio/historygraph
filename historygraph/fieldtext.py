@@ -1,4 +1,4 @@
-#A text field in a DOOP object
+#A text field in a HistoryGraph object
 from field import Field
 
 class FieldText(Field):

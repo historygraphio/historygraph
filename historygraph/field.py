@@ -1,4 +1,4 @@
-#A field in a DOOP object
+#A field in a HistoryGraph object
 
 class Field(object):
     pass

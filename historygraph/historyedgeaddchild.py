@@ -1,4 +1,4 @@
-#The edge representing adding a child object in DOOP
+#The edge representing adding a child object in HistoryGraph
 from historyedge import HistoryEdge
 
 class HistoryEdgeAddChild(HistoryEdge):

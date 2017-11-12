@@ -1,4 +1,4 @@
-#A list of sub objects in doop
+#An ordered list of sub objects in HistoryGraph
 # From work by Marek Zawirski https://twitter.com/zzzawir/status/757635463536578560
 from field import Field
 from changetype import ChangeType

@@ -1,6 +1,5 @@
-#The base class for edges in DOOP
+#The base class for edges in HistoryGraph
 import hashlib
-#import utils
 
 class HistoryEdge(object):
     def __init__(self, startnodes, documentid, documentclassname):
@@ -15,8 +14,6 @@ class HistoryEdge(object):
         self.pastedges = self.pastedges | set(pastedges)
         edges = graph.edgesbystartnode[self.GetEndNode()]
         pastedges.add(self.GetEndNode())
-        #print "RecordPastEdges edges=",edges
-        #print "RecordPastEdges pastedges=",pastedges
         for edge in edges:
             edge.RecordPastEdges(set(pastedges), graph)
 

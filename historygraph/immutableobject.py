@@ -1,4 +1,4 @@
-#A DOOP Immutable Object
+#A HistoryGraph Immutable Object
 import uuid
 from field import Field
 from changetype import *
@@ -11,11 +11,11 @@ class ImmutableObject(object):
     
     def __init__(self, **kwargs):
         self.insetup = True
-        self.doop_field = dict()
+        self._field = dict()
         variables = [a for a in dir(self.__class__) if not a.startswith('__') and not callable(getattr(self.__class__,a))]
         for k in variables:
             var = getattr(self.__class__, k)
-            self.doop_field[k] = var
+            self._field[k] = var
             assert isinstance(var, FieldCollection) == False #Immutable objects not allow references to other objects just use a FieldText as a key
             if isinstance(var, Field):
                 setattr(self, k, var.CreateInstance(self, k))
@@ -36,14 +36,14 @@ class ImmutableObject(object):
 
     def GetHash(self):
         #Immutable objects don't have UUIDs have have SHA1 hashes of their content
-        s = sorted([(k,str(getattr(self, k))) for (k,v) in self.doop_field.iteritems()], key=itemgetter(0)) + [('_prevhash', str(self._prevhash))]
+        s = sorted([(k,str(getattr(self, k))) for (k,v) in self._field.iteritems()], key=itemgetter(0)) + [('_prevhash', str(self._prevhash))]
 
         return hashlib.sha256(str(s)).hexdigest()
         
     def asDict(self):
         #Return a dict suitable for transport
         ret = dict()
-        for k in self.doop_field:
+        for k in self._field:
             ret[k] = getattr(self, k)
         ret["_prevhash"] = self._prevhash
         ret["classname"] = self.__class__.__name__

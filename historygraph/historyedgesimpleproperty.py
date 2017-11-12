@@ -19,7 +19,7 @@ class HistoryEdgeSimpleProperty(HistoryEdge):
         if self.inactive:
             return
         edgeobject = doc.GetDocumentObject(self.propertyownerid)
-        field = edgeobject.doop_field[self.propertyname]
+        field = edgeobject._field[self.propertyname]
         setattr(edgeobject, self.propertyname, field.TranslateFromString(self.propertyvalue))
 
     def Clone(self):
@@ -30,12 +30,9 @@ class HistoryEdgeSimpleProperty(HistoryEdge):
     def GetConflictWinner(self, edge2):
         if self.propertyownerid != edge2.propertyownerid:
             return 0
-        #print "self.propertyname = " + self.propertyname
-        #print "edge2.propertyname = " + edge2.propertyname
         if self.propertyname != edge2.propertyname:
             assert False
             return 0
-        #print "self.propertytype = " + str(self.propertytype)
         if self.propertytype == "int":
             if int(self.propertyvalue) > int(edge2.propertyvalue):
                 return -1

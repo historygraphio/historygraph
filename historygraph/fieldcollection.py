@@ -1,4 +1,4 @@
-#A list of sub objects in doop
+#A list of sub objects in HistoryGraph
 from field import Field
 from changetype import ChangeType
 

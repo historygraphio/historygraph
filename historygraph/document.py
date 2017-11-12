@@ -1,4 +1,4 @@
-#A DOOP document
+#A HistoryGraph document
 from documentobject import DocumentObject
 import uuid
 from historygraph import HistoryGraph
@@ -182,7 +182,7 @@ class Document(DocumentObject):
         self.edgeslistener.append(listener)
 
     def Clean(self):
-        for (propname, prop) in self.doop_field.items():
+        for (propname, prop) in self._field.items():
             prop.Clean(self, propname)
 
     def depth(self):

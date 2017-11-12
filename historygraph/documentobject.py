@@ -1,4 +1,4 @@
-#A DOOP Document Object
+#A HistoryGraph Document Object
 import uuid
 from field import Field
 from changetype import *
@@ -10,7 +10,7 @@ class DocumentObject(object):
     def Clone(self):
         ret = self.__class__(self.id)
         ret.CopyDocumentObject(self)
-        for prop in self.doop_field:
+        for prop in self._field:
             if isinstance(prop, FieldCollection):
                 retlist = ret.getattr(prop.name)
                 retlist.empty()
@@ -20,7 +20,7 @@ class DocumentObject(object):
     
     def __init__(self, id):
         self.insetattr = True
-        self.doop_field = dict()
+        self._field = dict()
         self.change_handlers = list()
         self.parent = None
         if id is None:
@@ -29,7 +29,7 @@ class DocumentObject(object):
         variables = [a for a in dir(self.__class__) if not a.startswith('__') and not callable(getattr(self.__class__,a))]
         for k in variables:
             var = getattr(self.__class__, k)
-            self.doop_field[k] = var
+            self._field[k] = var
             if isinstance(var, Field):
                 setattr(self, k, var.CreateInstance(self, k))
         self.insetattr = False
@@ -39,9 +39,9 @@ class DocumentObject(object):
         if name == "insetattr" or self.insetattr:
             return
         self.insetattr = True
-        if name in self.doop_field:
-            if type(self.doop_field[name]) != FieldCollection and type(self.doop_field[name]) != FieldIntCounter and type(self.doop_field[name]) != FieldList:
-                self.WasChanged(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self.doop_field[name].GetTypeName())
+        if name in self._field:
+            if type(self._field[name]) != FieldCollection and type(self._field[name]) != FieldIntCounter and type(self._field[name]) != FieldList:
+                self.WasChanged(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self._field[name].GetTypeName())
         self.insetattr = False
         for h in self.change_handlers:
             h(self)
@@ -52,8 +52,8 @@ class DocumentObject(object):
             self.parent.WasChanged(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
     def CopyDocumentObject(self, src):
-        for k in src.doop_field:
-            v = src.doop_field[k]
+        for k in src._field:
+            v = src._field[k]
             setattr(self, k, v.Clone(k, src, self))
 
     def GetDocument(self):
@@ -61,7 +61,7 @@ class DocumentObject(object):
         return self.parent.GetDocument()
 
     def __str__(self):
-        return '\n'.join([str(k) + ':' + str(getattr(self, k)) for k in self.doop_field])
+        return '\n'.join([str(k) + ':' + str(getattr(self, k)) for k in self._field])
 
     def AddHandler(self, h):
         self.change_handlers.append(h)

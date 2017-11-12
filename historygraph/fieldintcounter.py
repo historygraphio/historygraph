@@ -1,4 +1,4 @@
-#An integer register field in DOOP
+#An integer register field in HistoryGraph
 from field import Field
 from changetype import ChangeType
 #import utils
