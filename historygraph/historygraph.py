@@ -1,7 +1,7 @@
 #A HistoryGraph
 from collections import defaultdict
 import uuid
-from historyedgenull import HistoryEdgeNull
+from historyedgemerge import HistoryEdgeMerge
 
 class HistoryGraph(object):
     def __init__(self):
@@ -84,7 +84,7 @@ class HistoryGraph(object):
                 documentid = edge.documentid
                 documentclassname = edge.documentclassname
         if len(presentnodes) > 1:
-            nulledge = HistoryEdgeNull(presentnodes, "", "", "", "", documentid, documentclassname)
+            nulledge = HistoryEdgeMerge(presentnodes, "", "", "", "", documentid, documentclassname)
             self.AddEdges([nulledge])
             if len(presentnodes) > 2:
                 self.ProcessGraph()

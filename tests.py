@@ -8,7 +8,7 @@ from historygraph import FieldText
 from historygraph import FieldIntCounter
 from historygraph import ImmutableObject
 from historygraph import FieldList
-from historygraph import HistoryEdgeNull
+from historygraph import HistoryEdgeMerge
 import time
 import timeit
 import uuid
@@ -152,7 +152,7 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
         #In the old way        
         dummysha = hashlib.sha256('Invalid node').hexdigest()
         history = test.history.Clone()
-        edgenull = HistoryEdgeNull({test6.currentnode, dummysha}, "", "", "", "", test6.id, test6.__class__.__name__)
+        edgenull = HistoryEdgeMerge({test6.currentnode, dummysha}, "", "", "", "", test6.id, test6.__class__.__name__)
         history.AddEdges([edgenull])
         test6 = Covers(test.id)
         history.Replay(test6)
@@ -161,7 +161,7 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
         #In the new way
         test6 = test.Clone()
         oldnode = test6.currentnode
-        edgenull = HistoryEdgeNull({test6.currentnode, dummysha}, "", "", "", "", test6.id, test6.__class__.__name__)
+        edgenull = HistoryEdgeMerge({test6.currentnode, dummysha}, "", "", "", "", test6.id, test6.__class__.__name__)
         test6.AddEdges([edgenull])
         self.assertEqual(test6.covers, 2)
         self.assertEqual(test6.currentnode, oldnode)
@@ -542,8 +542,8 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
 
         dummysha1 = hashlib.sha256('Invalid node 1').hexdigest()
         dummysha2 = hashlib.sha256('Invalid node 2').hexdigest()
-        edgenull1 = HistoryEdgeNull({dummysha1, dummysha2}, "", "", "", "", test2.id, test2.__class__.__name__)
-        edgenull2 = HistoryEdgeNull({test2.currentnode, edgenull1.GetEndNode()}, "", "", "", "", test2.id, test2.__class__.__name__)
+        edgenull1 = HistoryEdgeMerge({dummysha1, dummysha2}, "", "", "", "", test2.id, test2.__class__.__name__)
+        edgenull2 = HistoryEdgeMerge({test2.currentnode, edgenull1.GetEndNode()}, "", "", "", "", test2.id, test2.__class__.__name__)
 
         self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edgenull2.asTuple()],"immutableobjects":[]}))
         test2s = self.dc.GetByClass(TestPropertyOwner1)

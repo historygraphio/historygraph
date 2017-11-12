@@ -2,7 +2,7 @@
 from collections import defaultdict
 from historyedgesimpleproperty import HistoryEdgeSimpleProperty
 from historyedgeremovechild import HistoryEdgeRemoveChild
-from historyedgenull import HistoryEdgeNull
+from historyedgemerge import HistoryEdgeMerge
 from historyedge import HistoryEdge
 from documentobject import DocumentObject
 from fieldcollection import FieldCollection
@@ -99,11 +99,10 @@ class DocumentCollection(object):
             elif propertytypestr == "basestring":
                 propertytype = basestring
                 propertyvalue = str(propertyvaluestr)
-            elif propertytypestr == "" and edgeclassname == "HistoryEdgeNull":
+            elif propertytypestr == "" and edgeclassname == "HistoryEdgeMerge":
                 propertytype = None
                 propertyvalue = ""
             else:
-                #propertytype = self.classes[propertytypestr]
                 propertyvalue = propertyvaluestr
             propertytype = propertytypestr
             documentclassnamedict[documentid] = documentclassname
@@ -112,8 +111,6 @@ class DocumentCollection(object):
             else:
                 startnodes = {startnode1id, startnode2id}
             edge = self.historyedgeclasses[edgeclassname](startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname)
-            #print "LoadFromJSON edge.asTuple() = ",edge.asTuple()
-            #assert edge.GetEndNode() == endnodeid, "edge.GetEndNode() == endnodeid failed edge.GetEndNode() = " + str(edge.GetEndNode()) + " endnodeid = " + str(endnodeid)
             history = historygraphdict[documentid]
             history.AddEdges([edge])
 

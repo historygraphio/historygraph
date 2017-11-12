@@ -6,7 +6,7 @@ from changetype import ChangeType
 from historyedgesimpleproperty import HistoryEdgeSimpleProperty
 from historyedgeaddchild import HistoryEdgeAddChild
 from historyedgeremovechild import HistoryEdgeRemoveChild
-from historyedgenull import HistoryEdgeNull
+from historyedgemerge import HistoryEdgeMerge
 from historyedgeaddintcounter import HistoryEdgeAddIntCounter
 from historyedgeaddlistitem import HistoryEdgeAddListItem
 from historyedgeremovelistitem import HistoryEdgeRemoveListItem
@@ -92,7 +92,7 @@ class Document(DocumentObject):
         startnodes = set()
         endnodes = set()
         for edge in edges:
-            if isinstance(edge, HistoryEdgeNull):
+            if isinstance(edge, HistoryEdgeMerge):
                 #Always perform a full replay on null
                 self.FullReplay(edges)
                 return

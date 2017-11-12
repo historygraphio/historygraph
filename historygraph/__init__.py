@@ -7,6 +7,6 @@ from fieldtext import FieldText
 from fieldintcounter import FieldIntCounter
 from immutableobject import ImmutableObject
 from fieldlist import FieldList
-from historyedgenull import HistoryEdgeNull
+from historyedgemerge import HistoryEdgeMerge
 from historyedge import HistoryEdge
 from historygraph import HistoryGraph

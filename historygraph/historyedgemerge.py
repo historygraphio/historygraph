@@ -1,9 +1,9 @@
-#A null edge is used to merge a branched hypergraph back together
+#A merge edge is used to merge a branched hypergraph back together
 from historyedge import HistoryEdge
 
-class HistoryEdgeNull(HistoryEdge):
+class HistoryEdgeMerge(HistoryEdge):
     def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname):
-        super(HistoryEdgeNull, self).__init__(startnodes, documentid, documentclassname)
+        super(HistoryEdgeMerge, self).__init__(startnodes, documentid, documentclassname)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
         assert isinstance(propertyvalue, basestring)
@@ -13,7 +13,7 @@ class HistoryEdgeNull(HistoryEdge):
         self.propertytype = propertytype
 
     def Clone(self):
-        return HistoryEdgeNull(self.startnodes, self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
+        return HistoryEdgeMerge(self.startnodes, self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
 
     def Replay(self, doc):
         pass
