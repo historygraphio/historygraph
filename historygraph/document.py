@@ -67,7 +67,6 @@ class Document(DocumentObject):
             edge = HistoryEdgeRemoveListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         else:
             assert False
-        #print "Document edge created = ",edge
         self.currentnode = edge.GetEndNode()
         self.history.AddEdges([edge])
         for l in self.edgeslistener:

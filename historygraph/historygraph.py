@@ -49,7 +49,6 @@ class HistoryGraph(object):
     def ReplayEdges(self, doc, edge):
         if edge.CanReplay(self) == False:
             return
-        #print "Playing edge = ", edge.asDict()
         edge.Replay(doc)
         edge.isplayed = True
         edges = self.edgesbystartnode[edge.GetEndNode()]
@@ -98,8 +97,6 @@ class HistoryGraph(object):
             for k2 in self.edgesbyendnode:
                 edge2 = self.edgesbyendnode[k2]
 
-                #print "edge1 = " + edge1.GetEdgeDescription()
-                #print "edge2 = " + edge2.GetEdgeDescription()
                 if k1 != k2:
                     if not edge2.HasPastEdge(k1) and not edge1.HasPastEdge(k2):
                         edge1.CompareForConflicts(edge2)

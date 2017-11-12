@@ -78,11 +78,6 @@ class FieldList(Field):
             self.Render()
             return self._rendered_list[index].obj
 
-        #def __iter__(self):
-        #    doc = self.parent.GetDocument()
-        #    for item in self.l:
-        #        yield doc.documentobjects[item]
-
         def Clone(self, owner, name):
             ret = FieldList.FieldListImpl(self.theclass, owner, name)
             ret._listnodes = list(self._listnodes)

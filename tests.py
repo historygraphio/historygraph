@@ -141,10 +141,8 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
         self.assertEqual(test5.covers, 3)
         
         #Test live adding of orphaned edges
-        #print "Adding edge 4"
         test6.AddEdges([edge4])
         self.assertEqual(test6.covers, 1)
-        #print "Adding edge 3"
         test6.AddEdges([edge3])
         self.assertEqual(test6.covers, 4)
 
@@ -643,7 +641,6 @@ class LargeMergeTestCase(unittest.TestCase):
             test.AddEdges([v for (k, v) in test2.history.edgesbyendnode.iteritems()])
         wrapped = wrapper(test_add_edges, test, test2)
         time_taken = timeit.timeit(wrapped, number=1)
-        #print "time_taken=",time_taken #Comment out because I don't need to see this on every run
         self.assertEqual(test.covers, 101)
 
 class MessageTest(ImmutableObject):
@@ -831,8 +828,6 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
         self.assertEqual(len(tpo1s), 1)
         test2 = tpo1s[0]
 
-        #print "test1 edges=",[str(edge) for edge in test1.history.GetAllEdges()]
-        #print "test2 edges=",[str(edge) for edge in test2.history.GetAllEdges()]
         self.assertEqual(sharedcurrentnode, test2.currentnode)
         #The second user makes some changes and sends them back to the first
         test2.testcounter.add(1)

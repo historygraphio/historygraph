@@ -79,7 +79,6 @@ class HistoryEdge(object):
             "documentid",str(self.documentid),
             "documentclassname",str(self.documentclassname),
          )
-        #utils.log_output("GetEndNode s = ",str(s))
         return hashlib.sha256(str(s)).hexdigest()
 
     def asTuple(self):

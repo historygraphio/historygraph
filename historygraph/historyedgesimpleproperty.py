@@ -9,7 +9,6 @@ class HistoryEdgeSimpleProperty(HistoryEdge):
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
         assert propertytype == 'int' or propertytype == 'basestring'
-        #assert isinstance(propertyvalue, basestring)
         self.propertyownerid = propertyownerid
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue

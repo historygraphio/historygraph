@@ -11,7 +11,6 @@ class FieldIntCounter(Field):
             self.value = 0
 
         def add(self, change):
-            #utils.log_output("Add ", change, " to field ", self.name, " in ", self)
             self.value += change
             self.WasChanged(ChangeType.ADD_INT_COUNTER, self.parent.id, self.name, change, "FieldIntCounter")
 
