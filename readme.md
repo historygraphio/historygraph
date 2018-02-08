@@ -8,8 +8,8 @@ Installation
 
 Set up a virtualenv and install the necessary stuff
 ```
-virtualenv .
-source bin/activate
+virtualenv venv
+source venv/bin/activate
 pip install pip --upgrade
 pip install urllib3[secure]
 pip install -r requirements.txt
