@@ -32,3 +32,6 @@ venv/
 pip-selfcheck.json
 *.pyc
 
+.tox
+historygraph.egg-info/
+
