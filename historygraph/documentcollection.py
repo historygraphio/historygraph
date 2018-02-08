@@ -1,17 +1,20 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals, print_function
+
 #This module handles storing all documents in the database (and reloading)
 from collections import defaultdict
-from historyedgesimpleproperty import HistoryEdgeSimpleProperty
-from historyedgeremovechild import HistoryEdgeRemoveChild
-from historyedgemerge import HistoryEdgeMerge
-from historyedge import HistoryEdge
-from documentobject import DocumentObject
-from fieldcollection import FieldCollection
-from historygraph import HistoryGraph
+from .historyedgesimpleproperty import HistoryEdgeSimpleProperty
+from .historyedgeremovechild import HistoryEdgeRemoveChild
+from .historyedgemerge import HistoryEdgeMerge
+from .historyedge import HistoryEdge
+from .documentobject import DocumentObject
+from .fieldcollection import FieldCollection
+from .historygraph import HistoryGraph
 from json import JSONEncoder, JSONDecoder
-from fieldintregister import FieldIntRegister
-from document import Document
-from historyedgeaddchild import HistoryEdgeAddChild
-from immutableobject import ImmutableObject
+from .fieldintregister import FieldIntRegister
+from .document import Document
+from .historyedgeaddchild import HistoryEdgeAddChild
+from .immutableobject import ImmutableObject
 import hashlib
 import uuid
 

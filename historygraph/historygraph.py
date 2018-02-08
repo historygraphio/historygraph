@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals, print_function
+
 #A HistoryGraph
 from collections import defaultdict
 import uuid
-from historyedgemerge import HistoryEdgeMerge
+from .historyedgemerge import HistoryEdgeMerge
 
 class HistoryGraph(object):
     def __init__(self):
@@ -115,7 +118,7 @@ class HistoryGraph(object):
         if currentnode == '':
             return 0
         else:
-            if currentnode not in self.edgesbyendnode:
-                print 'self.edgesbyendnode=',[e.asTuple() for e in self.edgesbyendnode.values()]
+            #if currentnode not in self.edgesbyendnode:
+            #    print ('self.edgesbyendnode=',[e.asTuple() for e in self.edgesbyendnode.values()])
             return self.edgesbyendnode[currentnode].depth(self)
         

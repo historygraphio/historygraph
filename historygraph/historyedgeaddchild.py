@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals, print_function
+
 #The edge representing adding a child object in HistoryGraph
-from historyedge import HistoryEdge
+from .historyedge import HistoryEdge
 
 class HistoryEdgeAddChild(HistoryEdge):
     def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname):

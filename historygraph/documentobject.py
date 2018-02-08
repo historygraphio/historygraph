@@ -1,10 +1,13 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals, print_function
+
 #A HistoryGraph Document Object
 import uuid
-from field import Field
-from changetype import *
-from fieldcollection import FieldCollection
-from fieldintcounter import FieldIntCounter
-from fieldlist import FieldList
+from .field import Field
+from .changetype import *
+from .fieldcollection import FieldCollection
+from .fieldintcounter import FieldIntCounter
+from .fieldlist import FieldList
 
 class DocumentObject(object):
     def Clone(self):

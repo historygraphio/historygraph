@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals, print_function
+
 #A merge edge is used to merge a branched hypergraph back together
-from historyedge import HistoryEdge
+from .historyedge import HistoryEdge
 
 class HistoryEdgeMerge(HistoryEdge):
     def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname):

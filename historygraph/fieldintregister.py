@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals, print_function
+
 #An integer register field in HistoryGraph
-from field import Field
+from .field import Field
 
 class FieldIntRegister(Field):
     def CreateInstance(self, owner, name):

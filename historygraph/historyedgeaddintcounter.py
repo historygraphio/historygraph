@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals, print_function
+
 #An edge that changes a value in a document
-from historyedge import HistoryEdge
-from fieldintregister import FieldIntRegister
+from .historyedge import HistoryEdge
+from .fieldintregister import FieldIntRegister
 
 class HistoryEdgeAddIntCounter(HistoryEdge):
     def __init__(self, startnodes, propertyownerid,

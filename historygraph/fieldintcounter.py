@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals, print_function
+
 #An integer register field in HistoryGraph
-from field import Field
-from changetype import ChangeType
-#import utils
+from .field import Field
+from .changetype import ChangeType
 
 class FieldIntCounter(Field):
     class FieldIntCounterImpl(object):

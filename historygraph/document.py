@@ -1,15 +1,18 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals, print_function
+
 #A HistoryGraph document
-from documentobject import DocumentObject
+from .documentobject import DocumentObject
 import uuid
-from historygraph import HistoryGraph
-from changetype import ChangeType
-from historyedgesimpleproperty import HistoryEdgeSimpleProperty
-from historyedgeaddchild import HistoryEdgeAddChild
-from historyedgeremovechild import HistoryEdgeRemoveChild
-from historyedgemerge import HistoryEdgeMerge
-from historyedgeaddintcounter import HistoryEdgeAddIntCounter
-from historyedgeaddlistitem import HistoryEdgeAddListItem
-from historyedgeremovelistitem import HistoryEdgeRemoveListItem
+from .historygraph import HistoryGraph
+from .changetype import ChangeType
+from .historyedgesimpleproperty import HistoryEdgeSimpleProperty
+from .historyedgeaddchild import HistoryEdgeAddChild
+from .historyedgeremovechild import HistoryEdgeRemoveChild
+from .historyedgemerge import HistoryEdgeMerge
+from .historyedgeaddintcounter import HistoryEdgeAddIntCounter
+from .historyedgeaddlistitem import HistoryEdgeAddListItem
+from .historyedgeremovelistitem import HistoryEdgeRemoveListItem
 
 class Document(DocumentObject):
     def Clone(self):

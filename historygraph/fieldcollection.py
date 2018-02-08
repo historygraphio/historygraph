@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals, print_function
+
 #A list of sub objects in HistoryGraph
-from field import Field
-from changetype import ChangeType
+from .field import Field
+from .changetype import ChangeType
 
 class FieldCollection(Field):
     class FieldCollectionImpl(object):
