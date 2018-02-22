@@ -21,7 +21,7 @@ class DocumentObject(object):
                     retlist.add(obj.Clone())
         return ret
     
-    def __init__(self, id):
+    def __init__(self, id=None):
         self.insetattr = True
         self._field = dict()
         self.change_handlers = list()

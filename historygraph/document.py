@@ -40,7 +40,7 @@ class Document(DocumentObject):
         history.Replay(ret)
         return ret
 
-    def __init__(self, id):
+    def __init__(self, id=None):
         super(Document, self).__init__(id)
         self.insetattr = True
         self.parent = None

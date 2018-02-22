@@ -30,8 +30,6 @@ class TestPropertyOwner1(Document):
         self.bWasChanged = True
 
 class Covers(Document):
-    def __init__(self, id):
-        super(Covers, self).__init__(id)
     covers = FieldIntRegister()
 
 class SimpleCoversTestCase(unittest.TestCase):
@@ -42,7 +40,7 @@ class SimpleCoversTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test merging together simple covers documents
-        test = Covers(None)
+        test = Covers()
         test.covers = 1
         #Test we can set a value
         self.assertEqual(test.covers, 1)
@@ -59,7 +57,7 @@ class SimpleCoversTestCase(unittest.TestCase):
         assert test2 is not test3
         assert test2.history is not test3.history
         
-        test = Covers(None)
+        test = Covers()
         test.covers = 1
         test.covers = 2
         test2 = Covers(test.id)
@@ -75,7 +73,7 @@ class MergeHistoryCoverTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test merge together two simple covers objects
-        test = Covers(None)
+        test = Covers()
         test.covers = 1
         test2 = test.Clone()
         test.covers = 2
@@ -102,7 +100,7 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test merging together by receiving an edge
-        test = Covers(None)
+        test = Covers()
         test.covers = 1
         test2 = test.Clone()
         test.covers = 2
@@ -116,7 +114,7 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
         self.assertEqual(test3.covers, 3)
 
         #Test the behaviour of receiving edges out of order
-        test = Covers(None)
+        test = Covers()
         test.covers = 1
         test2 = test.Clone()
         test.covers = 2
@@ -174,9 +172,9 @@ class ListItemChangeHistoryTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test that various types of changes create was changed events
-        test1 = TestPropertyOwner1(None)
+        test1 = TestPropertyOwner1()
         test1.bWasChanged = False
-        test2 = TestPropertyOwner2(None)
+        test2 = TestPropertyOwner2()
         test1.propertyowner2s.add(test2)
         self.assertTrue(test1.bWasChanged)
         test1.bWasChanged = False
@@ -195,8 +193,8 @@ class SimpleItemTestCase(unittest.TestCase):
         self.dc.Register(TestPropertyOwner2)
 
     def runTest(self):
-        test1 = TestPropertyOwner1(None)
-        testitem = TestPropertyOwner2(None)
+        test1 = TestPropertyOwner1()
+        testitem = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem)
         testitem.cover = 1
         #Test semantics for retriving objects
@@ -205,8 +203,8 @@ class SimpleItemTestCase(unittest.TestCase):
             self.assertEqual(po2.__class__.__name__ , TestPropertyOwner2.__name__)
             self.assertEqual(po2.cover, 1)
 
-        test1 = TestPropertyOwner1(None)
-        testitem = TestPropertyOwner2(None)
+        test1 = TestPropertyOwner1()
+        testitem = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem)
         testitem.cover = 1
         test1.propertyowner2s.remove(testitem.id)
@@ -221,8 +219,8 @@ class SimpleItemTestCase(unittest.TestCase):
         #Check that replaying correctly removes the object
         self.assertEqual(len(test2.propertyowner2s), 0)
 
-        test1 = TestPropertyOwner1(None)
-        testitem = TestPropertyOwner2(None)
+        test1 = TestPropertyOwner1()
+        testitem = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem)
         testitem.cover = 1
         test2 = test1.Clone()
@@ -240,9 +238,9 @@ class AdvancedItemTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test changing them deleting a sub element
-        test1 = TestPropertyOwner1(None)
+        test1 = TestPropertyOwner1()
         self.dc.AddDocumentObject(test1)
-        testitem1 = TestPropertyOwner2(None)
+        testitem1 = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem1)
         testitem1.cover = 1
         test2 = test1.Clone()
@@ -253,9 +251,9 @@ class AdvancedItemTestCase(unittest.TestCase):
         self.assertEqual(len(test3.propertyowner2s), 0)
 
         #Test changing them deleting a sub element. Test merging in the opposition order to previous test
-        test1 = TestPropertyOwner1(None)
+        test1 = TestPropertyOwner1()
         self.dc.AddDocumentObject(test1)
-        testitem1 = TestPropertyOwner2(None)
+        testitem1 = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem1)
         testitem1.cover = 1
         test2 = test1.Clone()
@@ -266,9 +264,9 @@ class AdvancedItemTestCase(unittest.TestCase):
         self.assertEqual(len(test3.propertyowner2s), 0)
 
         #Test merging changes to different objects in the same document works
-        test1 = TestPropertyOwner1(None)
+        test1 = TestPropertyOwner1()
         self.dc.AddDocumentObject(test1)
-        testitem1 = TestPropertyOwner2(None)
+        testitem1 = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem1)
         test2 = test1.Clone()
         testitem1.cover = 3
@@ -280,12 +278,12 @@ class AdvancedItemTestCase(unittest.TestCase):
         self.assertEqual(test3.covers, 2)
 
         #Test changing different objects on different branches works
-        test1 = TestPropertyOwner1(None)
+        test1 = TestPropertyOwner1()
         self.dc.AddDocumentObject(test1)
-        testitem1 = TestPropertyOwner2(None)
+        testitem1 = TestPropertyOwner2()
         id1 = testitem1.id
         test1.propertyowner2s.add(testitem1)
-        testitem2 = TestPropertyOwner2(None)
+        testitem2 = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem2)
         id2 = testitem2.id
         test2 = test1.Clone()
@@ -303,12 +301,12 @@ class AdvancedItemTestCase(unittest.TestCase):
         self.assertEqual(testitem1.quantity, 3)
         
         #Test changing different objects on different branches works reverse merge of above
-        test1 = TestPropertyOwner1(None)
+        test1 = TestPropertyOwner1()
         self.dc.AddDocumentObject(test1)
-        testitem1 = TestPropertyOwner2(None)
+        testitem1 = TestPropertyOwner2()
         id1 = testitem1.id
         test1.propertyowner2s.add(testitem1)
-        testitem2 = TestPropertyOwner2(None)
+        testitem2 = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem2)
         id2 = testitem2.id
         test2 = test1.Clone()
@@ -326,8 +324,6 @@ class AdvancedItemTestCase(unittest.TestCase):
         self.assertEqual(testitem1.quantity, 3)
     
 class Comments(Document):
-    def __init__(self, id):
-        super(Comments, self).__init__(id)
     comment = FieldText()
 
 class MergeHistoryCommentTestCase(unittest.TestCase):
@@ -338,7 +334,7 @@ class MergeHistoryCommentTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test merge together two simple covers objects
-        test = Comments(None)
+        test = Comments()
         test.comment = "AAA"
         test2 = test.Clone()
         test.comment = "BBB"
@@ -348,7 +344,7 @@ class MergeHistoryCommentTestCase(unittest.TestCase):
         self.assertEqual(test3.comment, "CCC")
 
         #Test merge together two simple covers objects
-        test = Comments(None)
+        test = Comments()
         test.comment = "AAA"
         test2 = test.Clone()
         test.comment = "CCC"
@@ -365,10 +361,10 @@ class StoreObjectsInJSONTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test writing the history to a sql lite database
-        test1 = TestPropertyOwner1(None)
+        test1 = TestPropertyOwner1()
         self.dc.AddDocumentObject(test1)
         test1id = test1.id
-        testitem1 = TestPropertyOwner2(None)
+        testitem1 = TestPropertyOwner2()
         testitem1id = testitem1.id
         test1.propertyowner2s.add(testitem1)
         test2 = test1.Clone()
@@ -409,10 +405,10 @@ class MergeChangesMadeInJSONTestCase(unittest.TestCase):
 
     def runTest(self):
         #Create an object and set some values
-        test1 = TestPropertyOwner1(None)
+        test1 = TestPropertyOwner1()
         self.dc.AddDocumentObject(test1)
         test1id = test1.id
-        testitem1 = TestPropertyOwner2(None)
+        testitem1 = TestPropertyOwner2()
         testitem1id = testitem1.id
         test1.propertyowner2s.add(testitem1)
         testitem1.cover = 3
@@ -477,9 +473,9 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
 
     def runTest(self):
         #Create an object and set some values
-        test1 = TestPropertyOwner1(None)
+        test1 = TestPropertyOwner1()
         test1id = test1.id
-        testitem1 = TestPropertyOwner2(None)
+        testitem1 = TestPropertyOwner2()
         testitem1id = testitem1.id
         test1.propertyowner2s.add(testitem1)
         testitem1.cover = 3
@@ -578,7 +574,7 @@ class FreezeTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test merging together by receiving an edge
-        test = Covers(None) 
+        test = Covers() 
         test.covers = 1
         test2 = test.Clone()
         test.covers = 2
@@ -601,7 +597,7 @@ class FreezeThreeWayMergeTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test merging together by receiving an edge
-        test = Covers(None)
+        test = Covers()
         test.covers = 1
         test2 = test.Clone()
         test3 = test.Clone()
@@ -628,7 +624,7 @@ class LargeMergeTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test merging together performance by receiving large numbers of edges
-        test = Covers(None)
+        test = Covers()
         test.covers = 1
         test2 = test.Clone()
         for i in range(2,52):
@@ -707,7 +703,7 @@ class SimpleCoversUpdateTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test merging together simple covers documents
-        test = Covers(None)
+        test = Covers()
         test.covers = 1
         handler = TestUpdateHandler()
         test.AddHandler(handler.WasChanged)
@@ -726,7 +722,7 @@ class FreezeUpdateTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test merging together by receiving an edge
-        test = Covers(None) 
+        test = Covers() 
         test.covers = 1
 
         test2 = test.Clone()
@@ -750,14 +746,12 @@ class FreezeUpdateTestCase(unittest.TestCase):
 
 
 class CounterTestContainer(Document):
-    def __init__(self, id):
-        super(CounterTestContainer, self).__init__(id)
     testcounter = FieldIntCounter()
 
 class SimpleCounterTestCase(unittest.TestCase):
     def runTest(self):
         #Test merging together simple counter documents
-        test = CounterTestContainer(None)
+        test = CounterTestContainer()
         #Test we default to zero
         self.assertEqual(test.testcounter.get(), 0)
         #Test adding and subtract gives reasonable values
@@ -774,7 +768,7 @@ class MergeCounterTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test merge together two simple covers objects
-        test = CounterTestContainer(None)
+        test = CounterTestContainer()
         test.testcounter.add(1)
         self.assertEqual(test.testcounter.get(), 1)
         test2 = test.Clone()
@@ -790,7 +784,7 @@ class UncleanReplayCounterTestCase(unittest.TestCase):
 
     def runTest(self):
         #Test merge together two simple covers objects
-        test = CounterTestContainer(None)
+        test = CounterTestContainer()
         test.testcounter.add(1)
         self.assertEqual(test.testcounter.get(), 1)
         history2 = test.history.Clone()
@@ -805,7 +799,7 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
 
     def runTest(self):
         #Create an object and set some values
-        test1 = CounterTestContainer(None)
+        test1 = CounterTestContainer()
         test1id = test1.id
 
         self.dc.AddDocumentObject(test1)
@@ -853,7 +847,7 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
 
 class HistoryGraphDepthTestCase(unittest.TestCase):
     def runTest(self):
-        test = Covers(None)
+        test = Covers()
         #Test there are no edges in the object just created
         self.assertEqual(test.depth(), 0)
 
@@ -886,7 +880,7 @@ class HistoryGraphDepthTestCase(unittest.TestCase):
         test2 = None
         test3 = None
 
-        test = Covers(None)
+        test = Covers()
         self.assertEqual(test.depth(), 0)
         test.covers = 1
         self.assertEqual(test.depth(), 1)
@@ -928,10 +922,10 @@ class FieldListFunctionsTestCase(unittest.TestCase):
         with self.assertRaises(IndexError):
             flImpl[0]
 
-        parent = TestPropertyOwner1(None)
+        parent = TestPropertyOwner1()
         name = "test"
         flImpl = fl.CreateInstance(parent, name)
-        test1 = TestPropertyOwner1(None)
+        test1 = TestPropertyOwner1()
         self.assertEqual(parent.depth(), 0)
         flImpl.insert(0, test1)
         self.assertEqual(parent.depth(), 1)
@@ -941,14 +935,14 @@ class FieldListFunctionsTestCase(unittest.TestCase):
 
         self.assertEqual(len(flImpl._listnodes), 1) # A single addition should have been added for this
         
-        test2 = TestPropertyOwner1(None)
+        test2 = TestPropertyOwner1()
         flImpl.insert(1, test2)
         self.assertEqual(parent.depth(), 2)
         self.assertEqual(len(flImpl), 2)
         self.assertEqual(flImpl[0].id, test1.id) 
         self.assertEqual(flImpl[1].id, test2.id) 
         
-        test3 = TestPropertyOwner1(None)
+        test3 = TestPropertyOwner1()
         flImpl.insert(0, test3)
         self.assertEqual(parent.depth(), 3)
         self.assertEqual(len(flImpl), 3)
@@ -990,16 +984,16 @@ class FieldListMergeTestCase(unittest.TestCase):
         dc = DocumentCollection()
         dc.Register(TestFieldListOwner1)
         dc.Register(TestFieldListOwner2)
-        test1 = TestFieldListOwner1(None)
-        l0 = TestFieldListOwner2(None)
-        l1 = TestFieldListOwner2(None)
+        test1 = TestFieldListOwner1()
+        l0 = TestFieldListOwner2()
+        l1 = TestFieldListOwner2()
         test1.propertyowner2s.insert(0, l0)
         test1.propertyowner2s.insert(1, l1)
 
         test2 = test1.Clone()
         dc.AddDocumentObject(test2)
 
-        l2 = TestFieldListOwner2(None)
+        l2 = TestFieldListOwner2()
         test2.propertyowner2s.insert(2, l2)
 
         test1.propertyowner2s.remove(1)
@@ -1031,14 +1025,14 @@ class FieldListMergeTestCase(unittest.TestCase):
         dc.Register(TestListofLists1)
         dc.Register(TestListofLists2)
         dc.Register(TestListofLists3)
-        test1 = TestListofLists1(None)
+        test1 = TestListofLists1()
         dc.AddDocumentObject(test1)
-        l0 = TestListofLists2(None)
-        l1 = TestListofLists2(None)
+        l0 = TestListofLists2()
+        l1 = TestListofLists2()
         test1.propertyowner2s.insert(0, l0)
         test1.propertyowner2s.insert(1, l1)
 
-        ll0 = TestListofLists3(None)
+        ll0 = TestListofLists3()
         l0.propertyowner2s.insert(0, ll0)
 
         assert test1.propertyowner2s[0].id == l0.id
@@ -1084,14 +1078,14 @@ class FieldCollofCollMergeTestCase(unittest.TestCase):
         dc.Register(TestColofCol1)
         dc.Register(TestColofCol2)
         dc.Register(TestColofCols3)
-        test1 = TestColofCol1(None)
+        test1 = TestColofCol1()
         dc.AddDocumentObject(test1)
-        l0 = TestColofCol2(None)
-        l1 = TestColofCol2(None)
+        l0 = TestColofCol2()
+        l1 = TestColofCol2()
         test1.propertyowner2s.add(l0)
         test1.propertyowner2s.add(l1)
 
-        ll0 = TestColofCols3(None)
+        ll0 = TestColofCols3()
         l0.propertyowner2s.add(ll0)
 
         assert {l.id for l in test1.propertyowner2s} == {l0.id, l1.id}
