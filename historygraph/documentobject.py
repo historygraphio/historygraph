@@ -3,18 +3,15 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 #A HistoryGraph Document Object
 import uuid
-from .field import Field
 from .changetype import *
-from .fieldcollection import FieldCollection
-from .fieldintcounter import FieldIntCounter
-from .fieldlist import FieldList
+from . import fields
 
 class DocumentObject(object):
     def Clone(self):
         ret = self.__class__(self.id)
         ret.CopyDocumentObject(self)
         for prop in self._field:
-            if isinstance(prop, FieldCollection):
+            if isinstance(prop, fields.Collection):
                 retlist = ret.getattr(prop.name)
                 retlist.empty()
                 for obj in prop:
@@ -33,7 +30,7 @@ class DocumentObject(object):
         for k in variables:
             var = getattr(self.__class__, k)
             self._field[k] = var
-            if isinstance(var, Field):
+            if isinstance(var, fields.Field):
                 setattr(self, k, var.CreateInstance(self, k))
         self.insetattr = False
         
@@ -43,7 +40,7 @@ class DocumentObject(object):
             return
         self.insetattr = True
         if name in self._field:
-            if type(self._field[name]) != FieldCollection and type(self._field[name]) != FieldIntCounter and type(self._field[name]) != FieldList:
+            if type(self._field[name]) != fields.Collection and type(self._field[name]) != fields.IntCounter and type(self._field[name]) != fields.List:
                 self.WasChanged(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self._field[name].GetTypeName())
         self.insetattr = False
         for h in self.change_handlers:

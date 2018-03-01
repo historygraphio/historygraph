@@ -3,9 +3,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 #A HistoryGraph Immutable Object
 import uuid
-from .field import Field
 from .changetype import *
-from .fieldcollection import FieldCollection
+from . import fields
 from operator import itemgetter
 import hashlib
 
@@ -19,8 +18,8 @@ class ImmutableObject(object):
         for k in variables:
             var = getattr(self.__class__, k)
             self._field[k] = var
-            assert isinstance(var, FieldCollection) == False #Immutable objects not allow references to other objects just use a FieldText as a key
-            if isinstance(var, Field):
+            assert isinstance(var, fields.Collection) == False #Immutable objects not allow references to other objects just use a FieldText as a key
+            if isinstance(var, fields.Field):
                 setattr(self, k, var.CreateInstance(self, k))
                 if k in kwargs:
                     setattr(self, k, kwargs[k])

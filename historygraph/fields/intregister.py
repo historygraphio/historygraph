@@ -2,9 +2,9 @@
 from __future__ import absolute_import, unicode_literals, print_function
 
 #An integer register field in HistoryGraph
-from .field import Field
+from . import Field
 
-class FieldIntRegister(Field):
+class IntRegister(Field):
     def CreateInstance(self, owner, name):
         return 0
 

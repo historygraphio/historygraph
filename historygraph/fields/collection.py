@@ -2,11 +2,11 @@
 from __future__ import absolute_import, unicode_literals, print_function
 
 #A list of sub objects in HistoryGraph
-from .field import Field
-from .changetype import ChangeType
+from . import Field
+from ..changetype import ChangeType
 
-class FieldCollection(Field):
-    class FieldCollectionImpl(object):
+class Collection(Field):
+    class _FieldCollectionImpl(object):
         def __init__(self, theclass, parent, name):
             self.theclass = theclass
             self.parent = parent
@@ -41,7 +41,7 @@ class FieldCollection(Field):
                 yield doc.documentobjects[item]
 
         def Clone(self, owner, name):
-            ret = FieldCollection.FieldCollectionImpl(self.theclass, owner, name)
+            ret = Collection._FieldCollectionImpl(self.theclass, owner, name)
             srcdoc = self.parent.GetDocument()
             for objid in self.l:
                 srcobj = srcdoc.documentobjects[objid]
@@ -58,8 +58,9 @@ class FieldCollection(Field):
 
     def __init__(self, theclass):
         self.theclass = theclass
+
     def CreateInstance(self, owner, name):
-        return FieldCollection.FieldCollectionImpl(self.theclass, owner, name)
+        return Collection._FieldCollectionImpl(self.theclass, owner, name)
 
     def Clone(self, name, src, owner):
         return getattr(src, name).Clone(owner, name)

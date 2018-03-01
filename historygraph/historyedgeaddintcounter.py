@@ -3,7 +3,6 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 #An edge that changes a value in a document
 from .historyedge import HistoryEdge
-from .fieldintregister import FieldIntRegister
 
 class HistoryEdgeAddIntCounter(HistoryEdge):
     def __init__(self, startnodes, propertyownerid,
@@ -11,7 +10,7 @@ class HistoryEdgeAddIntCounter(HistoryEdge):
         super(HistoryEdgeAddIntCounter, self).__init__(startnodes, documentid, documentclassname)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring), "propertytype should be basestring but it actually is " + str(type(propertytype))
-        assert propertytype == 'int' or propertytype == 'basestring' or propertytype == 'FieldIntCounter', "Expected int or basestring for property type, actually got " + propertytype
+        assert propertytype == 'int' or propertytype == 'basestring' or propertytype == 'IntCounter', "Expected int or basestring for property type, actually got " + propertytype
         self.propertyownerid = propertyownerid
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue

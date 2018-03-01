@@ -8,10 +8,9 @@ from .historyedgeremovechild import HistoryEdgeRemoveChild
 from .historyedgemerge import HistoryEdgeMerge
 from .historyedge import HistoryEdge
 from .documentobject import DocumentObject
-from .fieldcollection import FieldCollection
+from . import fields
 from .historygraph import HistoryGraph
 from json import JSONEncoder, JSONDecoder
-from .fieldintregister import FieldIntRegister
 from .document import Document
 from .historyedgeaddchild import HistoryEdgeAddChild
 from .immutableobject import ImmutableObject
@@ -166,7 +165,7 @@ class DocumentCollection(object):
         assert obj.__class__.__name__  in self.classes
         for propname in obj._field:
             propvalue = obj._field[propname]
-            if isinstance(propvalue, FieldCollection):
+            if isinstance(propvalue, fields.Collection):
                 for obj2 in getattr(obj, propname):
                     assert obj2.__class__.__name__  in self.classes
         wasfound = False

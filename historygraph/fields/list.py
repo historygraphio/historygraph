@@ -3,13 +3,13 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 #An ordered list of sub objects in HistoryGraph
 # From work by Marek Zawirski https://twitter.com/zzzawir/status/757635463536578560
-from .field import Field
-from .changetype import ChangeType
+from . import Field
+from ..changetype import ChangeType
 import uuid
 from json import JSONEncoder, JSONDecoder
 
-class FieldList(Field):
-    class ListNode(object):
+class List(Field):
+    class _ListNode(object):
         def __init__(self, parent, timestamp, data, obj):
             self.id = str(uuid.uuid4())
             assert isinstance(parent, basestring)
@@ -33,11 +33,11 @@ class FieldList(Field):
             self.parent.GetDocument().documentobjects[obj.id] = obj
             index = index - 1
             if index == -1:
-                added_node = FieldList.ListNode('', self.parent.GetDocument().depth(), obj.id, obj)
+                added_node = List._ListNode('', self.parent.GetDocument().depth(), obj.id, obj)
                 self._listnodes.append(added_node)
             else:
                 self.Render()
-                added_node = FieldList.ListNode(self._rendered_list[index].id, self.parent.GetDocument().depth(), obj.id, obj)
+                added_node = List._ListNode(self._rendered_list[index].id, self.parent.GetDocument().depth(), obj.id, obj)
                 self._listnodes.append(added_node)
             if hasattr(self, "_rendered_list"):
                 delattr(self, "_rendered_list")
@@ -82,7 +82,7 @@ class FieldList(Field):
             return self._rendered_list[index].obj
 
         def Clone(self, owner, name):
-            ret = FieldList.FieldListImpl(self.theclass, owner, name)
+            ret = List.FieldListImpl(self.theclass, owner, name)
             ret._listnodes = list(self._listnodes)
             ret._tombstones = set(self._tombstones)
             return ret
@@ -124,7 +124,7 @@ class FieldList(Field):
         self.theclass = theclass
 
     def CreateInstance(self, owner, name):
-        return FieldList.FieldListImpl(self.theclass, owner, name)
+        return List.FieldListImpl(self.theclass, owner, name)
 
     def Clone(self, name, src, owner):
         return getattr(src, name).Clone(owner, name)

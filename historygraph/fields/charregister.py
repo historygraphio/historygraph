@@ -2,9 +2,9 @@
 from __future__ import absolute_import, unicode_literals, print_function
 
 #A text field in a HistoryGraph object
-from .field import Field
+from . import Field
 
-class FieldText(Field):
+class CharRegister(Field):
     def CreateInstance(self, owner, name):
         return ""
 

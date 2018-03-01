@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 #The edge representing adding a child object in HistoryGraph
 from .historyedge import HistoryEdge
 from json import JSONEncoder, JSONDecoder
-from .fieldlist import FieldList
+from . import fields
 
 class HistoryEdgeAddListItem(HistoryEdge):
     def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname):
@@ -24,7 +24,7 @@ class HistoryEdgeAddListItem(HistoryEdge):
             doc.documentobjects[newobj.id] = newobj
         else:
             newobj = doc.documentobjects[objid]
-        added_node = FieldList.ListNode(added_node_parent, added_node_timestamp, added_node_data, newobj)
+        added_node = fields.List._ListNode(added_node_parent, added_node_timestamp, added_node_data, newobj)
         added_node.id = added_node_id
         if self.propertyownerid == "" and self.propertyname == "":
             assert False # We can never create stand alone object this way

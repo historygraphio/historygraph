@@ -5,13 +5,9 @@ import unittest
 from historygraph import DocumentCollection
 from historygraph import DocumentObject
 from historygraph import Document
-from historygraph import FieldIntRegister
-from historygraph import FieldCollection
-from historygraph import FieldText
-from historygraph import FieldIntCounter
-from historygraph import ImmutableObject
-from historygraph import FieldList
+from historygraph import fields
 from historygraph import HistoryEdgeMerge
+from historygraph import ImmutableObject
 import time
 import timeit
 import uuid
@@ -19,18 +15,18 @@ import hashlib
 from json import JSONEncoder, JSONDecoder
 
 class TestPropertyOwner2(DocumentObject):
-    cover = FieldIntRegister()
-    quantity = FieldIntRegister()
+    cover = fields.IntRegister()
+    quantity = fields.IntRegister()
 
 class TestPropertyOwner1(Document):
-    covers = FieldIntRegister()
-    propertyowner2s = FieldCollection(TestPropertyOwner2)
+    covers = fields.IntRegister()
+    propertyowner2s = fields.Collection(TestPropertyOwner2)
     def WasChanged(self, changetype, propertyowner, propertyname, propertyvalue, propertytype):
         super(TestPropertyOwner1, self).WasChanged(changetype, propertyowner, propertyname, propertyvalue, propertytype)
         self.bWasChanged = True
 
 class Covers(Document):
-    covers = FieldIntRegister()
+    covers = fields.IntRegister()
 
 class SimpleCoversTestCase(unittest.TestCase):
     def setUp(self):
@@ -83,12 +79,12 @@ class MergeHistoryCoverTestCase(unittest.TestCase):
         self.assertEqual(test3.covers, 3)
 
 class TestPropertyOwner2(DocumentObject):
-    cover = FieldIntRegister()
-    quantity = FieldIntRegister()
+    cover = fields.IntRegister()
+    quantity = fields.IntRegister()
 
 class TestPropertyOwner1(Document):
-    covers = FieldIntRegister()
-    propertyowner2s = FieldCollection(TestPropertyOwner2)
+    covers = fields.IntRegister()
+    propertyowner2s = fields.Collection(TestPropertyOwner2)
     def WasChanged(self, changetype, propertyowner, propertyname, propertyvalue, propertytype):
         super(TestPropertyOwner1, self).WasChanged(changetype, propertyowner, propertyname, propertyvalue, propertytype)
         self.bWasChanged = True
@@ -324,7 +320,7 @@ class AdvancedItemTestCase(unittest.TestCase):
         self.assertEqual(testitem1.quantity, 3)
     
 class Comments(Document):
-    comment = FieldText()
+    comment = fields.CharRegister()
 
 class MergeHistoryCommentTestCase(unittest.TestCase):
     def setUp(self):
@@ -645,8 +641,8 @@ class LargeMergeTestCase(unittest.TestCase):
 class MessageTest(ImmutableObject):
     # A demo class of an immutable object. It emulated a simple text message broadcast at a certain time
     # similar to a tweet
-    messagetime = FieldIntRegister() # The time in epoch milliseconds of the message
-    text = FieldText() # The text of the message
+    messagetime = fields.IntRegister() # The time in epoch milliseconds of the message
+    text = fields.CharRegister() # The text of the message
 
 class ImmutableClassTestCase(unittest.TestCase):
     def setUp(self):
@@ -746,7 +742,7 @@ class FreezeUpdateTestCase(unittest.TestCase):
 
 
 class CounterTestContainer(Document):
-    testcounter = FieldIntCounter()
+    testcounter = fields.IntCounter()
 
 class SimpleCounterTestCase(unittest.TestCase):
     def runTest(self):
@@ -906,9 +902,9 @@ class HistoryGraphDepthTestCase(unittest.TestCase):
 
 
 class FieldListFunctionsTestCase(unittest.TestCase):
-    # Test each individual function in the FieldList and FieldListImpl classes
+    # Test each individual function in the fields.List and FieldListImpl classes
     def runTest(self):
-        fl = FieldList(TestPropertyOwner1)
+        fl = fields.List(TestPropertyOwner1)
         self.assertEqual(fl.theclass, TestPropertyOwner1)
 
         parent = uuid.uuid4()
@@ -970,16 +966,16 @@ class FieldListFunctionsTestCase(unittest.TestCase):
 
 
 class TestFieldListOwner2(DocumentObject):
-    cover = FieldIntRegister()
-    quantity = FieldIntRegister()
+    cover = fields.IntRegister()
+    quantity = fields.IntRegister()
 
 class TestFieldListOwner1(Document):
-    covers = FieldIntRegister()
-    propertyowner2s = FieldList(TestFieldListOwner2)
+    covers = fields.IntRegister()
+    propertyowner2s = fields.List(TestFieldListOwner2)
 
 
 class FieldListMergeTestCase(unittest.TestCase):
-    # Test each individual function in the FieldList and FieldListImpl classes
+    # Test each individual function in the fields.List and FieldListImpl classes
     def runTest(self):
         dc = DocumentCollection()
         dc.Register(TestFieldListOwner1)
@@ -1006,20 +1002,20 @@ class FieldListMergeTestCase(unittest.TestCase):
         
 
 class TestListofLists3(DocumentObject):
-    comment = FieldText()
+    comment = fields.CharRegister()
 
 class TestListofLists2(DocumentObject):
-    cover = FieldIntRegister()
-    quantity = FieldIntRegister()
-    propertyowner2s = FieldList(TestListofLists3)
+    cover = fields.IntRegister()
+    quantity = fields.IntRegister()
+    propertyowner2s = fields.List(TestListofLists3)
 
 class TestListofLists1(Document):
-    covers = FieldIntRegister()
-    propertyowner2s = FieldList(TestListofLists2)
+    covers = fields.IntRegister()
+    propertyowner2s = fields.List(TestListofLists2)
 
 
 class FieldListMergeTestCase(unittest.TestCase):
-    # Test each individual function in the FieldList and FieldListImpl classes
+    # Test each individual function in the fields.List and FieldListImpl classes
     def runTest(self):
         dc = DocumentCollection()
         dc.Register(TestListofLists1)
@@ -1059,20 +1055,20 @@ class FieldListMergeTestCase(unittest.TestCase):
         assert test2.propertyowner2s[0].propertyowner2s[0].GetDocument().id == test1.id
 
 class TestColofCols3(DocumentObject):
-    comment = FieldText()
+    comment = fields.CharRegister()
 
 class TestColofCol2(DocumentObject):
-    cover = FieldIntRegister()
-    quantity = FieldIntRegister()
-    propertyowner2s = FieldCollection(TestColofCols3)
+    cover = fields.IntRegister()
+    quantity = fields.IntRegister()
+    propertyowner2s = fields.Collection(TestColofCols3)
 
 class TestColofCol1(Document):
-    covers = FieldIntRegister()
-    propertyowner2s = FieldCollection(TestColofCol2)
+    covers = fields.IntRegister()
+    propertyowner2s = fields.Collection(TestColofCol2)
 
 
 class FieldCollofCollMergeTestCase(unittest.TestCase):
-    # Test each individual function in the FieldList and FieldListImpl classes
+    # Test each individual function in the fields.List and FieldListImpl classes
     def runTest(self):
         dc = DocumentCollection()
         dc.Register(TestColofCol1)
