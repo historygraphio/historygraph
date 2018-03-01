@@ -101,7 +101,7 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
         test2 = test.Clone()
         test.covers = 2
         test2.covers = 3
-        edge = test2.history.edgesbyendnode[test2.currentnode]
+        edge = test2.history.edgesbyendnode[test2._hashclock]
         history = test.history.Clone()
         history.AddEdges([edge])
         test3 = Covers(test.id)
@@ -118,7 +118,7 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
         test6 = test2.Clone()
         test2.covers = 3
         test2.covers = 4
-        edge4 = test2.history.edgesbyendnode[test2.currentnode]
+        edge4 = test2.history.edgesbyendnode[test2._hashclock]
         edge3 = test2.history.edgesbyendnode[list(edge4.startnodes)[0]]
         history = test.history.Clone()
         history.AddEdges([edge4])
@@ -147,7 +147,7 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
         #In the old way        
         dummysha = hashlib.sha256('Invalid node').hexdigest()
         history = test.history.Clone()
-        edgenull = edges.Merge({test6.currentnode, dummysha}, "", "", "", "", test6.id, test6.__class__.__name__)
+        edgenull = edges.Merge({test6._hashclock, dummysha}, "", "", "", "", test6.id, test6.__class__.__name__)
         history.AddEdges([edgenull])
         test6 = Covers(test.id)
         history.Replay(test6)
@@ -155,11 +155,11 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
 
         #In the new way
         test6 = test.Clone()
-        oldnode = test6.currentnode
-        edgenull = edges.Merge({test6.currentnode, dummysha}, "", "", "", "", test6.id, test6.__class__.__name__)
+        oldnode = test6._hashclock
+        edgenull = edges.Merge({test6._hashclock, dummysha}, "", "", "", "", test6.id, test6.__class__.__name__)
         test6.AddEdges([edgenull])
         self.assertEqual(test6.covers, 2)
-        self.assertEqual(test6.currentnode, oldnode)
+        self.assertEqual(test6._hashclock, oldnode)
         
 
 class ListItemChangeHistoryTestCase(unittest.TestCase):
@@ -499,11 +499,11 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
         for testitem2 in test2.propertyowner2s:
             testitem2.cover = 4
 
-        edge4 = test2.history.edgesbyendnode[test2.currentnode]
+        edge4 = test2.history.edgesbyendnode[test2._hashclock]
 
         test2.covers = 3
         
-        edge3 = test2.history.edgesbyendnode[test2.currentnode]
+        edge3 = test2.history.edgesbyendnode[test2._hashclock]
 
         #Simulate the first user received the second users changes out of order
         #the second edge is received first. Test it is right 
@@ -531,19 +531,19 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
             self.assertEqual(testitem2.cover, 4)
         self.assertEqual(testitem2.cover, 4)
 
-        oldnode = test2.currentnode         
+        oldnode = test2._hashclock         
 
         dummysha1 = hashlib.sha256('Invalid node 1').hexdigest()
         dummysha2 = hashlib.sha256('Invalid node 2').hexdigest()
         edgenull1 = edges.Merge({dummysha1, dummysha2}, "", "", "", "", test2.id, test2.__class__.__name__)
-        edgenull2 = edges.Merge({test2.currentnode, edgenull1.GetEndNode()}, "", "", "", "", test2.id, test2.__class__.__name__)
+        edgenull2 = edges.Merge({test2._hashclock, edgenull1.GetEndNode()}, "", "", "", "", test2.id, test2.__class__.__name__)
 
         self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edgenull2.asTuple()],"immutableobjects":[]}))
         test2s = self.dc.GetByClass(TestPropertyOwner1)
         self.assertEqual(len(test2s), 1)
         test2 = test2s[0]
 
-        self.assertEqual(oldnode, test2.currentnode)
+        self.assertEqual(oldnode, test2._hashclock)
 
         self.assertEqual(test2.covers, 3)
         for testitem2 in test2.propertyowner2s:
@@ -555,7 +555,7 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
         self.assertEqual(len(test2s), 1)
         test2 = test2s[0]
 
-        self.assertEqual(oldnode, test2.currentnode)
+        self.assertEqual(oldnode, test2._hashclock)
 
         self.assertEqual(test2.covers, 3)
         for testitem2 in test2.propertyowner2s:
@@ -576,7 +576,7 @@ class FreezeTestCase(unittest.TestCase):
         test.covers = 2
         test2.covers = 3
         test.Freeze()
-        edge = test2.history.edgesbyendnode[test2.currentnode]
+        edge = test2.history.edgesbyendnode[test2._hashclock]
         test.AddEdges([edge])
         # Normally we would receive the edge and play it. The new edge would win the conflict and update the object but that shouldn't
         # happened because we are frozen
@@ -601,8 +601,8 @@ class FreezeThreeWayMergeTestCase(unittest.TestCase):
         test2.covers = 3
         test3.covers = 4
         test.Freeze()
-        edge2 = test2.history.edgesbyendnode[test2.currentnode]
-        edge3 = test3.history.edgesbyendnode[test3.currentnode]
+        edge2 = test2.history.edgesbyendnode[test2._hashclock]
+        edge3 = test3.history.edgesbyendnode[test3._hashclock]
         test.AddEdges([edge2, edge3])
         # Normally we would receive the edge and play it. The new edge would win the conflict and update the object but that shouldn't
         # happened because we are frozen
@@ -728,7 +728,7 @@ class FreezeUpdateTestCase(unittest.TestCase):
         test2.covers = 3
         test.Freeze()
         self.assertEqual(handler.covers, 2)
-        edge = test2.history.edgesbyendnode[test2.currentnode]
+        edge = test2.history.edgesbyendnode[test2._hashclock]
         test.AddEdges([edge])
         # Normally we would receive the edge and play it. The new edge would win the conflict and update the object but that shouldn't
         # happened because we are frozen
@@ -804,7 +804,7 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
 
         olddc = self.dc
 
-        sharedcurrentnode = test1.currentnode
+        sharedhashclock = test1._hashclock
         #Simulate sending the object to another user via conversion to JSON and emailing
         jsontext = self.dc.asJSON()
 
@@ -821,12 +821,12 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
         self.assertEqual(len(tpo1s), 1)
         test2 = tpo1s[0]
 
-        self.assertEqual(sharedcurrentnode, test2.currentnode)
+        self.assertEqual(sharedhashclock, test2._hashclock)
         #The second user makes some changes and sends them back to the first
         test2.testcounter.add(1)
         self.assertEqual(test2.testcounter.get(), 2)
 
-        edgenext = test2.history.edgesbyendnode[test2.currentnode]
+        edgenext = test2.history.edgesbyendnode[test2._hashclock]
 
 
         #Simulate the first user received the second users changes out of order
