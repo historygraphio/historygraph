@@ -2,11 +2,11 @@
 from __future__ import absolute_import, unicode_literals, print_function
 
 #A merge edge is used to merge a branched hypergraph back together
-from .historyedge import HistoryEdge
+from . import Edge
 
-class HistoryEdgeMerge(HistoryEdge):
+class Merge(Edge):
     def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname):
-        super(HistoryEdgeMerge, self).__init__(startnodes, documentid, documentclassname)
+        super(Merge, self).__init__(startnodes, documentid, documentclassname)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
         assert isinstance(propertyvalue, basestring)
@@ -16,7 +16,7 @@ class HistoryEdgeMerge(HistoryEdge):
         self.propertytype = propertytype
 
     def Clone(self):
-        return HistoryEdgeMerge(self.startnodes, self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
+        return Merge(self.startnodes, self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
 
     def Replay(self, doc):
         pass

@@ -3,16 +3,11 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 #This module handles storing all documents in the database (and reloading)
 from collections import defaultdict
-from .historyedgesimpleproperty import HistoryEdgeSimpleProperty
-from .historyedgeremovechild import HistoryEdgeRemoveChild
-from .historyedgemerge import HistoryEdgeMerge
-from .historyedge import HistoryEdge
 from .documentobject import DocumentObject
-from . import fields
+from . import fields, edges
 from .historygraph import HistoryGraph
 from json import JSONEncoder, JSONDecoder
 from .document import Document
-from .historyedgeaddchild import HistoryEdgeAddChild
 from .immutableobject import ImmutableObject
 import hashlib
 import uuid
@@ -23,7 +18,7 @@ class DocumentCollection(object):
         self.objects = defaultdict(dict)
         self.classes = dict()
         self.historyedgeclasses = dict()
-        for theclass in HistoryEdge.__subclasses__():
+        for theclass in edges.Edge.__subclasses__():
             self.historyedgeclasses[theclass.__name__] = theclass
         self.listeners = list()
 
@@ -99,7 +94,7 @@ class DocumentCollection(object):
             elif propertytypestr == "basestring":
                 propertytype = basestring
                 propertyvalue = str(propertyvaluestr)
-            elif propertytypestr == "" and edgeclassname == "HistoryEdgeMerge":
+            elif propertytypestr == "" and edgeclassname == "Merge":
                 propertytype = None
                 propertyvalue = ""
             else:

@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 #The base class for edges in HistoryGraph
 import hashlib
 
-class HistoryEdge(object):
+class Edge(object):
     def __init__(self, startnodes, documentid, documentclassname):
         self.startnodes = sorted(startnodes)
         self.inactive = False

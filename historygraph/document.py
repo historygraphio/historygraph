@@ -6,13 +6,7 @@ from .documentobject import DocumentObject
 import uuid
 from .historygraph import HistoryGraph
 from .changetype import ChangeType
-from .historyedgesimpleproperty import HistoryEdgeSimpleProperty
-from .historyedgeaddchild import HistoryEdgeAddChild
-from .historyedgeremovechild import HistoryEdgeRemoveChild
-from .historyedgemerge import HistoryEdgeMerge
-from .historyedgeaddintcounter import HistoryEdgeAddIntCounter
-from .historyedgeaddlistitem import HistoryEdgeAddListItem
-from .historyedgeremovelistitem import HistoryEdgeRemoveListItem
+from . import edges
 
 class Document(DocumentObject):
     def Clone(self):
@@ -57,17 +51,17 @@ class Document(DocumentObject):
         nodeset = set()
         nodeset.add(self.currentnode)
         if changetype == ChangeType.SET_PROPERTY_VALUE:
-            edge = HistoryEdgeSimpleProperty(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
+            edge = edges.SimpleProperty(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         elif changetype == ChangeType.ADD_CHILD:
-            edge = HistoryEdgeAddChild(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
+            edge = edges.AddChild(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         elif changetype == ChangeType.REMOVE_CHILD:
-            edge = HistoryEdgeRemoveChild(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
+            edge = edges.RemoveChild(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         elif changetype == ChangeType.ADD_INT_COUNTER:
-            edge = HistoryEdgeAddIntCounter(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
+            edge = edges.AddIntCounter(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         elif changetype == ChangeType.ADD_LISTITEM:
-            edge = HistoryEdgeAddListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
+            edge = edges.AddListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         elif changetype == ChangeType.REMOVE_LISTITEM:
-            edge = HistoryEdgeRemoveListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
+            edge = edges.RemoveListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         else:
             assert False
         self.currentnode = edge.GetEndNode()
@@ -84,19 +78,19 @@ class Document(DocumentObject):
         #Return the document
         return self
 
-    def AddEdges(self, edges):
+    def AddEdges(self, edges_list):
         if self.isfrozen:
             #If we are frozen just add the edge to the history graph. We will be a full replay on unfreezing
-            self.history.AddEdges(edges)
+            self.history.AddEdges(edges_list)
             self.edges_received_while_frozen = True
             return
         fullreplay = False
         startnodes = set()
         endnodes = set()
-        for edge in edges:
-            if isinstance(edge, HistoryEdgeMerge):
+        for edge in edges_list:
+            if isinstance(edge, edges.Merge):
                 #Always perform a full replay on null
-                self.FullReplay(edges)
+                self.FullReplay(edges_list)
                 return
             startnode = list(edge.startnodes)[0]
             if startnode == '':
@@ -106,7 +100,7 @@ class Document(DocumentObject):
             #If any of startnodes in the list are in the history but not the current node we need to do a full replay
             
             if startnode != self.currentnode and startnode in self.history.edgesbyendnode:
-                self.FullReplay(edges)
+                self.FullReplay(edges_list)
                 return
 
             startnodes.add(startnode)
@@ -117,16 +111,16 @@ class Document(DocumentObject):
 
         if len(startnodes_not_in_endnodes) != 1 or len(endnodes_not_in_startnodes) != 1:
             #If this is a continuous chain there is only one start node and endnode
-            self.FullReplay(edges)
+            self.FullReplay(edges_list)
             return
 
         if list(startnodes_not_in_endnodes)[0] != self.currentnode:
             #If the first node in the chain is not the current node 
-            self.FullReplay(edges)
+            self.FullReplay(edges_list)
             return
 
         #Play each edge in the list in sequence
-        edgesdict = dict([(list(edge.startnodes)[0], edge) for edge in edges])
+        edgesdict = dict([(list(edge.startnodes)[0], edge) for edge in edges_list])
         while len(edgesdict) > 0:
             #Get the next edge
             oldnode = self.currentnode
@@ -140,7 +134,7 @@ class Document(DocumentObject):
                 l = self.history.edgesbystartnode[edge.GetEndNode()]
                 if len(l) > 0:
                     #If multiple edge match this one we need to do a full replay
-                    self.FullReplay(edges)
+                    self.FullReplay(edges_list)
                     return
                 #If the end node matches an edge we already have
                 edge2internal = l[0]
@@ -154,9 +148,9 @@ class Document(DocumentObject):
             
         
         
-    def FullReplay(self, edges):
+    def FullReplay(self, edges_list):
         history = self.history.Clone()
-        history.AddEdges(edges)
+        history.AddEdges(edges_list)
         history.ProcessGraph()
         history.RecordPastEdges()
         history.ProcessConflictWinners()

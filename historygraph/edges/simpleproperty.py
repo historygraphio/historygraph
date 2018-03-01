@@ -2,12 +2,12 @@
 from __future__ import absolute_import, unicode_literals, print_function
 
 #An edge that changes a value in a document
-from .historyedge import HistoryEdge
+from . import Edge
 
-class HistoryEdgeSimpleProperty(HistoryEdge):
+class SimpleProperty(Edge):
     def __init__(self, startnodes, propertyownerid,
                  propertyname, propertyvalue, propertytype, documentid, documentclassname):
-        super(HistoryEdgeSimpleProperty, self).__init__(startnodes, documentid, documentclassname)
+        super(SimpleProperty, self).__init__(startnodes, documentid, documentclassname)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
         assert propertytype == 'int' or propertytype == 'basestring'
@@ -24,7 +24,7 @@ class HistoryEdgeSimpleProperty(HistoryEdge):
         setattr(edgeobject, self.propertyname, field.TranslateFromString(self.propertyvalue))
 
     def Clone(self):
-        return HistoryEdgeSimpleProperty(self.startnodes, 
+        return SimpleProperty(self.startnodes, 
                 self.propertyownerid, self.propertyname, self.propertyvalue,
                 self.propertytype, self.documentid, self.documentclassname)
 

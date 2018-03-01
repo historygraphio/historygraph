@@ -2,12 +2,12 @@
 from __future__ import absolute_import, unicode_literals, print_function
 
 #An edge that changes a value in a document
-from .historyedge import HistoryEdge
+from . import Edge
 
-class HistoryEdgeAddIntCounter(HistoryEdge):
+class AddIntCounter(Edge):
     def __init__(self, startnodes, propertyownerid,
                  propertyname, propertyvalue, propertytype, documentid, documentclassname):
-        super(HistoryEdgeAddIntCounter, self).__init__(startnodes, documentid, documentclassname)
+        super(AddIntCounter, self).__init__(startnodes, documentid, documentclassname)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring), "propertytype should be basestring but it actually is " + str(type(propertytype))
         assert propertytype == 'int' or propertytype == 'basestring' or propertytype == 'IntCounter', "Expected int or basestring for property type, actually got " + propertytype
@@ -24,7 +24,7 @@ class HistoryEdgeAddIntCounter(HistoryEdge):
         getattr(edgeobject, self.propertyname).add(field.TranslateFromString(self.propertyvalue))
 
     def Clone(self):
-        return HistoryEdgeAddIntCounter(self.startnodes, 
+        return AddIntCounter(self.startnodes, 
                 self.propertyownerid, self.propertyname, self.propertyvalue,
                 self.propertytype, self.documentid, self.documentclassname)
 

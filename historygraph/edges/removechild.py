@@ -2,12 +2,12 @@
 from __future__ import absolute_import, unicode_literals, print_function
 
 #A HistoryGraph edge that removes a child
-from .historyedge import HistoryEdge
+from . import Edge
 
-class HistoryEdgeRemoveChild(HistoryEdge):
+class RemoveChild(Edge):
     def __init__(self, startnodes, propertyownerid,
                  propertyname, propertyvalue, propertytype, documentid, documentclassname):
-        super(HistoryEdgeRemoveChild, self).__init__(startnodes, documentid, documentclassname)
+        super(RemoveChild, self).__init__(startnodes, documentid, documentclassname)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
         assert isinstance(propertyvalue, basestring)
@@ -21,7 +21,7 @@ class HistoryEdgeRemoveChild(HistoryEdge):
         getattr(parent, self.propertyname).remove(self.propertyvalue)
 
     def Clone(self):
-        return HistoryEdgeRemoveChild(self.startnodes, 
+        return RemoveChild(self.startnodes, 
             self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
 
     def GetConflictWinner(self, edge2):

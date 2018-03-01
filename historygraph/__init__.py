@@ -10,6 +10,6 @@ from .document import Document
 #from .fieldintcounter import FieldIntCounter
 from .immutableobject import ImmutableObject
 #from .fieldlist import FieldList
-from .historyedgemerge import HistoryEdgeMerge
-from .historyedge import HistoryEdge
-from .historygraph import HistoryGraph
+#from .historyedgemerge import HistoryEdgeMerge
+#from .historyedge import HistoryEdge
+#from .historygraph import HistoryGraph

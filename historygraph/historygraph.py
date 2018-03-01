@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 #A HistoryGraph
 from collections import defaultdict
 import uuid
-from .historyedgemerge import HistoryEdgeMerge
+from . import edges
 
 class HistoryGraph(object):
     def __init__(self):
@@ -12,10 +12,10 @@ class HistoryGraph(object):
         self.edgesbyendnode = dict()
         self.isreplaying = False
 
-    def AddEdges(self, edges):
+    def AddEdges(self, edges_list):
         if self.isreplaying:
             return
-        edges2 = [edge for edge in edges if edge.GetEndNode() not in self.edgesbyendnode]
+        edges2 = [edge for edge in edges_list if edge.GetEndNode() not in self.edgesbyendnode]
         if len(edges2) == 0:
             return
         for edge in edges2:
@@ -86,7 +86,7 @@ class HistoryGraph(object):
                 documentid = edge.documentid
                 documentclassname = edge.documentclassname
         if len(presentnodes) > 1:
-            nulledge = HistoryEdgeMerge(presentnodes, "", "", "", "", documentid, documentclassname)
+            nulledge = edges.Merge(presentnodes, "", "", "", "", documentid, documentclassname)
             self.AddEdges([nulledge])
             if len(presentnodes) > 2:
                 self.ProcessGraph()
