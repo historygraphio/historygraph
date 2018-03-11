@@ -31,8 +31,8 @@ class Covers(Document):
 class SimpleCoversTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(TestPropertyOwner1)
-        self.dc.Register(TestPropertyOwner2)
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
 
     def runTest(self):
         #Test merging together simple covers documents
@@ -92,7 +92,7 @@ class TestPropertyOwner1(Document):
 class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(Covers)
+        self.dc.register(Covers)
 
     def runTest(self):
         #Test merging together by receiving an edge
@@ -185,8 +185,8 @@ class ListItemChangeHistoryTestCase(unittest.TestCase):
 class SimpleItemTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(TestPropertyOwner1)
-        self.dc.Register(TestPropertyOwner2)
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
 
     def runTest(self):
         test1 = TestPropertyOwner1()
@@ -206,10 +206,10 @@ class SimpleItemTestCase(unittest.TestCase):
         test1.propertyowner2s.remove(testitem.id)
 
         dc2 = DocumentCollection()
-        dc2.Register(TestPropertyOwner1)
-        dc2.Register(TestPropertyOwner2)
+        dc2.register(TestPropertyOwner1)
+        dc2.register(TestPropertyOwner2)
         test2 = TestPropertyOwner1(test1.id)
-        dc2.AddDocumentObject(test2)
+        dc2.add_document_object(test2)
         test1.history.Replay(test2)
 
         #Check that replaying correctly removes the object
@@ -229,13 +229,13 @@ class SimpleItemTestCase(unittest.TestCase):
 class AdvancedItemTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(TestPropertyOwner1)
-        self.dc.Register(TestPropertyOwner2)
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
 
     def runTest(self):
         #Test changing them deleting a sub element
         test1 = TestPropertyOwner1()
-        self.dc.AddDocumentObject(test1)
+        self.dc.add_document_object(test1)
         testitem1 = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem1)
         testitem1.cover = 1
@@ -248,7 +248,7 @@ class AdvancedItemTestCase(unittest.TestCase):
 
         #Test changing them deleting a sub element. Test merging in the opposition order to previous test
         test1 = TestPropertyOwner1()
-        self.dc.AddDocumentObject(test1)
+        self.dc.add_document_object(test1)
         testitem1 = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem1)
         testitem1.cover = 1
@@ -261,7 +261,7 @@ class AdvancedItemTestCase(unittest.TestCase):
 
         #Test merging changes to different objects in the same document works
         test1 = TestPropertyOwner1()
-        self.dc.AddDocumentObject(test1)
+        self.dc.add_document_object(test1)
         testitem1 = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem1)
         test2 = test1.clone()
@@ -275,7 +275,7 @@ class AdvancedItemTestCase(unittest.TestCase):
 
         #Test changing different objects on different branches works
         test1 = TestPropertyOwner1()
-        self.dc.AddDocumentObject(test1)
+        self.dc.add_document_object(test1)
         testitem1 = TestPropertyOwner2()
         id1 = testitem1.id
         test1.propertyowner2s.add(testitem1)
@@ -298,7 +298,7 @@ class AdvancedItemTestCase(unittest.TestCase):
         
         #Test changing different objects on different branches works reverse merge of above
         test1 = TestPropertyOwner1()
-        self.dc.AddDocumentObject(test1)
+        self.dc.add_document_object(test1)
         testitem1 = TestPropertyOwner2()
         id1 = testitem1.id
         test1.propertyowner2s.add(testitem1)
@@ -325,8 +325,8 @@ class Comments(Document):
 class MergeHistoryCommentTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(TestPropertyOwner1)
-        self.dc.Register(TestPropertyOwner2)
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
 
     def runTest(self):
         #Test merge together two simple covers objects
@@ -352,13 +352,13 @@ class MergeHistoryCommentTestCase(unittest.TestCase):
 class StoreObjectsInJSONTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(TestPropertyOwner1)
-        self.dc.Register(TestPropertyOwner2)
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
 
     def runTest(self):
         #Test writing the history to a sql lite database
         test1 = TestPropertyOwner1()
-        self.dc.AddDocumentObject(test1)
+        self.dc.add_document_object(test1)
         test1id = test1.id
         testitem1 = TestPropertyOwner2()
         testitem1id = testitem1.id
@@ -373,17 +373,17 @@ class StoreObjectsInJSONTestCase(unittest.TestCase):
         for item1 in test3.propertyowner2s:
             self.assertEqual(item1.cover, 3)
         self.assertEqual(test3.covers, 2)
-        self.dc.AddDocumentObject(test3)
+        self.dc.add_document_object(test3)
 
-        test1s = self.dc.GetByClass(TestPropertyOwner1)
+        test1s = self.dc.get_by_class(TestPropertyOwner1)
         self.assertEqual(len(test1s), 1)
 
-        jsontext = self.dc.asJSON()
+        jsontext = self.dc.as_json()
         self.dc = DocumentCollection()
-        self.dc.Register(TestPropertyOwner1)
-        self.dc.Register(TestPropertyOwner2)
-        self.dc.LoadFromJSON(jsontext)
-        test1s = self.dc.GetByClass(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
+        self.dc.load_from_json(jsontext)
+        test1s = self.dc.get_by_class(TestPropertyOwner1)
         self.assertEqual(len(test1s), 1)
         test1 = test1s[0]
         test1id = test1.id
@@ -396,13 +396,13 @@ class StoreObjectsInJSONTestCase(unittest.TestCase):
 class MergeChangesMadeInJSONTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(TestPropertyOwner1)
-        self.dc.Register(TestPropertyOwner2)
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
 
     def runTest(self):
         #Create an object and set some values
         test1 = TestPropertyOwner1()
-        self.dc.AddDocumentObject(test1)
+        self.dc.add_document_object(test1)
         test1id = test1.id
         testitem1 = TestPropertyOwner2()
         testitem1id = testitem1.id
@@ -410,20 +410,20 @@ class MergeChangesMadeInJSONTestCase(unittest.TestCase):
         testitem1.cover = 3
         test1.covers=2        
 
-        self.dc.AddDocumentObject(test1)
+        self.dc.add_document_object(test1)
 
         #Simulate sending the object to another user via conversion to JSON and emailing
-        jsontext = self.dc.asJSON()
+        jsontext = self.dc.as_json()
 
         #Make some local changes
         test1.covers = 4
 
         #Simulate the other user (who received the email with the edges) getting the document and loading it into memory
         self.dc = DocumentCollection()
-        self.dc.Register(TestPropertyOwner1)
-        self.dc.Register(TestPropertyOwner2)
-        self.dc.LoadFromJSON(jsontext)
-        tpo1s = self.dc.GetByClass(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
+        self.dc.load_from_json(jsontext)
+        tpo1s = self.dc.get_by_class(TestPropertyOwner1)
         self.assertEqual(len(tpo1s), 1)
         test2 = tpo1s[0]
 
@@ -435,14 +435,14 @@ class MergeChangesMadeInJSONTestCase(unittest.TestCase):
 
         test2.covers = 3
         
-        jsontext = self.dc.asJSON()
+        jsontext = self.dc.as_json()
         
         #Simulate the first user received the second users changes
         self.dc = DocumentCollection()
-        self.dc.Register(TestPropertyOwner1)
-        self.dc.Register(TestPropertyOwner2)
-        self.dc.LoadFromJSON(jsontext)
-        test2s = self.dc.GetByClass(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
+        self.dc.load_from_json(jsontext)
+        test2s = self.dc.get_by_class(TestPropertyOwner1)
         self.assertEqual(len(test2s), 1)
         test2 = test2s[0]
 
@@ -464,8 +464,8 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
     #Orphaned edges and partially orphaned merge edges
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(TestPropertyOwner1)
-        self.dc.Register(TestPropertyOwner2)
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
 
     def runTest(self):
         #Create an object and set some values
@@ -477,19 +477,19 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
         testitem1.cover = 3
         test1.covers=2        
 
-        self.dc.AddDocumentObject(test1)
+        self.dc.add_document_object(test1)
 
         olddc = self.dc
 
         #Simulate sending the object to another user via conversion to JSON and emailing
-        jsontext = self.dc.asJSON()
+        jsontext = self.dc.as_json()
 
         #Simulate the other user (who received the email with the edges) getting the document and loading it into memory
         self.dc = DocumentCollection()
-        self.dc.Register(TestPropertyOwner1)
-        self.dc.Register(TestPropertyOwner2)
-        self.dc.LoadFromJSON(jsontext)
-        tpo1s = self.dc.GetByClass(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
+        self.dc.load_from_json(jsontext)
+        tpo1s = self.dc.get_by_class(TestPropertyOwner1)
         self.assertEqual(len(tpo1s), 1)
         test2 = tpo1s[0]
 
@@ -508,8 +508,8 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
         #Simulate the first user received the second users changes out of order
         #the second edge is received first. Test it is right 
         self.dc = olddc
-        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edge3.as_tuple()],"immutableobjects":[]}))
-        test2s = self.dc.GetByClass(TestPropertyOwner1)
+        self.dc.load_from_json(JSONEncoder().encode({"history":[edge3.as_tuple()],"immutableobjects":[]}))
+        test2s = self.dc.get_by_class(TestPropertyOwner1)
         self.assertEqual(len(test2s), 1)
         test2 = test2s[0]
 
@@ -520,8 +520,8 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
          
         #Simulate the first user received the second users changes out of order
         #the first edge is not received make sure everything 
-        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edge4.as_tuple()],"immutableobjects":[]}))
-        test2s = self.dc.GetByClass(TestPropertyOwner1)
+        self.dc.load_from_json(JSONEncoder().encode({"history":[edge4.as_tuple()],"immutableobjects":[]}))
+        test2s = self.dc.get_by_class(TestPropertyOwner1)
         self.assertEqual(len(test2s), 1)
 
         test2 = test2s[0]
@@ -538,8 +538,8 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
         edgenull1 = edges.Merge({dummysha1, dummysha2}, "", "", "", "", test2.id, test2.__class__.__name__)
         edgenull2 = edges.Merge({test2._clockhash, edgenull1.get_end_node()}, "", "", "", "", test2.id, test2.__class__.__name__)
 
-        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edgenull2.as_tuple()],"immutableobjects":[]}))
-        test2s = self.dc.GetByClass(TestPropertyOwner1)
+        self.dc.load_from_json(JSONEncoder().encode({"history":[edgenull2.as_tuple()],"immutableobjects":[]}))
+        test2s = self.dc.get_by_class(TestPropertyOwner1)
         self.assertEqual(len(test2s), 1)
         test2 = test2s[0]
 
@@ -550,8 +550,8 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
             self.assertEqual(testitem2.cover, 4)
         self.assertEqual(testitem2.cover, 4)
 
-        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edgenull1.as_tuple()],"immutableobjects":[]}))
-        test2s = self.dc.GetByClass(TestPropertyOwner1)
+        self.dc.load_from_json(JSONEncoder().encode({"history":[edgenull1.as_tuple()],"immutableobjects":[]}))
+        test2s = self.dc.get_by_class(TestPropertyOwner1)
         self.assertEqual(len(test2s), 1)
         test2 = test2s[0]
 
@@ -566,7 +566,7 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
 class FreezeTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(Covers)
+        self.dc.register(Covers)
 
     def runTest(self):
         #Test merging together by receiving an edge
@@ -589,7 +589,7 @@ class FreezeTestCase(unittest.TestCase):
 class FreezeThreeWayMergeTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(Covers)
+        self.dc.register(Covers)
 
     def runTest(self):
         #Test merging together by receiving an edge
@@ -616,7 +616,7 @@ class FreezeThreeWayMergeTestCase(unittest.TestCase):
 class LargeMergeTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(Covers)
+        self.dc.register(Covers)
 
     def runTest(self):
         #Test merging together performance by receiving large numbers of edges
@@ -647,7 +647,7 @@ class MessageTest(ImmutableObject):
 class ImmutableClassTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(Covers)
+        self.dc.register(Covers)
 
     def runTest(self):
         t = int(round(time.time() * 1000))
@@ -663,24 +663,24 @@ class ImmutableClassTestCase(unittest.TestCase):
 class StoreImmutableObjectsInJSONTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(MessageTest)
+        self.dc.register(MessageTest)
 
     def runTest(self):
         #Test writing the immutable object to an sql lite database
         t = int(round(time.time() * 1000))
         m = MessageTest(messagetime=t, text="Hello")
-        self.dc.AddImmutableObject(m)
+        self.dc.add_immutable_object(m)
         test1id = m.GetHash()
 
-        test1s = self.dc.GetByClass(MessageTest)
+        test1s = self.dc.get_by_class(MessageTest)
         self.assertEqual(len(test1s), 1)
 
-        jsontext = self.dc.asJSON()
+        jsontext = self.dc.as_json()
 
         self.dc = DocumentCollection()
-        self.dc.Register(MessageTest)
-        self.dc.LoadFromJSON(jsontext)
-        test1s = self.dc.GetByClass(MessageTest)
+        self.dc.register(MessageTest)
+        self.dc.load_from_json(jsontext)
+        test1s = self.dc.get_by_class(MessageTest)
         self.assertEqual(len(test1s), 1)
         test1 = test1s[0]
         self.assertEqual(test1id, test1.GetHash())
@@ -694,8 +694,8 @@ class TestUpdateHandler(object):
 class SimpleCoversUpdateTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(TestPropertyOwner1)
-        self.dc.Register(TestPropertyOwner2)
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
 
     def runTest(self):
         #Test merging together simple covers documents
@@ -714,7 +714,7 @@ class SimpleCoversUpdateTestCase(unittest.TestCase):
 class FreezeUpdateTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(Covers)
+        self.dc.register(Covers)
 
     def runTest(self):
         #Test merging together by receiving an edge
@@ -791,14 +791,14 @@ class UncleanReplayCounterTestCase(unittest.TestCase):
 class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.Register(CounterTestContainer)
+        self.dc.register(CounterTestContainer)
 
     def runTest(self):
         #Create an object and set some values
         test1 = CounterTestContainer()
         test1id = test1.id
 
-        self.dc.AddDocumentObject(test1)
+        self.dc.add_document_object(test1)
         test1.testcounter.add(1)
         self.assertEqual(test1.testcounter.get(), 1)
 
@@ -806,7 +806,7 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
 
         sharedhashclock = test1._clockhash
         #Simulate sending the object to another user via conversion to JSON and emailing
-        jsontext = self.dc.asJSON()
+        jsontext = self.dc.as_json()
 
         #Simulate making local conflicting changes
         test1.testcounter.subtract(1)
@@ -814,10 +814,10 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
 
         #Simulate the other user (who received the email with the edges) getting the document and loading it into memory
         self.dc = DocumentCollection()
-        self.dc.Register(CounterTestContainer)
-        self.dc.LoadFromJSON(jsontext)
-        self.assertEqual(jsontext, self.dc.asJSON())
-        tpo1s = self.dc.GetByClass(CounterTestContainer)
+        self.dc.register(CounterTestContainer)
+        self.dc.load_from_json(jsontext)
+        self.assertEqual(jsontext, self.dc.as_json())
+        tpo1s = self.dc.get_by_class(CounterTestContainer)
         self.assertEqual(len(tpo1s), 1)
         test2 = tpo1s[0]
 
@@ -832,8 +832,8 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
         #Simulate the first user received the second users changes out of order
         #the second edge is received first. Test it is right 
         self.dc = olddc
-        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edgenext.as_tuple()],"immutableobjects":[]}))
-        test2s = self.dc.GetByClass(CounterTestContainer)
+        self.dc.load_from_json(JSONEncoder().encode({"history":[edgenext.as_tuple()],"immutableobjects":[]}))
+        test2s = self.dc.get_by_class(CounterTestContainer)
         self.assertEqual(len(test2s), 1)
         test2 = test2s[0]
         #print "test2 edges=",[str(edge) for edge in test2.history.GetAllEdges()]
@@ -978,8 +978,8 @@ class FieldListMergeTestCase(unittest.TestCase):
     # Test each individual function in the fields.List and FieldListImpl classes
     def runTest(self):
         dc = DocumentCollection()
-        dc.Register(TestFieldListOwner1)
-        dc.Register(TestFieldListOwner2)
+        dc.register(TestFieldListOwner1)
+        dc.register(TestFieldListOwner2)
         test1 = TestFieldListOwner1()
         l0 = TestFieldListOwner2()
         l1 = TestFieldListOwner2()
@@ -987,7 +987,7 @@ class FieldListMergeTestCase(unittest.TestCase):
         test1.propertyowner2s.insert(1, l1)
 
         test2 = test1.clone()
-        dc.AddDocumentObject(test2)
+        dc.add_document_object(test2)
 
         l2 = TestFieldListOwner2()
         test2.propertyowner2s.insert(2, l2)
@@ -1018,11 +1018,11 @@ class FieldListMergeTestCase(unittest.TestCase):
     # Test each individual function in the fields.List and FieldListImpl classes
     def runTest(self):
         dc = DocumentCollection()
-        dc.Register(TestListofLists1)
-        dc.Register(TestListofLists2)
-        dc.Register(TestListofLists3)
+        dc.register(TestListofLists1)
+        dc.register(TestListofLists2)
+        dc.register(TestListofLists3)
         test1 = TestListofLists1()
-        dc.AddDocumentObject(test1)
+        dc.add_document_object(test1)
         l0 = TestListofLists2()
         l1 = TestListofLists2()
         test1.propertyowner2s.insert(0, l0)
@@ -1040,11 +1040,11 @@ class FieldListMergeTestCase(unittest.TestCase):
         ll0.comment = 'Hello'
 
         dc2 = DocumentCollection()
-        dc2.Register(TestListofLists1)
-        dc2.Register(TestListofLists2)
-        dc2.Register(TestListofLists3)
+        dc2.register(TestListofLists1)
+        dc2.register(TestListofLists2)
+        dc2.register(TestListofLists3)
         test2 = TestListofLists1(test1.id)
-        dc2.AddDocumentObject(test2)
+        dc2.add_document_object(test2)
         test1.history.Replay(test2)
 
         assert test2.propertyowner2s[0].id == l0.id
@@ -1071,11 +1071,11 @@ class FieldCollofCollMergeTestCase(unittest.TestCase):
     # Test each individual function in the fields.List and FieldListImpl classes
     def runTest(self):
         dc = DocumentCollection()
-        dc.Register(TestColofCol1)
-        dc.Register(TestColofCol2)
-        dc.Register(TestColofCols3)
+        dc.register(TestColofCol1)
+        dc.register(TestColofCol2)
+        dc.register(TestColofCols3)
         test1 = TestColofCol1()
-        dc.AddDocumentObject(test1)
+        dc.add_document_object(test1)
         l0 = TestColofCol2()
         l1 = TestColofCol2()
         test1.propertyowner2s.add(l0)
@@ -1093,11 +1093,11 @@ class FieldCollofCollMergeTestCase(unittest.TestCase):
         ll0.comment = 'Hello'
 
         dc2 = DocumentCollection()
-        dc2.Register(TestColofCol1)
-        dc2.Register(TestColofCol2)
-        dc2.Register(TestColofCols3)
+        dc2.register(TestColofCol1)
+        dc2.register(TestColofCol2)
+        dc2.register(TestColofCols3)
         test2 = TestColofCol1(test1.id)
-        dc2.AddDocumentObject(test2)
+        dc2.add_document_object(test2)
         test1.history.Replay(test2)
 
         assert {l.id for l in test1.propertyowner2s} == {l0.id, l1.id}

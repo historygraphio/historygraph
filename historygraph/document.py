@@ -67,7 +67,7 @@ class Document(DocumentObject):
         self._clockhash = edge.get_end_node()
         self.history.AddEdges([edge])
         for l in self.edgeslistener:
-            l.EdgesAdded([edge])
+            l.edges_added([edge])
 
     def get_document_object(self, id):
         if id == self.id:
@@ -172,7 +172,7 @@ class Document(DocumentObject):
             history.Replay(self)
             edges = history.GetAllEdges()
             for l in self.edgeslistener:
-                l.EdgesAdded(edges)
+                l.edges_added(edges)
 
     def add_edges_listener(self, listener):
         self.edgeslistener.append(listener)

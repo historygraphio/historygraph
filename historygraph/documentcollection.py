@@ -22,11 +22,11 @@ class DocumentCollection(object):
             self.historyedgeclasses[theclass.__name__] = theclass
         self.listeners = list()
 
-    def Register(self, theclass):
+    def register(self, theclass):
         self.classes[theclass.__name__] = theclass
         
 
-    def getAllEdges(self):
+    def get_all_edges(self):
         historyedges = list()
         immutableobjects = list()
         for classname in self.objects:
@@ -59,11 +59,11 @@ class DocumentCollection(object):
                 assert False
         return (historyedges, immutableobjects)
 
-    def asJSON(self):
-        (historyedges, immutableobjects) = self.getAllEdges()
+    def as_json(self):
+        (historyedges, immutableobjects) = self.get_all_edges()
         return JSONEncoder().encode({"history":historyedges,"immutableobjects":immutableobjects})
 
-    def LoadFromJSON(self, jsontext):
+    def load_from_json(self, jsontext):
         historygraphdict = defaultdict(HistoryGraph)
         documentclassnamedict = dict()
 
@@ -132,7 +132,7 @@ class DocumentCollection(object):
             history.Replay(doc)
 
             if not wasexisting:
-                self.AddDocumentObject(doc)
+                self.add_document_object(doc)
             
         rows = rawdc["immutableobjects"]
         for d in rows:
@@ -151,10 +151,10 @@ class DocumentCollection(object):
                 self.objects[classname][io.GetHash()] = io
             
        
-    def GetByClass(self, theclass):
+    def get_by_class(self, theclass):
         return [obj for (objid, obj) in self.objects[theclass.__name__].iteritems()]
 
-    def AddDocumentObject(self, obj):
+    def add_document_object(self, obj):
         assert isinstance(obj, DocumentObject)
         obj.get_document().dc = self
         assert obj.__class__.__name__  in self.classes
@@ -167,19 +167,19 @@ class DocumentCollection(object):
         self.objects[obj.__class__.__name__][obj.id] = obj
         obj.get_document().add_edges_listener(self)
         for l in self.listeners:
-            l.AddDocumentObject(self, obj)
+            l.document_object_added(self, obj)
 
-    def AddImmutableObject(self, obj):
+    def add_immutable_object(self, obj):
         assert isinstance(obj, ImmutableObject)
         assert obj.__class__.__name__  in self.classes
         self.objects[obj.__class__.__name__][obj.GetHash()] = obj
         for l in self.listeners:
-            l.ImmutableObjectAdded(self, obj)
+            l.immutable_object_added(self, obj)
 
-    def AddListener(self, listener):
+    def add_listener(self, listener):
         self.listeners.append(listener)
 
-    def GetObjectByID(self, classname, id):
+    def get_object_by_id(self, classname, id):
         return self.objects[classname][id]
         """
         matches = [a for a in self.objects[classname] if a.id == id]
@@ -191,9 +191,9 @@ class DocumentCollection(object):
             assert False
         """
 
-    def EdgesAdded(self, edges):
+    def edges_added(self, edges):
         for l in self.listeners:
-            l.EdgesAdded(self, edges)
+            l.edges_added(self, edges)
         
 
 
