@@ -36,18 +36,18 @@ class ImmutableObject(object):
             return
         super(ImmutableObject, self).__setattr__(name, value)
 
-    def GetHash(self):
-        #Immutable objects don't have UUIDs have have SHA1 hashes of their content
+    def get_hash(self):
+        #Immutable objects don't have UUIDs have have SHA256 hashes of their content
         s = sorted([(k,str(getattr(self, k))) for (k,v) in self._field.iteritems()], key=itemgetter(0)) + [('_prevhash', str(self._prevhash))]
 
         return hashlib.sha256(str(s)).hexdigest()
         
-    def asDict(self):
+    def as_dict(self):
         #Return a dict suitable for transport
         ret = dict()
         for k in self._field:
             ret[k] = getattr(self, k)
         ret["_prevhash"] = self._prevhash
         ret["classname"] = self.__class__.__name__
-        ret["hash"] = self.GetHash()
+        ret["hash"] = self.get_hash()
         return ret

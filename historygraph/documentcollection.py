@@ -54,7 +54,7 @@ class DocumentCollection(object):
                         historyedges.append(edge.as_tuple())
             elif issubclass(self.classes[classname], ImmutableObject):
                 for (objid, obj) in documentdict.iteritems():
-                    immutableobjects.append(obj.asDict())
+                    immutableobjects.append(obj.as_dict())
             else:
                 assert False
         return (historyedges, immutableobjects)
@@ -145,10 +145,10 @@ class DocumentCollection(object):
             io = theclass(**d)
             wasexisting = False
             for (io2id, io2) in self.objects[classname].iteritems():
-                if io2.GetHash() == io.GetHash():
+                if io2.get_hash() == io.get_hash():
                     wasexisting = True
             if wasexisting == False:
-                self.objects[classname][io.GetHash()] = io
+                self.objects[classname][io.get_hash()] = io
             
        
     def get_by_class(self, theclass):
@@ -172,7 +172,7 @@ class DocumentCollection(object):
     def add_immutable_object(self, obj):
         assert isinstance(obj, ImmutableObject)
         assert obj.__class__.__name__  in self.classes
-        self.objects[obj.__class__.__name__][obj.GetHash()] = obj
+        self.objects[obj.__class__.__name__][obj.get_hash()] = obj
         for l in self.listeners:
             l.immutable_object_added(self, obj)
 

@@ -670,7 +670,7 @@ class StoreImmutableObjectsInJSONTestCase(unittest.TestCase):
         t = int(round(time.time() * 1000))
         m = MessageTest(messagetime=t, text="Hello")
         self.dc.add_immutable_object(m)
-        test1id = m.GetHash()
+        test1id = m.get_hash()
 
         test1s = self.dc.get_by_class(MessageTest)
         self.assertEqual(len(test1s), 1)
@@ -683,7 +683,7 @@ class StoreImmutableObjectsInJSONTestCase(unittest.TestCase):
         test1s = self.dc.get_by_class(MessageTest)
         self.assertEqual(len(test1s), 1)
         test1 = test1s[0]
-        self.assertEqual(test1id, test1.GetHash())
+        self.assertEqual(test1id, test1.get_hash())
 
 
 class TestUpdateHandler(object):
