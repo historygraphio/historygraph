@@ -36,7 +36,7 @@ class List(Field):
                 added_node = List._ListNode('', self.parent.get_document().depth(), obj.id, obj)
                 self._listnodes.append(added_node)
             else:
-                self.Render()
+                self.render()
                 added_node = List._ListNode(self._rendered_list[index].id, self.parent.get_document().depth(), obj.id, obj)
                 self._listnodes.append(added_node)
             if hasattr(self, "_rendered_list"):
@@ -48,7 +48,7 @@ class List(Field):
             self.insert(len(self), obj)
 
         def remove(self, index):
-            self.Render()
+            self.render()
             node = self._rendered_list[index] # Get the node we are deleting
             self.remove_by_node(node)
 
@@ -74,14 +74,14 @@ class List(Field):
             self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
         def __len__(self):
-            self.Render()
+            self.render()
             return len(self._rendered_list)
 
         def __getitem__(self,index):
-            self.Render()
+            self.render()
             return self._rendered_list[index].obj
 
-        def Clone(self, owner, name):
+        def clone(self, owner, name):
             ret = List.FieldListImpl(self.theclass, owner, name)
             ret._listnodes = list(self._listnodes)
             ret._tombstones = set(self._tombstones)
@@ -93,22 +93,22 @@ class List(Field):
             if hasattr(self, "_rendered_list"):
                 delattr(self, "_rendered_list")
 
-        def Render(self):
+        def render(self):
             if hasattr(self, "_rendered_list"):
                 return
-            # Render the list - replay all of the additions
+            # render the list - replay all of the additions
             l = self._render('')
             self._rendered_list = tuple([node for node in l if node.id not in self._tombstones])
 
         def _render(self, nodeid):
-            matching = self.GetMatchingListNodes(nodeid)
+            matching = self.get_matching_list_nodes(nodeid)
             ret = tuple()
             for node in matching:
                 ret = ret + (node, )
                 ret = ret + self._render(node.id)
             return ret
 
-        def GetMatchingListNodes(self, nodeid):
+        def get_matching_list_nodes(self, nodeid):
             # Get a list of nodes with matching ids
             l = [n for n in self._listnodes if n.parent == nodeid]
             # Sort the nodes in timestamp then id order
@@ -126,8 +126,8 @@ class List(Field):
     def create_instance(self, owner, name):
         return List.FieldListImpl(self.theclass, owner, name)
 
-    def Clone(self, name, src, owner):
-        return getattr(src, name).Clone(owner, name)
+    def clone(self, name, src, owner):
+        return getattr(src, name).clone(owner, name)
 
     def clean(self, owner, name):
         return getattr(owner, name).clean()
