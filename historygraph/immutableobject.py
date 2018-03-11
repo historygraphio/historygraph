@@ -20,7 +20,7 @@ class ImmutableObject(object):
             self._field[k] = var
             assert isinstance(var, fields.Collection) == False #Immutable objects not allow references to other objects just use a FieldText as a key
             if isinstance(var, fields.Field):
-                setattr(self, k, var.CreateInstance(self, k))
+                setattr(self, k, var.create_instance(self, k))
                 if k in kwargs:
                     setattr(self, k, kwargs[k])
         self._prevhash = kwargs['_prevhash'] if '_prevhash' in kwargs else ''

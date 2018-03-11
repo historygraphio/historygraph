@@ -179,7 +179,7 @@ class Document(DocumentObject):
 
     def clean(self):
         for (propname, prop) in self._field.items():
-            prop.Clean(self, propname)
+            prop.clean(self, propname)
 
     def depth(self):
         return self.history.depth(self._clockhash)

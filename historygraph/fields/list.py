@@ -87,7 +87,7 @@ class List(Field):
             ret._tombstones = set(self._tombstones)
             return ret
 
-        def Clean(self):
+        def clean(self):
             self._listnodes = list()
             self._tombstones = set()
             if hasattr(self, "_rendered_list"):
@@ -123,11 +123,11 @@ class List(Field):
     def __init__(self, theclass):
         self.theclass = theclass
 
-    def CreateInstance(self, owner, name):
+    def create_instance(self, owner, name):
         return List.FieldListImpl(self.theclass, owner, name)
 
     def Clone(self, name, src, owner):
         return getattr(src, name).Clone(owner, name)
 
-    def Clean(self, owner, name):
-        return getattr(owner, name).Clean()
+    def clean(self, owner, name):
+        return getattr(owner, name).clean()

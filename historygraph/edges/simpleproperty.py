@@ -21,7 +21,7 @@ class SimpleProperty(Edge):
             return
         edgeobject = doc.get_document_object(self.propertyownerid)
         field = edgeobject._field[self.propertyname]
-        setattr(edgeobject, self.propertyname, field.TranslateFromString(self.propertyvalue))
+        setattr(edgeobject, self.propertyname, field.translate_from_string(self.propertyvalue))
 
     def clone(self):
         return SimpleProperty(self._start_hashes, 

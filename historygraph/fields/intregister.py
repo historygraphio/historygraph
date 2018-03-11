@@ -5,17 +5,17 @@ from __future__ import absolute_import, unicode_literals, print_function
 from . import Field
 
 class IntRegister(Field):
-    def CreateInstance(self, owner, name):
+    def create_instance(self, owner, name):
         return 0
 
-    def TranslateFromString(self, s):
+    def translate_from_string(self, s):
         return int(s)
 
-    def Clone(self, propertyname, src, owner):
+    def clone(self, propertyname, src, owner):
         return getattr(src, propertyname)
 
-    def GetTypeName(self):
+    def get_type_name(self):
         return "int"
 
-    def Clean(self, owner, name):
+    def clean(self, owner, name):
         pass

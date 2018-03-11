@@ -27,24 +27,24 @@ class IntCounter(Field):
             assert isinstance(propertyownerid, basestring)
             self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
-        def Clone(self, owner, name):
+        def clone(self, owner, name):
             ret = IntCounter._FieldIntCounterImpl(self.parent, self.name)
             ret.value = self.value
             return ret
 
-        def Clean(self):
+        def clean(self):
             self.value = 0
 
 
-    def CreateInstance(self, owner, name):
+    def create_instance(self, owner, name):
         return IntCounter._FieldIntCounterImpl(owner, name)
 
-    def Clone(self, name, src, owner):
-        return getattr(src, name).Clone(owner, name)
+    def clone(self, name, src, owner):
+        return getattr(src, name).clone(owner, name)
 
     def TranslateFromString(self, s):
         return int(s)
 
-    def Clean(self, owner, name):
-        return getattr(owner, name).Clean()
+    def clean(self, owner, name):
+        return getattr(owner, name).clean()
 

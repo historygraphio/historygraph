@@ -31,7 +31,7 @@ class DocumentObject(object):
             var = getattr(self.__class__, k)
             self._field[k] = var
             if isinstance(var, fields.Field):
-                setattr(self, k, var.CreateInstance(self, k))
+                setattr(self, k, var.create_instance(self, k))
         self.insetattr = False
         
     def __setattr__(self, name, value):
@@ -41,7 +41,7 @@ class DocumentObject(object):
         self.insetattr = True
         if name in self._field:
             if type(self._field[name]) != fields.Collection and type(self._field[name]) != fields.IntCounter and type(self._field[name]) != fields.List:
-                self.was_changed(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self._field[name].GetTypeName())
+                self.was_changed(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self._field[name].get_type_name())
         self.insetattr = False
         for h in self.change_handlers:
             h(self)
@@ -54,7 +54,7 @@ class DocumentObject(object):
     def copy_document_object(self, src):
         for k in src._field:
             v = src._field[k]
-            setattr(self, k, v.Clone(k, src, self))
+            setattr(self, k, v.clone(k, src, self))
 
     def get_document(self):
         #Return the document

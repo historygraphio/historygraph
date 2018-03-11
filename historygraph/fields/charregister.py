@@ -5,18 +5,18 @@ from __future__ import absolute_import, unicode_literals, print_function
 from . import Field
 
 class CharRegister(Field):
-    def CreateInstance(self, owner, name):
+    def create_instance(self, owner, name):
         return ""
 
-    def TranslateFromString(self, s):
+    def translate_from_string(self, s):
         return s
 
-    def Clone(self, propertyname, src, owner):
+    def clone(self, propertyname, src, owner):
         return getattr(src, propertyname)
 
-    def GetTypeName(self):
+    def get_type_name(self):
         return "basestring"
 
-    def Clean(self, owner, name):
+    def clean(self, owner, name):
         pass
     

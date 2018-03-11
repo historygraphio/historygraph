@@ -40,7 +40,7 @@ class Collection(Field):
             for item in self.l:
                 yield doc.documentobjects[item]
 
-        def Clone(self, owner, name):
+        def clone(self, owner, name):
             ret = Collection._FieldCollectionImpl(self.theclass, owner, name)
             srcdoc = self.parent.get_document()
             for objid in self.l:
@@ -48,7 +48,7 @@ class Collection(Field):
                 ret.add(srcobj.clone())
             return ret
 
-        def Clean(self):
+        def clean(self):
             self.l = set()
 
         def get_document(self):
@@ -59,11 +59,11 @@ class Collection(Field):
     def __init__(self, theclass):
         self.theclass = theclass
 
-    def CreateInstance(self, owner, name):
+    def create_instance(self, owner, name):
         return Collection._FieldCollectionImpl(self.theclass, owner, name)
 
-    def Clone(self, name, src, owner):
-        return getattr(src, name).Clone(owner, name)
+    def clone(self, name, src, owner):
+        return getattr(src, name).clone(owner, name)
 
-    def Clean(self, owner, name):
-        return getattr(owner, name).Clean()
+    def clean(self, owner, name):
+        return getattr(owner, name).clean()

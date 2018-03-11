@@ -909,7 +909,7 @@ class FieldListFunctionsTestCase(unittest.TestCase):
 
         parent = uuid.uuid4()
         name = uuid.uuid4()
-        flImpl = fl.CreateInstance(parent, name)
+        flImpl = fl.create_instance(parent, name)
         self.assertEqual(flImpl.theclass, TestPropertyOwner1)
         self.assertEqual(flImpl.parent, parent)
         self.assertEqual(flImpl.name, name)
@@ -920,7 +920,7 @@ class FieldListFunctionsTestCase(unittest.TestCase):
 
         parent = TestPropertyOwner1()
         name = "test"
-        flImpl = fl.CreateInstance(parent, name)
+        flImpl = fl.create_instance(parent, name)
         test1 = TestPropertyOwner1()
         self.assertEqual(parent.depth(), 0)
         flImpl.insert(0, test1)
@@ -959,7 +959,7 @@ class FieldListFunctionsTestCase(unittest.TestCase):
         self.assertEqual(flImpl[0].id, l[0].id) 
         self.assertEqual(flImpl[1].id, l[1].id) 
         
-        flImpl.Clean()
+        flImpl.clean()
         self.assertEqual(len(flImpl._listnodes), 0)
         self.assertEqual(len(flImpl._tombstones), 0)
         self.assertFalse(hasattr(flImpl, "_rendered_list"))
