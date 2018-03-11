@@ -17,15 +17,15 @@ class RemoveListItem(Edge):
         self.propertyvalue = propertyvalue
         self.propertytype = propertytype
 
-    def Replay(self, doc):
+    def replay(self, doc):
         parent = doc.GetDocumentObject(self.propertyownerid)
         getattr(parent, self.propertyname).remove_by_nodeid(self.propertyvalue)
 
-    def Clone(self):
+    def clone(self):
         return RemoveListItem(self.startnodes, 
             self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
 
-    def GetConflictWinner(self, edge2):
+    def get_conflict_winner(self, edge2):
         return 0
 
     

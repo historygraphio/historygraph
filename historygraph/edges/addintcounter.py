@@ -16,19 +16,19 @@ class AddIntCounter(Edge):
         self.propertyvalue = propertyvalue
         self.propertytype = propertytype
 
-    def Replay(self, doc):
+    def replay(self, doc):
         if self._inactive:
             return
         edgeobject = doc.get_document_object(self.propertyownerid)
         field = edgeobject._field[self.propertyname]
         getattr(edgeobject, self.propertyname).add(field.TranslateFromString(self.propertyvalue))
 
-    def Clone(self):
+    def clone(self):
         return AddIntCounter(self._start_hashes, 
                 self.propertyownerid, self.propertyname, self.propertyvalue,
                 self.propertytype, self.documentid, self.documentclassname)
 
-    def GetConflictWinner(self, edge2):
+    def get_conflict_winner(self, edge2):
         return 0 # Counter CRDT edges can never conflict
 
     def GetEdgeDescription(self):

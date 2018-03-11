@@ -127,7 +127,7 @@ class Document(DocumentObject):
             edge = edgesdict[self._clockhash]
             #Play it
             self.history.add_edges([edge])
-            edge.Replay(self)
+            edge.replay(self)
             assert self._clockhash == edge.get_end_node()
             assert self._clockhash != oldnode
             if edge.get_end_node() in self.history.edgesbystartnode:

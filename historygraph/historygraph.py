@@ -43,7 +43,7 @@ class HistoryGraph(object):
         edgeclones = list()
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
-            edge2 = edge.Clone()
+            edge2 = edge.clone()
             edgeclones.append(edge2)
             assert edge.get_end_node() == edge2.get_end_node(), 'Mismatch edge = ' + repr(edge.asDict()) + ', edge2 = ' + repr(edge2.asDict())
         ret.add_edges(edgeclones)
@@ -52,7 +52,7 @@ class HistoryGraph(object):
     def replay_edges(self, doc, edge):
         if edge.can_replay(self) == False:
             return
-        edge.Replay(doc)
+        edge.replay(doc)
         edge.isplayed = True
         edges = self.edgesbystartnode[edge.get_end_node()]
         doc._clockhash = edge.get_end_node()

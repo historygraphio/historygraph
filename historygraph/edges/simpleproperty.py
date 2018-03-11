@@ -16,19 +16,19 @@ class SimpleProperty(Edge):
         self.propertyvalue = propertyvalue
         self.propertytype = propertytype
 
-    def Replay(self, doc):
+    def replay(self, doc):
         if self._inactive:
             return
         edgeobject = doc.get_document_object(self.propertyownerid)
         field = edgeobject._field[self.propertyname]
         setattr(edgeobject, self.propertyname, field.TranslateFromString(self.propertyvalue))
 
-    def Clone(self):
+    def clone(self):
         return SimpleProperty(self._start_hashes, 
                 self.propertyownerid, self.propertyname, self.propertyvalue,
                 self.propertytype, self.documentid, self.documentclassname)
 
-    def GetConflictWinner(self, edge2):
+    def get_conflict_winner(self, edge2):
         if self.propertyownerid != edge2.propertyownerid:
             return 0
         if self.propertyname != edge2.propertyname:

@@ -15,7 +15,7 @@ class AddChild(Edge):
         self.propertyname = propertyname
         self.propertytype = propertytype
 
-    def Replay(self, doc):
+    def replay(self, doc):
         newobj = doc.dc.classes[self.propertytype](self.propertyvalue)
         doc.documentobjects[newobj.id] = newobj
         if isinstance(self, AddChild) and self.propertyownerid == "" and self.propertyname == "":
@@ -24,11 +24,11 @@ class AddChild(Edge):
             parent = doc.get_document_object(self.propertyownerid)
             getattr(parent, self.propertyname).add(newobj)
 
-    def Clone(self):
+    def clone(self):
         return AddChild(self._start_hashes, 
             self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
 
-    def GetConflictWinner(self, edge2):
+    def get_conflict_winner(self, edge2):
         return 0 #There can never be a conflict because all edges are new
 
     

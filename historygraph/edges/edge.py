@@ -41,7 +41,7 @@ class Edge(object):
 		    return; #Different edge types can never conflict
 	    if (self._inactive or edge2.inactive):
 		    return; #Inactive edges can never conflict with active edges
-	    conflictwinner = self.GetConflictWinner(edge2)
+	    conflictwinner = self.get_conflict_winner(edge2)
 	    assert conflictwinner == -1 or conflictwinner == 0 or conflictwinner == 1
 	    if conflictwinner == 1:
 	        self._inactive = True
