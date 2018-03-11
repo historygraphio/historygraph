@@ -17,7 +17,7 @@ class RemoveChild(Edge):
         self.propertytype = propertytype
 
     def Replay(self, doc):
-        parent = doc.GetDocumentObject(self.propertyownerid)
+        parent = doc.get_document_object(self.propertyownerid)
         getattr(parent, self.propertyname).remove(self.propertyvalue)
 
     def Clone(self):

@@ -7,7 +7,7 @@ from .changetype import *
 from . import fields
 
 class DocumentObject(object):
-    def Clone(self):
+    def clone(self):
         ret = self.__class__(self.id)
         ret.CopyDocumentObject(self)
         for prop in self._field:
@@ -15,7 +15,7 @@ class DocumentObject(object):
                 retlist = ret.getattr(prop.name)
                 retlist.empty()
                 for obj in prop:
-                    retlist.add(obj.Clone())
+                    retlist.add(obj.clone())
         return ret
     
     def __init__(self, id=None):
@@ -41,24 +41,24 @@ class DocumentObject(object):
         self.insetattr = True
         if name in self._field:
             if type(self._field[name]) != fields.Collection and type(self._field[name]) != fields.IntCounter and type(self._field[name]) != fields.List:
-                self.WasChanged(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self._field[name].GetTypeName())
+                self.was_changed(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self._field[name].GetTypeName())
         self.insetattr = False
         for h in self.change_handlers:
             h(self)
          
-    def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
+    def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
         if self.parent is not None:
             assert isinstance(propertyownerid, basestring)
-            self.parent.WasChanged(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
+            self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
     def CopyDocumentObject(self, src):
         for k in src._field:
             v = src._field[k]
             setattr(self, k, v.Clone(k, src, self))
 
-    def GetDocument(self):
+    def get_document(self):
         #Return the document
-        return self.parent.GetDocument()
+        return self.parent.get_document()
 
     def __str__(self):
         return '\n'.join([str(k) + ':' + str(getattr(self, k)) for k in self._field])

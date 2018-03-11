@@ -19,7 +19,7 @@ class SimpleProperty(Edge):
     def Replay(self, doc):
         if self._inactive:
             return
-        edgeobject = doc.GetDocumentObject(self.propertyownerid)
+        edgeobject = doc.get_document_object(self.propertyownerid)
         field = edgeobject._field[self.propertyname]
         setattr(edgeobject, self.propertyname, field.TranslateFromString(self.propertyvalue))
 

@@ -29,7 +29,7 @@ class AddListItem(Edge):
         if self.propertyownerid == "" and self.propertyname == "":
             assert False # We can never create stand alone object this way
         else:
-            parent = doc.GetDocumentObject(self.propertyownerid)
+            parent = doc.get_document_object(self.propertyownerid)
             newobj.parent = parent
             flImpl = getattr(parent, self.propertyname)
             if hasattr(flImpl, "_rendered_list"):

@@ -18,42 +18,42 @@ class Collection(Field):
             self.l.add(obj.id)
             assert obj.parent is None
             obj.parent = self
-            self.parent.GetDocument().documentobjects[obj.id] = obj
-            self.WasChanged(ChangeType.ADD_CHILD, self.parent.id, self.name, obj.id, obj.__class__.__name__)
+            self.parent.get_document().documentobjects[obj.id] = obj
+            self.was_changed(ChangeType.ADD_CHILD, self.parent.id, self.name, obj.id, obj.__class__.__name__)
 
         def remove(self, objid):
             assert isinstance(objid, basestring)
             self.l.remove(objid)
-            obj = self.parent.GetDocument().documentobjects[objid]
-            del self.parent.GetDocument().documentobjects[objid]
-            self.WasChanged(ChangeType.REMOVE_CHILD, self.parent.id, self.name, objid, obj.__class__.__name__)            
+            obj = self.parent.get_document().documentobjects[objid]
+            del self.parent.get_document().documentobjects[objid]
+            self.was_changed(ChangeType.REMOVE_CHILD, self.parent.id, self.name, objid, obj.__class__.__name__)            
 
-        def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
+        def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             assert isinstance(propertyownerid, basestring)
-            self.parent.WasChanged(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
+            self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
         def __len__(self):
             return len(self.l)
 
         def __iter__(self):
-            doc = self.parent.GetDocument()
+            doc = self.parent.get_document()
             for item in self.l:
                 yield doc.documentobjects[item]
 
         def Clone(self, owner, name):
             ret = Collection._FieldCollectionImpl(self.theclass, owner, name)
-            srcdoc = self.parent.GetDocument()
+            srcdoc = self.parent.get_document()
             for objid in self.l:
                 srcobj = srcdoc.documentobjects[objid]
-                ret.add(srcobj.Clone())
+                ret.add(srcobj.clone())
             return ret
 
         def Clean(self):
             self.l = set()
 
-        def GetDocument(self):
+        def get_document(self):
             #Return the document
-            return self.parent.GetDocument()
+            return self.parent.get_document()
 
 
     def __init__(self, theclass):

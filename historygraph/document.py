@@ -9,9 +9,9 @@ from .changetype import ChangeType
 from . import edges
 
 class Document(DocumentObject):
-    def Clone(self):
-        #Return a deep copy of this object. This object all of it's children and
-        #it's history are cloned
+    def clone(self):
+        # Return a deep copy of this object. This object all of it's children and
+        # it's history are cloned
         ret = self.__class__(self.id)
         ret.CopyDocumentObject(self)
         ret.history = self.history.Clone()
@@ -19,16 +19,16 @@ class Document(DocumentObject):
         ret._clockhash = self._clockhash
         return ret
 
-    def Merge(self, doc2):
+    def merge(self, doc2):
         assert self.id == doc2.id
         assert isinstance(doc2, Document)
-        #Make a copy of self's history
+        # Make a copy of self's history
         history = self.history.Clone()
-        #Merge doc2's history
+        # Merge doc2's history
         history.MergeGraphs(doc2.history)
         history.record_past_edges()
         history.ProcessConflictWinners()
-        #Create the return object and replay the history in to it
+        # Create the return object and replay the history in to it
         ret = self.__class__(self.id)
         ret.dc = self.dc
         history.Replay(ret)
@@ -47,7 +47,7 @@ class Document(DocumentObject):
         self.edgeslistener = list()
         self.insetattr = False
         
-    def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
+    def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
         nodeset = set()
         nodeset.add(self._clockhash)
         if changetype == ChangeType.SET_PROPERTY_VALUE:
@@ -69,16 +69,16 @@ class Document(DocumentObject):
         for l in self.edgeslistener:
             l.EdgesAdded([edge])
 
-    def GetDocumentObject(self, id):
+    def get_document_object(self, id):
         if id == self.id:
             return self
         return self.documentobjects[id]
 
-    def GetDocument(self):
+    def get_document(self):
         #Return the document
         return self
 
-    def AddEdges(self, edges_list):
+    def add_edges(self, edges_list):
         if self.isfrozen:
             #If we are frozen just add the edge to the history graph. We will be a full replay on unfreezing
             self.history.AddEdges(edges_list)
@@ -90,7 +90,7 @@ class Document(DocumentObject):
         for edge in edges_list:
             if isinstance(edge, edges.Merge):
                 #Always perform a full replay on null
-                self.FullReplay(edges_list)
+                self.full_replay(edges_list)
                 return
             startnode = list(edge._start_hashes)[0]
             if startnode == '':
@@ -100,7 +100,7 @@ class Document(DocumentObject):
             #If any of startnodes in the list are in the history but not the current node we need to do a full replay
             
             if startnode != self._clockhash and startnode in self.history.edgesbyendnode:
-                self.FullReplay(edges_list)
+                self.full_replay(edges_list)
                 return
 
             startnodes.add(startnode)
@@ -111,12 +111,12 @@ class Document(DocumentObject):
 
         if len(startnodes_not_in_endnodes) != 1 or len(endnodes_not_in_startnodes) != 1:
             #If this is a continuous chain there is only one start node and endnode
-            self.FullReplay(edges_list)
+            self.full_replay(edges_list)
             return
 
         if list(startnodes_not_in_endnodes)[0] != self._clockhash:
             #If the first node in the chain is not the current node 
-            self.FullReplay(edges_list)
+            self.full_replay(edges_list)
             return
 
         #Play each edge in the list in sequence
@@ -134,21 +134,21 @@ class Document(DocumentObject):
                 l = self.history.edgesbystartnode[edge.get_end_node()]
                 if len(l) > 0:
                     #If multiple edge match this one we need to do a full replay
-                    self.FullReplay(edges_list)
+                    self.full_replay(edges_list)
                     return
                 #If the end node matches an edge we already have
                 edge2internal = l[0]
                 edge2external = edgesdict[edge.get_end_node()]
                 if edge2internal.get_end_node() != edge2external.get_end_node():
                     #If the edges are different so do a full replay
-                    self.FullReplay(edges)
+                    self.full_replay(edges)
                     return
             del edgesdict[oldnode]
             
             
         
         
-    def FullReplay(self, edges_list):
+    def full_replay(self, edges_list):
         history = self.history.Clone()
         history.AddEdges(edges_list)
         history.ProcessGraph()
@@ -156,12 +156,12 @@ class Document(DocumentObject):
         history.ProcessConflictWinners()
         history.Replay(self)
 
-    def Freeze(self):
+    def freeze(self):
         assert self.isfrozen == False
         self.isfrozen = True
         self.edges_received_while_frozen = False
 
-    def Unfreeze(self):
+    def unfreeze(self):
         assert self.isfrozen == True
         self.isfrozen = False
         if self.edges_received_while_frozen:
@@ -174,10 +174,10 @@ class Document(DocumentObject):
             for l in self.edgeslistener:
                 l.EdgesAdded(edges)
 
-    def AddEdgesListener(self, listener):
+    def add_edges_listener(self, listener):
         self.edgeslistener.append(listener)
 
-    def Clean(self):
+    def clean(self):
         for (propname, prop) in self._field.items():
             prop.Clean(self, propname)
 

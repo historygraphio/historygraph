@@ -19,7 +19,7 @@ class AddIntCounter(Edge):
     def Replay(self, doc):
         if self._inactive:
             return
-        edgeobject = doc.GetDocumentObject(self.propertyownerid)
+        edgeobject = doc.get_document_object(self.propertyownerid)
         field = edgeobject._field[self.propertyname]
         getattr(edgeobject, self.propertyname).add(field.TranslateFromString(self.propertyvalue))
 

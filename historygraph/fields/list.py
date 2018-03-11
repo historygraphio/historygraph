@@ -30,19 +30,19 @@ class List(Field):
         def insert(self, index, obj):
             assert isinstance(obj, self.theclass)
             obj.parent = self
-            self.parent.GetDocument().documentobjects[obj.id] = obj
+            self.parent.get_document().documentobjects[obj.id] = obj
             index = index - 1
             if index == -1:
-                added_node = List._ListNode('', self.parent.GetDocument().depth(), obj.id, obj)
+                added_node = List._ListNode('', self.parent.get_document().depth(), obj.id, obj)
                 self._listnodes.append(added_node)
             else:
                 self.Render()
-                added_node = List._ListNode(self._rendered_list[index].id, self.parent.GetDocument().depth(), obj.id, obj)
+                added_node = List._ListNode(self._rendered_list[index].id, self.parent.get_document().depth(), obj.id, obj)
                 self._listnodes.append(added_node)
             if hasattr(self, "_rendered_list"):
                 delattr(self, "_rendered_list")
                 
-            self.WasChanged(ChangeType.ADD_LISTITEM, self.parent.id, self.name, JSONEncoder().encode((obj.id, added_node.id, added_node.parent, added_node.timestamp, added_node.data)), obj.__class__.__name__)
+            self.was_changed(ChangeType.ADD_LISTITEM, self.parent.id, self.name, JSONEncoder().encode((obj.id, added_node.id, added_node.parent, added_node.timestamp, added_node.data)), obj.__class__.__name__)
 
         def append(self, obj):
             self.insert(len(self), obj)
@@ -65,13 +65,13 @@ class List(Field):
             if hasattr(self, "_rendered_list"):
                 delattr(self, "_rendered_list")
 
-            obj = self.parent.GetDocument().documentobjects[obj.id]
-            del self.parent.GetDocument().documentobjects[obj.id]
-            self.WasChanged(ChangeType.REMOVE_LISTITEM, self.parent.id, self.name, node.id, obj.__class__.__name__)            
+            obj = self.parent.get_document().documentobjects[obj.id]
+            del self.parent.get_document().documentobjects[obj.id]
+            self.was_changed(ChangeType.REMOVE_LISTITEM, self.parent.id, self.name, node.id, obj.__class__.__name__)            
 
-        def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
+        def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             assert isinstance(propertyownerid, basestring)
-            self.parent.WasChanged(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
+            self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
         def __len__(self):
             self.Render()
@@ -114,9 +114,9 @@ class List(Field):
             # Sort the nodes in timestamp then id order
             return sorted(l, key=lambda n: (-n.timestamp, n.id))
 
-        def GetDocument(self):
+        def get_document(self):
             #Return the document
-            return self.parent.GetDocument()
+            return self.parent.get_document()
             
 
 

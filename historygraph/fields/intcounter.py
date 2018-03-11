@@ -14,18 +14,18 @@ class IntCounter(Field):
 
         def add(self, change):
             self.value += change
-            self.WasChanged(ChangeType.ADD_INT_COUNTER, self.parent.id, self.name, change, "IntCounter")
+            self.was_changed(ChangeType.ADD_INT_COUNTER, self.parent.id, self.name, change, "IntCounter")
 
         def subtract(self, change):
             self.value -= change
-            self.WasChanged(ChangeType.ADD_INT_COUNTER, self.parent.id, self.name, -change, "IntCounter")
+            self.was_changed(ChangeType.ADD_INT_COUNTER, self.parent.id, self.name, -change, "IntCounter")
 
         def get(self):
             return self.value
 
-        def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
+        def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             assert isinstance(propertyownerid, basestring)
-            self.parent.WasChanged(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
+            self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
         def Clone(self, owner, name):
             ret = IntCounter._FieldIntCounterImpl(self.parent, self.name)

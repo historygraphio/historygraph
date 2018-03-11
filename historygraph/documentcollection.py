@@ -156,7 +156,7 @@ class DocumentCollection(object):
 
     def AddDocumentObject(self, obj):
         assert isinstance(obj, DocumentObject)
-        obj.GetDocument().dc = self
+        obj.get_document().dc = self
         assert obj.__class__.__name__  in self.classes
         for propname in obj._field:
             propvalue = obj._field[propname]
@@ -165,7 +165,7 @@ class DocumentCollection(object):
                     assert obj2.__class__.__name__  in self.classes
         wasfound = False
         self.objects[obj.__class__.__name__][obj.id] = obj
-        obj.GetDocument().AddEdgesListener(self)
+        obj.get_document().add_edges_listener(self)
         for l in self.listeners:
             l.AddDocumentObject(self, obj)
 
