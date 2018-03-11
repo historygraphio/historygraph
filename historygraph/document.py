@@ -13,7 +13,7 @@ class Document(DocumentObject):
         # Return a deep copy of this object. This object all of it's children and
         # it's history are cloned
         ret = self.__class__(self.id)
-        ret.CopyDocumentObject(self)
+        ret.copy_document_object(self)
         ret.history = self.history.Clone()
         ret.dc = self.dc
         ret._clockhash = self._clockhash

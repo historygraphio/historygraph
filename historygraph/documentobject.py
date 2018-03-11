@@ -9,7 +9,7 @@ from . import fields
 class DocumentObject(object):
     def clone(self):
         ret = self.__class__(self.id)
-        ret.CopyDocumentObject(self)
+        ret.copy_document_object(self)
         for prop in self._field:
             if isinstance(prop, fields.Collection):
                 retlist = ret.getattr(prop.name)
@@ -51,7 +51,7 @@ class DocumentObject(object):
             assert isinstance(propertyownerid, basestring)
             self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
-    def CopyDocumentObject(self, src):
+    def copy_document_object(self, src):
         for k in src._field:
             v = src._field[k]
             setattr(self, k, v.Clone(k, src, self))
@@ -63,9 +63,9 @@ class DocumentObject(object):
     def __str__(self):
         return '\n'.join([str(k) + ':' + str(getattr(self, k)) for k in self._field])
 
-    def AddHandler(self, h):
+    def add_handler(self, h):
         self.change_handlers.append(h)
 
-    def RemoveHandler(self, h):
+    def remove_handler(self, h):
         self.change_handlers.remove(h)
 

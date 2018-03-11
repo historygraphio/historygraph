@@ -702,11 +702,11 @@ class SimpleCoversUpdateTestCase(unittest.TestCase):
         test = Covers()
         test.covers = 1
         handler = TestUpdateHandler()
-        test.AddHandler(handler.WasChanged)
+        test.add_handler(handler.WasChanged)
         self.assertEqual(len(test.change_handlers), 1)
         test.covers = 2
         self.assertEqual(handler.covers, 2)
-        test.RemoveHandler(handler.WasChanged)
+        test.remove_handler(handler.WasChanged)
         self.assertEqual(len(test.change_handlers), 0)
         test.covers = 3
         self.assertEqual(handler.covers, 2)
@@ -723,7 +723,7 @@ class FreezeUpdateTestCase(unittest.TestCase):
 
         test2 = test.clone()
         handler = TestUpdateHandler()
-        test.AddHandler(handler.WasChanged)
+        test.add_handler(handler.WasChanged)
         test.covers = 2
         test2.covers = 3
         test.freeze()
