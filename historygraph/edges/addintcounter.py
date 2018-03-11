@@ -24,7 +24,7 @@ class AddIntCounter(Edge):
         getattr(edgeobject, self.propertyname).add(field.TranslateFromString(self.propertyvalue))
 
     def Clone(self):
-        return AddIntCounter(self.startnodes, 
+        return AddIntCounter(self._start_hashes, 
                 self.propertyownerid, self.propertyname, self.propertyvalue,
                 self.propertytype, self.documentid, self.documentclassname)
 
@@ -33,7 +33,7 @@ class AddIntCounter(Edge):
 
     def GetEdgeDescription(self):
         #Return a description of the edgeuseful for debugging purposes
-        return "Edge type = " + self.__class__.__name__ + " edgeid = " + self.edgeid + " start nodes = " + str(self.startnodes) + " end node = " + self.endnode + "  self.propertyname = " +  self.propertyname + " self.propertyvalue = " + self.propertyvalue + " self.propertytype = " + str(self.propertytype)
+        return "Edge type = " + self.__class__.__name__ + " edgeid = " + self.edgeid + " start nodes = " + str(self._start_hashes) + " end node = " + self.endnode + "  self.propertyname = " +  self.propertyname + " self.propertyvalue = " + self.propertyvalue + " self.propertytype = " + str(self.propertytype)
     
 
         

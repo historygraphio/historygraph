@@ -36,14 +36,14 @@ class DocumentCollection(object):
                     history = document.history
                     for edgeid in history.edgesbyendnode:
                         edge = history.edgesbyendnode[edgeid]
-                        startnodes = list(edge.startnodes)
-                        if len(edge.startnodes) == 1:
-                            startnode1id = startnodes[0]
-                            startnode2id = ""
-                        elif len(edge.startnodes) == 2:
-                            startnode1id = startnodes[0]
+                        start_hashes = list(edge._start_hashes)
+                        if len(edge._start_hashes) == 1:
+                            start_hash_1 = start_hashes[0]
+                            start_hash_2 = ""
+                        elif len(edge._start_hashes) == 2:
+                            start_hash_1 = start_hashes[0]
 
-                            startnode2id = startnodes[1]
+                            start_hash_2 = start_hashes[1]
                         else:
                             assert False
                         
@@ -75,8 +75,8 @@ class DocumentCollection(object):
             documentclassname = str(row[1])
             edgeclassname = str(row[2])
             endnodeid = str(row[3])
-            startnode1id = str(row[4])
-            startnode2id = str(row[5])
+            start_hash_1 = str(row[4])
+            start_hash_2 = str(row[5])
             propertyownerid = str(row[6])
             propertyname = str(row[7])
             propertyvaluestr = str(row[8])
@@ -101,11 +101,11 @@ class DocumentCollection(object):
                 propertyvalue = propertyvaluestr
             propertytype = propertytypestr
             documentclassnamedict[documentid] = documentclassname
-            if startnode2id == "":
-                startnodes = {startnode1id}
+            if start_hash_2 == "":
+                start_hashes = {start_hash_1}
             else:
-                startnodes = {startnode1id, startnode2id}
-            edge = self.historyedgeclasses[edgeclassname](startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname)
+                start_hashes = {start_hash_1, start_hash_2}
+            edge = self.historyedgeclasses[edgeclassname](start_hashes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname)
             history = historygraphdict[documentid]
             history.AddEdges([edge])
 

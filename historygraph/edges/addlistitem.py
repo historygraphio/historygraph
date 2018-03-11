@@ -37,7 +37,7 @@ class AddListItem(Edge):
             flImpl._listnodes.append(added_node)
 
     def Clone(self):
-        return AddListItem(self.startnodes, 
+        return AddListItem(self._start_hashes, 
             self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
 
     def GetConflictWinner(self, edge2):

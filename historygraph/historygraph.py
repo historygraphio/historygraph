@@ -19,7 +19,7 @@ class HistoryGraph(object):
         if len(edges2) == 0:
             return
         for edge in edges2:
-            nodes = edge.startnodes
+            nodes = edge._start_hashes
             for node in nodes:
                 self.edgesbystartnode[node].append(edge)
             self.edgesbyendnode[edge.GetEndNode()] = edge
@@ -35,8 +35,8 @@ class HistoryGraph(object):
         self.ReplayEdges(doc, l[0])
         doc.history = self.Clone()
         self.isreplaying = False
-        assert doc._hashclock in self.edgesbyendnode, doc._hashclock + ' not found'
-        assert doc._hashclock in doc.history.edgesbyendnode, doc._hashclock + ' not found'
+        assert doc._clockhash in self.edgesbyendnode, doc._clockhash + ' not found'
+        assert doc._clockhash in doc.history.edgesbyendnode, doc._clockhash + ' not found'
 
     def Clone(self):
         ret = HistoryGraph()
@@ -55,7 +55,7 @@ class HistoryGraph(object):
         edge.Replay(doc)
         edge.isplayed = True
         edges = self.edgesbystartnode[edge.GetEndNode()]
-        doc._hashclock = edge.GetEndNode()
+        doc._clockhash = edge.GetEndNode()
         for edge2 in edges:
             self.ReplayEdges(doc, edge2)
 
@@ -114,11 +114,11 @@ class HistoryGraph(object):
     def GetAllEdges(self):
         return [v for (k, v) in self.edgesbyendnode.iteritems()]
         
-    def depth(self, _hashclock):
-        if _hashclock == '':
+    def depth(self, _clockhash):
+        if _clockhash == '':
             return 0
         else:
-            #if _hashclock not in self.edgesbyendnode:
+            #if _clockhash not in self.edgesbyendnode:
             #    print ('self.edgesbyendnode=',[e.asTuple() for e in self.edgesbyendnode.values()])
-            return self.edgesbyendnode[_hashclock].depth(self)
+            return self.edgesbyendnode[_clockhash].depth(self)
         

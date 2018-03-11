@@ -16,7 +16,7 @@ class Document(DocumentObject):
         ret.CopyDocumentObject(self)
         ret.history = self.history.Clone()
         ret.dc = self.dc
-        ret._hashclock = self._hashclock
+        ret._clockhash = self._clockhash
         return ret
 
     def Merge(self, doc2):
@@ -40,7 +40,7 @@ class Document(DocumentObject):
         self.parent = None
         self.history = HistoryGraph()
         self.documentobjects = dict()
-        self._hashclock = ""
+        self._clockhash = ""
         self.dc = None #The document collection this document belongs to
         self.isfrozen = False
         self.edges_received_while_frozen = False
@@ -49,7 +49,7 @@ class Document(DocumentObject):
         
     def WasChanged(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
         nodeset = set()
-        nodeset.add(self._hashclock)
+        nodeset.add(self._clockhash)
         if changetype == ChangeType.SET_PROPERTY_VALUE:
             edge = edges.SimpleProperty(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         elif changetype == ChangeType.ADD_CHILD:
@@ -64,7 +64,7 @@ class Document(DocumentObject):
             edge = edges.RemoveListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         else:
             assert False
-        self._hashclock = edge.GetEndNode()
+        self._clockhash = edge.GetEndNode()
         self.history.AddEdges([edge])
         for l in self.edgeslistener:
             l.EdgesAdded([edge])
@@ -92,14 +92,14 @@ class Document(DocumentObject):
                 #Always perform a full replay on null
                 self.FullReplay(edges_list)
                 return
-            startnode = list(edge.startnodes)[0]
+            startnode = list(edge._start_hashes)[0]
             if startnode == '':
                 #If we received a start edge it's OK as long as it is the same as the one we already have
                 assert edge.GetEndNode() == self.history.edgesbystartnode[''][0].GetEndNode()
 
             #If any of startnodes in the list are in the history but not the current node we need to do a full replay
             
-            if startnode != self._hashclock and startnode in self.history.edgesbyendnode:
+            if startnode != self._clockhash and startnode in self.history.edgesbyendnode:
                 self.FullReplay(edges_list)
                 return
 
@@ -114,22 +114,22 @@ class Document(DocumentObject):
             self.FullReplay(edges_list)
             return
 
-        if list(startnodes_not_in_endnodes)[0] != self._hashclock:
+        if list(startnodes_not_in_endnodes)[0] != self._clockhash:
             #If the first node in the chain is not the current node 
             self.FullReplay(edges_list)
             return
 
         #Play each edge in the list in sequence
-        edgesdict = dict([(list(edge.startnodes)[0], edge) for edge in edges_list])
+        edgesdict = dict([(list(edge._start_hashes)[0], edge) for edge in edges_list])
         while len(edgesdict) > 0:
             #Get the next edge
-            oldnode = self._hashclock
-            edge = edgesdict[self._hashclock]
+            oldnode = self._clockhash
+            edge = edgesdict[self._clockhash]
             #Play it
             self.history.AddEdges([edge])
             edge.Replay(self)
-            assert self._hashclock == edge.GetEndNode()
-            assert self._hashclock != oldnode
+            assert self._clockhash == edge.GetEndNode()
+            assert self._clockhash != oldnode
             if edge.GetEndNode() in self.history.edgesbystartnode:
                 l = self.history.edgesbystartnode[edge.GetEndNode()]
                 if len(l) > 0:
@@ -182,4 +182,4 @@ class Document(DocumentObject):
             prop.Clean(self, propname)
 
     def depth(self):
-        return self.history.depth(self._hashclock)
+        return self.history.depth(self._clockhash)

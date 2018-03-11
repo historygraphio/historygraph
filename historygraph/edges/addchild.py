@@ -25,7 +25,7 @@ class AddChild(Edge):
             getattr(parent, self.propertyname).add(newobj)
 
     def Clone(self):
-        return AddChild(self.startnodes, 
+        return AddChild(self._start_hashes, 
             self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
 
     def GetConflictWinner(self, edge2):

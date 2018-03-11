@@ -5,8 +5,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 import hashlib
 
 class Edge(object):
-    def __init__(self, startnodes, documentid, documentclassname):
-        self.startnodes = sorted(startnodes)
+    def __init__(self, start_hashes, documentid, documentclassname):
+        self._start_hashes = sorted(start_hashes)
         self.inactive = False
         self.played = False
         self.documentid = documentid
@@ -22,7 +22,7 @@ class Edge(object):
 
     
     def CanReplay(self, graph):
-        for node in self.startnodes:
+        for node in self._start_hashes:
             if node != "":
                 if node not in graph.edgesbyendnode:
                     return False
@@ -51,7 +51,7 @@ class Edge(object):
         
     def asDict(self):
         return {"classname":self.__class__.__name__,
-            "startnodes":list(self.startnodes),
+            "start_hashes":list(self._start_hashes),
             "endnode":self.GetEndNode(),
             "propertyownerid":self.propertyownerid,
             "propertyvalue":self.propertyvalue,
@@ -65,15 +65,15 @@ class Edge(object):
         return str(self.asDict())
 
     def GetEndNode(self):
-        startnodes = list(self.startnodes)
-        startnode1id = startnodes[0]
-        if len(startnodes) > 1:
-            startnode2id = startnodes[1]
+        start_hashes= list(self._start_hashes)
+        start_hash_1 = start_hashes[0]
+        if len(start_hashes) > 1:
+            start_hash_2 = start_hashes[1]
         else:
-            startnode2id = ""
+            start_hash_2 = ""
         s = ("classname",str(self.__class__.__name__),
-            "startnode1",str(startnode1id),
-            "startnode2",str(startnode2id),
+            "start_hash_1",str(start_hash_1),
+            "start_hash_2",str(start_hash_2),
             "propertyownerid",str(self.propertyownerid),
 
             "propertyvalue",str(self.propertyvalue),
@@ -86,33 +86,33 @@ class Edge(object):
 
     def asTuple(self):
         #Return a tuple that represents the edge when it is turned in JSON
-        startnodes = list(self.startnodes)
-        startnode1id = startnodes[0]
-        if len(startnodes) > 1:
-            startnode2id = startnodes[1]
+        start_hashes = list(self._start_hashes)
+        start_hash_1 = start_hashes[0]
+        if len(start_hashes) > 1:
+            start_hash_2 = start_hashes[1]
         else:
-            startnode2id = ""
+            start_hash_2 = ""
         return (str(self.documentid),
                 str(self.documentclassname),
                 str(self.__class__.__name__),
                 str(self.GetEndNode()),
-                str(startnode1id),
-                str(startnode2id),
+                str(start_hash_1),
+                str(start_hash_2),
                 str(self.propertyownerid),
                 str(self.propertyname), 
                 str(self.propertyvalue),
                 str(self.propertytype))
     
     def depth(self, historygraph):
-        startnodes = list(self.startnodes)
-        if len(startnodes) == 1:
-            if startnodes[0] == '':
+        start_hashes = list(self._start_hashes)
+        if len(start_hashes) == 1:
+            if start_hashes[0] == '':
                 return 1
             else:
-                return historygraph.edgesbyendnode[startnodes[0]].depth(historygraph) + 1
-        elif len(self.startnodes) == 2:
-            depth1 = historygraph.edgesbyendnode[startnodes[0]].depth(historygraph) + 1
-            depth2 = historygraph.edgesbyendnode[startnodes[1]].depth(historygraph) + 1
+                return historygraph.edgesbyendnode[start_hashes[0]].depth(historygraph) + 1
+        elif len(self._start_hashes) == 2:
+            depth1 = historygraph.edgesbyendnode[start_hashes[0]].depth(historygraph) + 1
+            depth2 = historygraph.edgesbyendnode[start_hashes[1]].depth(historygraph) + 1
             return max(depth1, depth2)
         else:
             assert False

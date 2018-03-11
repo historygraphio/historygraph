@@ -21,7 +21,7 @@ class RemoveChild(Edge):
         getattr(parent, self.propertyname).remove(self.propertyvalue)
 
     def Clone(self):
-        return RemoveChild(self.startnodes, 
+        return RemoveChild(self._start_hashes, 
             self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
 
     def GetConflictWinner(self, edge2):

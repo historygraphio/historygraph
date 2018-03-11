@@ -16,14 +16,14 @@ class Merge(Edge):
         self.propertytype = propertytype
 
     def Clone(self):
-        return Merge(self.startnodes, self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
+        return Merge(self._start_hashes, self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
 
     def Replay(self, doc):
         pass
     
     def GetEdgeDescription(self):
         #Return a description of the edgeuseful for debugging purposes
-        return "Edge type = " + self.__class__.__name__ + " edgeid = " + self.edgeid + " start nodes = " + str(self.startnodes) + " end node = " + self.endnode
+        return "Edge type = " + self.__class__.__name__ + " edgeid = " + self.edgeid + " start nodes = " + str(self._start_hashes) + " end node = " + self.endnode
 
     def GetConflictWinner(self, edge2):
         return 0 #Merge edges can never conflict with anything
