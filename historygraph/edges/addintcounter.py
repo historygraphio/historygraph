@@ -21,7 +21,7 @@ class AddIntCounter(Edge):
             return
         edgeobject = doc.get_document_object(self.propertyownerid)
         field = edgeobject._field[self.propertyname]
-        getattr(edgeobject, self.propertyname).add(field.TranslateFromString(self.propertyvalue))
+        getattr(edgeobject, self.propertyname).add(field.translate_from_string(self.propertyvalue))
 
     def clone(self):
         return AddIntCounter(self._start_hashes, 
