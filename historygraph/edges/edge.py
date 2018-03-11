@@ -7,21 +7,20 @@ import hashlib
 class Edge(object):
     def __init__(self, start_hashes, documentid, documentclassname):
         self._start_hashes = sorted(start_hashes)
-        self.inactive = False
-        self.played = False
+        self._inactive = False
         self.documentid = documentid
         self.documentclassname = documentclassname
 
         
-    def RecordPastEdges(self, pastedges, graph):
+    def record_past_edges(self, pastedges, graph):
         self.pastedges = self.pastedges | set(pastedges)
-        edges = graph.edgesbystartnode[self.GetEndNode()]
-        pastedges.add(self.GetEndNode())
+        edges = graph.edgesbystartnode[self.get_end_node()]
+        pastedges.add(self.get_end_node())
         for edge in edges:
-            edge.RecordPastEdges(set(pastedges), graph)
+            edge.record_past_edges(set(pastedges), graph)
 
     
-    def CanReplay(self, graph):
+    def can_replay(self, graph):
         for node in self._start_hashes:
             if node != "":
                 if node not in graph.edgesbyendnode:
@@ -31,28 +30,28 @@ class Edge(object):
                     return False
         return True
 
-    def ResetPastEdges(self):
+    def reset_past_edges(self):
         self.pastedges = set()
 
-    def HasPastEdge(self, pastedgeid):
-        return pastedgeid in self.pastedges
+    def has_past_edge(self, past_edge_id):
+        return past_edge_id in self.pastedges
 
-    def CompareForConflicts(self, edge2):
+    def compare_for_conflicts(self, edge2):
 	    if (self.__class__ != edge2.__class__):
 		    return; #Different edge types can never conflict
-	    if (self.inactive or edge2.inactive):
+	    if (self._inactive or edge2.inactive):
 		    return; #Inactive edges can never conflict with active edges
 	    conflictwinner = self.GetConflictWinner(edge2)
 	    assert conflictwinner == -1 or conflictwinner == 0 or conflictwinner == 1
 	    if conflictwinner == 1:
-	        self.inactive = True
+	        self._inactive = True
 	    elif conflictwinner == -1:
 	        edge2.inactive = True
         
-    def asDict(self):
+    def as_dict(self):
         return {"classname":self.__class__.__name__,
             "start_hashes":list(self._start_hashes),
-            "endnode":self.GetEndNode(),
+            "endnode":self.get_end_node(),
             "propertyownerid":self.propertyownerid,
             "propertyvalue":self.propertyvalue,
             "propertyname":self.propertyname,
@@ -62,9 +61,9 @@ class Edge(object):
          }
 
     def __str__(self):
-        return str(self.asDict())
+        return str(self.as_dict())
 
-    def GetEndNode(self):
+    def get_end_node(self):
         start_hashes= list(self._start_hashes)
         start_hash_1 = start_hashes[0]
         if len(start_hashes) > 1:
@@ -84,7 +83,7 @@ class Edge(object):
          )
         return hashlib.sha256(str(s)).hexdigest()
 
-    def asTuple(self):
+    def as_tuple(self):
         #Return a tuple that represents the edge when it is turned in JSON
         start_hashes = list(self._start_hashes)
         start_hash_1 = start_hashes[0]
@@ -95,7 +94,7 @@ class Edge(object):
         return (str(self.documentid),
                 str(self.documentclassname),
                 str(self.__class__.__name__),
-                str(self.GetEndNode()),
+                str(self.get_end_node()),
                 str(start_hash_1),
                 str(start_hash_2),
                 str(self.propertyownerid),

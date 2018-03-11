@@ -508,7 +508,7 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
         #Simulate the first user received the second users changes out of order
         #the second edge is received first. Test it is right 
         self.dc = olddc
-        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edge3.asTuple()],"immutableobjects":[]}))
+        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edge3.as_tuple()],"immutableobjects":[]}))
         test2s = self.dc.GetByClass(TestPropertyOwner1)
         self.assertEqual(len(test2s), 1)
         test2 = test2s[0]
@@ -520,7 +520,7 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
          
         #Simulate the first user received the second users changes out of order
         #the first edge is not received make sure everything 
-        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edge4.asTuple()],"immutableobjects":[]}))
+        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edge4.as_tuple()],"immutableobjects":[]}))
         test2s = self.dc.GetByClass(TestPropertyOwner1)
         self.assertEqual(len(test2s), 1)
 
@@ -536,9 +536,9 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
         dummysha1 = hashlib.sha256('Invalid node 1').hexdigest()
         dummysha2 = hashlib.sha256('Invalid node 2').hexdigest()
         edgenull1 = edges.Merge({dummysha1, dummysha2}, "", "", "", "", test2.id, test2.__class__.__name__)
-        edgenull2 = edges.Merge({test2._clockhash, edgenull1.GetEndNode()}, "", "", "", "", test2.id, test2.__class__.__name__)
+        edgenull2 = edges.Merge({test2._clockhash, edgenull1.get_end_node()}, "", "", "", "", test2.id, test2.__class__.__name__)
 
-        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edgenull2.asTuple()],"immutableobjects":[]}))
+        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edgenull2.as_tuple()],"immutableobjects":[]}))
         test2s = self.dc.GetByClass(TestPropertyOwner1)
         self.assertEqual(len(test2s), 1)
         test2 = test2s[0]
@@ -550,7 +550,7 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
             self.assertEqual(testitem2.cover, 4)
         self.assertEqual(testitem2.cover, 4)
 
-        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edgenull1.asTuple()],"immutableobjects":[]}))
+        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edgenull1.as_tuple()],"immutableobjects":[]}))
         test2s = self.dc.GetByClass(TestPropertyOwner1)
         self.assertEqual(len(test2s), 1)
         test2 = test2s[0]
@@ -832,7 +832,7 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
         #Simulate the first user received the second users changes out of order
         #the second edge is received first. Test it is right 
         self.dc = olddc
-        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edgenext.asTuple()],"immutableobjects":[]}))
+        self.dc.LoadFromJSON(JSONEncoder().encode({"history":[edgenext.as_tuple()],"immutableobjects":[]}))
         test2s = self.dc.GetByClass(CounterTestContainer)
         self.assertEqual(len(test2s), 1)
         test2 = test2s[0]

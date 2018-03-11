@@ -15,14 +15,14 @@ class HistoryGraph(object):
     def AddEdges(self, edges_list):
         if self.isreplaying:
             return
-        edges2 = [edge for edge in edges_list if edge.GetEndNode() not in self.edgesbyendnode]
+        edges2 = [edge for edge in edges_list if edge.get_end_node() not in self.edgesbyendnode]
         if len(edges2) == 0:
             return
         for edge in edges2:
             nodes = edge._start_hashes
             for node in nodes:
                 self.edgesbystartnode[node].append(edge)
-            self.edgesbyendnode[edge.GetEndNode()] = edge
+            self.edgesbyendnode[edge.get_end_node()] = edge
 
     def Replay(self, doc):
         self.isreplaying = True
@@ -45,30 +45,30 @@ class HistoryGraph(object):
             edge = self.edgesbyendnode[k]
             edge2 = edge.Clone()
             edgeclones.append(edge2)
-            assert edge.GetEndNode() == edge2.GetEndNode(), 'Mismatch edge = ' + repr(edge.asDict()) + ', edge2 = ' + repr(edge2.asDict())
+            assert edge.get_end_node() == edge2.get_end_node(), 'Mismatch edge = ' + repr(edge.asDict()) + ', edge2 = ' + repr(edge2.asDict())
         ret.AddEdges(edgeclones)
         return ret
 
     def ReplayEdges(self, doc, edge):
-        if edge.CanReplay(self) == False:
+        if edge.can_replay(self) == False:
             return
         edge.Replay(doc)
         edge.isplayed = True
-        edges = self.edgesbystartnode[edge.GetEndNode()]
-        doc._clockhash = edge.GetEndNode()
+        edges = self.edgesbystartnode[edge.get_end_node()]
+        doc._clockhash = edge.get_end_node()
         for edge2 in edges:
             self.ReplayEdges(doc, edge2)
 
-    def RecordPastEdges(self):
+    def record_past_edges(self):
         if len(self.edgesbyendnode) == 0:
             return
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
-            edge.ResetPastEdges()
+            edge.reset_past_edges()
         l = self.edgesbystartnode[""]
         assert len(l) == 1
         pastedges = set()
-        l[0].RecordPastEdges(pastedges, self)
+        l[0].record_past_edges(pastedges, self)
 
     def MergeGraphs(self, graph):
         for k in graph.edgesbyendnode:
@@ -80,9 +80,9 @@ class HistoryGraph(object):
         presentnodes = set()
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
-            l = self.edgesbystartnode[edge.GetEndNode()]
+            l = self.edgesbystartnode[edge.get_end_node()]
             if len(l) == 0:
-                presentnodes.add(edge.GetEndNode())
+                presentnodes.add(edge.get_end_node())
                 documentid = edge.documentid
                 documentclassname = edge.documentclassname
         if len(presentnodes) > 1:
@@ -101,8 +101,8 @@ class HistoryGraph(object):
                 edge2 = self.edgesbyendnode[k2]
 
                 if k1 != k2:
-                    if not edge2.HasPastEdge(k1) and not edge1.HasPastEdge(k2):
-                        edge1.CompareForConflicts(edge2)
+                    if not edge2.has_past_edge(k1) and not edge1.has_past_edge(k2):
+                        edge1.compare_for_conflicts(edge2)
                         
     def HasDanglingEdges(self):
         # A sanity check a graph has dangling edges if there is more than one endnode that does not have a start node

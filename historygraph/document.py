@@ -26,7 +26,7 @@ class Document(DocumentObject):
         history = self.history.Clone()
         #Merge doc2's history
         history.MergeGraphs(doc2.history)
-        history.RecordPastEdges()
+        history.record_past_edges()
         history.ProcessConflictWinners()
         #Create the return object and replay the history in to it
         ret = self.__class__(self.id)
@@ -64,7 +64,7 @@ class Document(DocumentObject):
             edge = edges.RemoveListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         else:
             assert False
-        self._clockhash = edge.GetEndNode()
+        self._clockhash = edge.get_end_node()
         self.history.AddEdges([edge])
         for l in self.edgeslistener:
             l.EdgesAdded([edge])
@@ -95,7 +95,7 @@ class Document(DocumentObject):
             startnode = list(edge._start_hashes)[0]
             if startnode == '':
                 #If we received a start edge it's OK as long as it is the same as the one we already have
-                assert edge.GetEndNode() == self.history.edgesbystartnode[''][0].GetEndNode()
+                assert edge.get_end_node() == self.history.edgesbystartnode[''][0].get_end_node()
 
             #If any of startnodes in the list are in the history but not the current node we need to do a full replay
             
@@ -104,7 +104,7 @@ class Document(DocumentObject):
                 return
 
             startnodes.add(startnode)
-            endnodes.add(edge.GetEndNode())
+            endnodes.add(edge.get_end_node())
 
         startnodes_not_in_endnodes = startnodes - endnodes
         endnodes_not_in_startnodes = endnodes - startnodes
@@ -128,18 +128,18 @@ class Document(DocumentObject):
             #Play it
             self.history.AddEdges([edge])
             edge.Replay(self)
-            assert self._clockhash == edge.GetEndNode()
+            assert self._clockhash == edge.get_end_node()
             assert self._clockhash != oldnode
-            if edge.GetEndNode() in self.history.edgesbystartnode:
-                l = self.history.edgesbystartnode[edge.GetEndNode()]
+            if edge.get_end_node() in self.history.edgesbystartnode:
+                l = self.history.edgesbystartnode[edge.get_end_node()]
                 if len(l) > 0:
                     #If multiple edge match this one we need to do a full replay
                     self.FullReplay(edges_list)
                     return
                 #If the end node matches an edge we already have
                 edge2internal = l[0]
-                edge2external = edgesdict[edge.GetEndNode()]
-                if edge2internal.GetEndNode() != edge2external.GetEndNode():
+                edge2external = edgesdict[edge.get_end_node()]
+                if edge2internal.get_end_node() != edge2external.get_end_node():
                     #If the edges are different so do a full replay
                     self.FullReplay(edges)
                     return
@@ -152,7 +152,7 @@ class Document(DocumentObject):
         history = self.history.Clone()
         history.AddEdges(edges_list)
         history.ProcessGraph()
-        history.RecordPastEdges()
+        history.record_past_edges()
         history.ProcessConflictWinners()
         history.Replay(self)
 
@@ -167,7 +167,7 @@ class Document(DocumentObject):
         if self.edges_received_while_frozen:
             history = self.history.Clone()
             history.ProcessGraph()
-            history.RecordPastEdges()
+            history.record_past_edges()
             history.ProcessConflictWinners()
             history.Replay(self)
             edges = history.GetAllEdges()

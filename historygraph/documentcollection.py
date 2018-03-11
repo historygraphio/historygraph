@@ -51,7 +51,7 @@ class DocumentCollection(object):
                             propertytypename = ""
                         else:
                             propertytypename = edge.propertytype
-                        historyedges.append(edge.asTuple())
+                        historyedges.append(edge.as_tuple())
             elif issubclass(self.classes[classname], ImmutableObject):
                 for (objid, obj) in documentdict.iteritems():
                     immutableobjects.append(obj.asDict())
@@ -126,7 +126,7 @@ class DocumentCollection(object):
             history = doc.history.Clone()
             #Merge doc2's history
             history.MergeGraphs(historygraphdict[documentid])
-            history.RecordPastEdges()
+            history.record_past_edges()
             history.ProcessConflictWinners()
             #Create the return object and replay the history in to it
             history.Replay(doc)
