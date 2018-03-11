@@ -12,7 +12,7 @@ class HistoryGraph(object):
         self.edgesbyendnode = dict()
         self.isreplaying = False
 
-    def AddEdges(self, edges_list):
+    def add_edges(self, edges_list):
         if self.isreplaying:
             return
         edges2 = [edge for edge in edges_list if edge.get_end_node() not in self.edgesbyendnode]
@@ -24,7 +24,7 @@ class HistoryGraph(object):
                 self.edgesbystartnode[node].append(edge)
             self.edgesbyendnode[edge.get_end_node()] = edge
 
-    def Replay(self, doc):
+    def replay(self, doc):
         self.isreplaying = True
         doc.clean()
         for k in self.edgesbyendnode:
@@ -32,13 +32,13 @@ class HistoryGraph(object):
             edge.isplayed = False
         l = self.edgesbystartnode[""]
         assert len(l) == 1
-        self.ReplayEdges(doc, l[0])
-        doc.history = self.Clone()
+        self.replay_edges(doc, l[0])
+        doc.history = self.clone()
         self.isreplaying = False
         assert doc._clockhash in self.edgesbyendnode, doc._clockhash + ' not found'
         assert doc._clockhash in doc.history.edgesbyendnode, doc._clockhash + ' not found'
 
-    def Clone(self):
+    def clone(self):
         ret = HistoryGraph()
         edgeclones = list()
         for k in self.edgesbyendnode:
@@ -46,10 +46,10 @@ class HistoryGraph(object):
             edge2 = edge.Clone()
             edgeclones.append(edge2)
             assert edge.get_end_node() == edge2.get_end_node(), 'Mismatch edge = ' + repr(edge.asDict()) + ', edge2 = ' + repr(edge2.asDict())
-        ret.AddEdges(edgeclones)
+        ret.add_edges(edgeclones)
         return ret
 
-    def ReplayEdges(self, doc, edge):
+    def replay_edges(self, doc, edge):
         if edge.can_replay(self) == False:
             return
         edge.Replay(doc)
@@ -57,7 +57,7 @@ class HistoryGraph(object):
         edges = self.edgesbystartnode[edge.get_end_node()]
         doc._clockhash = edge.get_end_node()
         for edge2 in edges:
-            self.ReplayEdges(doc, edge2)
+            self.replay_edges(doc, edge2)
 
     def record_past_edges(self):
         if len(self.edgesbyendnode) == 0:
@@ -70,13 +70,13 @@ class HistoryGraph(object):
         pastedges = set()
         l[0].record_past_edges(pastedges, self)
 
-    def MergeGraphs(self, graph):
+    def merge_graphs(self, graph):
         for k in graph.edgesbyendnode:
             edge = graph.edgesbyendnode[k]
-            self.AddEdges([edge])
-        self.ProcessGraph()
+            self.add_edges([edge])
+        self.process_graph()
 
-    def ProcessGraph(self):
+    def process_graph(self):
         presentnodes = set()
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
@@ -87,11 +87,11 @@ class HistoryGraph(object):
                 documentclassname = edge.documentclassname
         if len(presentnodes) > 1:
             nulledge = edges.Merge(presentnodes, "", "", "", "", documentid, documentclassname)
-            self.AddEdges([nulledge])
+            self.add_edges([nulledge])
             if len(presentnodes) > 2:
-                self.ProcessGraph()
+                self.process_graph()
 
-    def ProcessConflictWinners(self):
+    def process_conflict_winners(self):
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
             edge.inactive = False
@@ -104,14 +104,14 @@ class HistoryGraph(object):
                     if not edge2.has_past_edge(k1) and not edge1.has_past_edge(k2):
                         edge1.compare_for_conflicts(edge2)
                         
-    def HasDanglingEdges(self):
+    def has_dangling_edges(self):
         # A sanity check a graph has dangling edges if there is more than one endnode that does not have a start node
         # It means that a Merge needs to be run
         startnodes = set([k for (k, v) in self.edgesbystartnode.iteritems()])
         endnodes = set([k for (k, v) in self.edgesbyendnode.iteritems()])
         return len(endnodes - startnodes) > 1
 
-    def GetAllEdges(self):
+    def get_all_edges(self):
         return [v for (k, v) in self.edgesbyendnode.iteritems()]
         
     def depth(self, _clockhash):

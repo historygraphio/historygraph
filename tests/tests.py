@@ -41,7 +41,7 @@ class SimpleCoversTestCase(unittest.TestCase):
         #Test we can set a value
         self.assertEqual(test.covers, 1)
         test2 = Covers(test.id)
-        test.history.Replay(test2)
+        test.history.replay(test2)
         #Test we can rebuild a simple object by playing an edge
         self.assertEqual(test2.covers, 1)
         #Test these are just the same history object but it was actually copied
@@ -57,7 +57,7 @@ class SimpleCoversTestCase(unittest.TestCase):
         test.covers = 1
         test.covers = 2
         test2 = Covers(test.id)
-        test.history.Replay(test2)
+        test.history.replay(test2)
         self.assertEqual(test.covers, 2)
         assert test.history is not test2.history
         assert test is not test2
@@ -102,10 +102,10 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
         test.covers = 2
         test2.covers = 3
         edge = test2.history.edgesbyendnode[test2._clockhash]
-        history = test.history.Clone()
-        history.AddEdges([edge])
+        history = test.history.clone()
+        history.add_edges([edge])
         test3 = Covers(test.id)
-        history.Replay(test3)
+        history.replay(test3)
         #In a merge conflict between two integers the greater one is the winner
         self.assertEqual(test3.covers, 3)
 
@@ -120,16 +120,16 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
         test2.covers = 4
         edge4 = test2.history.edgesbyendnode[test2._clockhash]
         edge3 = test2.history.edgesbyendnode[list(edge4._start_hashes)[0]]
-        history = test.history.Clone()
-        history.AddEdges([edge4])
+        history = test.history.clone()
+        history.add_edges([edge4])
         test3 = Covers(test.id)
-        history.Replay(test3)
+        history.replay(test3)
         #edge4 should be orphaned and not played
         self.assertEqual(test3.covers, 2)
         #Once edge3 is added we should replay automatically to 4
-        history.AddEdges([edge3])
+        history.add_edges([edge3])
         test4 = Covers(test.id)
-        history.Replay(test4)
+        history.replay(test4)
         #edge4 should be orphaned and not played
         self.assertEqual(test4.covers, 4)
 
@@ -146,11 +146,11 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
         #Test adding a Null edge where we don't  have one of the start nodes.
         #In the old way        
         dummysha = hashlib.sha256('Invalid node').hexdigest()
-        history = test.history.Clone()
+        history = test.history.clone()
         edgenull = edges.Merge({test6._clockhash, dummysha}, "", "", "", "", test6.id, test6.__class__.__name__)
-        history.AddEdges([edgenull])
+        history.add_edges([edgenull])
         test6 = Covers(test.id)
-        history.Replay(test6)
+        history.replay(test6)
         self.assertEqual(test6.covers, 2)
 
         #In the new way
@@ -210,7 +210,7 @@ class SimpleItemTestCase(unittest.TestCase):
         dc2.register(TestPropertyOwner2)
         test2 = TestPropertyOwner1(test1.id)
         dc2.add_document_object(test2)
-        test1.history.Replay(test2)
+        test1.history.replay(test2)
 
         #Check that replaying correctly removes the object
         self.assertEqual(len(test2.propertyowner2s), 0)
@@ -583,7 +583,7 @@ class FreezeTestCase(unittest.TestCase):
         self.assertEqual(test.covers, 2)
         # Once we unfreeze the updates should play
         test.unfreeze()
-        self.assertFalse(test.history.HasDanglingEdges())
+        self.assertFalse(test.history.has_dangling_edges())
         self.assertEqual(test.covers, 3)
 
 class FreezeThreeWayMergeTestCase(unittest.TestCase):
@@ -610,7 +610,7 @@ class FreezeThreeWayMergeTestCase(unittest.TestCase):
         # Once we unfreeze the updates should play
         test.unfreeze()
         #print "test.id=",test.id
-        self.assertFalse(test.history.HasDanglingEdges())
+        self.assertFalse(test.history.has_dangling_edges())
         self.assertEqual(test.covers, 4)
 
 class LargeMergeTestCase(unittest.TestCase):
@@ -736,7 +736,7 @@ class FreezeUpdateTestCase(unittest.TestCase):
         self.assertEqual(handler.covers, 2)
         # Once we unfreeze the updates should play
         test.unfreeze()
-        self.assertFalse(test.history.HasDanglingEdges())
+        self.assertFalse(test.history.has_dangling_edges())
         self.assertEqual(test.covers, 3)
         self.assertEqual(handler.covers, 3)
 
@@ -783,8 +783,8 @@ class UncleanReplayCounterTestCase(unittest.TestCase):
         test = CounterTestContainer()
         test.testcounter.add(1)
         self.assertEqual(test.testcounter.get(), 1)
-        history2 = test.history.Clone()
-        history2.Replay(test)
+        history2 = test.history.clone()
+        history2.replay(test)
         self.assertEqual(test.testcounter.get(), 1)
         
 
@@ -1045,7 +1045,7 @@ class FieldListMergeTestCase(unittest.TestCase):
         dc2.register(TestListofLists3)
         test2 = TestListofLists1(test1.id)
         dc2.add_document_object(test2)
-        test1.history.Replay(test2)
+        test1.history.replay(test2)
 
         assert test2.propertyowner2s[0].id == l0.id
         assert test2.propertyowner2s[1].id == l1.id
@@ -1098,7 +1098,7 @@ class FieldCollofCollMergeTestCase(unittest.TestCase):
         dc2.register(TestColofCols3)
         test2 = TestColofCol1(test1.id)
         dc2.add_document_object(test2)
-        test1.history.Replay(test2)
+        test1.history.replay(test2)
 
         assert {l.id for l in test1.propertyowner2s} == {l0.id, l1.id}
         for l in test1.propertyowner2s:

@@ -107,7 +107,7 @@ class DocumentCollection(object):
                 start_hashes = {start_hash_1, start_hash_2}
             edge = self.historyedgeclasses[edgeclassname](start_hashes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname)
             history = historygraphdict[documentid]
-            history.AddEdges([edge])
+            history.add_edges([edge])
 
         for documentid in historygraphdict:
             doc = None
@@ -123,13 +123,13 @@ class DocumentCollection(object):
                 assert len(doc.history.edgesbyendnode) == 0
 
             #Make a copy of self's history
-            history = doc.history.Clone()
+            history = doc.history.clone()
             #Merge doc2's history
-            history.MergeGraphs(historygraphdict[documentid])
+            history.merge_graphs(historygraphdict[documentid])
             history.record_past_edges()
-            history.ProcessConflictWinners()
+            history.process_conflict_winners()
             #Create the return object and replay the history in to it
-            history.Replay(doc)
+            history.replay(doc)
 
             if not wasexisting:
                 self.add_document_object(doc)

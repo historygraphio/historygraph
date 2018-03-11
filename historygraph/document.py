@@ -14,7 +14,7 @@ class Document(DocumentObject):
         # it's history are cloned
         ret = self.__class__(self.id)
         ret.copy_document_object(self)
-        ret.history = self.history.Clone()
+        ret.history = self.history.clone()
         ret.dc = self.dc
         ret._clockhash = self._clockhash
         return ret
@@ -23,15 +23,15 @@ class Document(DocumentObject):
         assert self.id == doc2.id
         assert isinstance(doc2, Document)
         # Make a copy of self's history
-        history = self.history.Clone()
+        history = self.history.clone()
         # Merge doc2's history
-        history.MergeGraphs(doc2.history)
+        history.merge_graphs(doc2.history)
         history.record_past_edges()
-        history.ProcessConflictWinners()
+        history.process_conflict_winners()
         # Create the return object and replay the history in to it
         ret = self.__class__(self.id)
         ret.dc = self.dc
-        history.Replay(ret)
+        history.replay(ret)
         return ret
 
     def __init__(self, id=None):
@@ -65,7 +65,7 @@ class Document(DocumentObject):
         else:
             assert False
         self._clockhash = edge.get_end_node()
-        self.history.AddEdges([edge])
+        self.history.add_edges([edge])
         for l in self.edgeslistener:
             l.edges_added([edge])
 
@@ -81,7 +81,7 @@ class Document(DocumentObject):
     def add_edges(self, edges_list):
         if self.isfrozen:
             #If we are frozen just add the edge to the history graph. We will be a full replay on unfreezing
-            self.history.AddEdges(edges_list)
+            self.history.add_edges(edges_list)
             self.edges_received_while_frozen = True
             return
         fullreplay = False
@@ -126,7 +126,7 @@ class Document(DocumentObject):
             oldnode = self._clockhash
             edge = edgesdict[self._clockhash]
             #Play it
-            self.history.AddEdges([edge])
+            self.history.add_edges([edge])
             edge.Replay(self)
             assert self._clockhash == edge.get_end_node()
             assert self._clockhash != oldnode
@@ -149,12 +149,12 @@ class Document(DocumentObject):
         
         
     def full_replay(self, edges_list):
-        history = self.history.Clone()
-        history.AddEdges(edges_list)
-        history.ProcessGraph()
+        history = self.history.clone()
+        history.add_edges(edges_list)
+        history.process_graph()
         history.record_past_edges()
-        history.ProcessConflictWinners()
-        history.Replay(self)
+        history.process_conflict_winners()
+        history.replay(self)
 
     def freeze(self):
         assert self.isfrozen == False
@@ -165,12 +165,12 @@ class Document(DocumentObject):
         assert self.isfrozen == True
         self.isfrozen = False
         if self.edges_received_while_frozen:
-            history = self.history.Clone()
-            history.ProcessGraph()
+            history = self.history.clone()
+            history.process_graph()
             history.record_past_edges()
-            history.ProcessConflictWinners()
-            history.Replay(self)
-            edges = history.GetAllEdges()
+            history.process_conflict_winners()
+            history.replay(self)
+            edges = history.get_all_edges()
             for l in self.edgeslistener:
                 l.edges_added(edges)
 
