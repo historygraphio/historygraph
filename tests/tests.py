@@ -15,7 +15,7 @@ import hashlib
 from json import JSONEncoder, JSONDecoder
 
 class DocumentCollection(_DocumentCollection):
-    class MasterListener(object):
+    class GenericListener(object):
         def __init__(self, dc):
             self.slave = dc
             self.master = dc.master
@@ -30,36 +30,21 @@ class DocumentCollection(_DocumentCollection):
                 self.frozen_edges += [edge.as_tuple() for edge in edges]
             else:
                 edges = [edge.as_tuple() for edge in edges]
-                self.slave.load_from_json(JSONEncoder().encode({'history': edges, 'immutableobjects': []}))
+                self.send_edges(edges)
         def freeze_dc_comms(self):
             self.frozen = True
         def unfreeze_dc_comms(self):
             self.frozen = False
-            self.slave.load_from_json(JSONEncoder().encode({'history': self.frozen_edges, 'immutableobjects': []}))
+            self.send_edges(self.frozen_edges)
             self.frozen_edges = []
 
-    class SlaveListener(object):
-        def __init__(self, dc):
-            self.slave = dc
-            self.master = dc.master
-            self.frozen = False
-            self.frozen_edges = []
-        def document_object_added(self, dc, obj):
-            pass
-        def immutable_object_added(self, dc, obj):
-            pass
-        def edges_added(self, dc, edges):
-            if self.frozen:
-                self.frozen_edges += [edge.as_tuple() for edge in edges]
-            else:
-                edges = [edge.as_tuple() for edge in edges]
-                self.master.load_from_json(JSONEncoder().encode({'history': edges, 'immutableobjects': []}))
-        def freeze_dc_comms(self):
-            self.frozen = True
-        def unfreeze_dc_comms(self):
-            self.frozen = False
-            self.master.load_from_json(JSONEncoder().encode({'history': self.frozen_edges, 'immutableobjects': []}))
-            self.frozen_edges = []
+    class MasterListener(GenericListener):
+        def send_edges(self, edges):
+            self.slave.load_from_json(JSONEncoder().encode({'history': edges, 'immutableobjects': []}))
+
+    class SlaveListener(GenericListener):
+        def send_edges(self, edges):
+            self.master.load_from_json(JSONEncoder().encode({'history': edges, 'immutableobjects': []}))
 
 
     # This class is an inmemory simulation of two document collections which are
@@ -134,8 +119,6 @@ class SimpleCoversTestCase(unittest.TestCase):
         assert test.history is not test2.history
         assert test is not test2
 
-#TODO: Remove the Document's Merge function it is not compatible with requiring all
-# Documents to belong to a dc because the merge is done when DC's shared edges
 class MergeHistoryCoverTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()
