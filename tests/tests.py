@@ -15,6 +15,53 @@ import hashlib
 from json import JSONEncoder, JSONDecoder
 
 class DocumentCollection(_DocumentCollection):
+    class MasterListener(object):
+        def __init__(self, dc):
+            self.slave = dc
+            self.master = dc.master
+            self.frozen = False
+            self.frozen_edges = []
+        def document_object_added(self, dc, obj):
+            pass
+        def immutable_object_added(self, dc, obj):
+            pass
+        def edges_added(self, dc, edges):
+            if self.frozen:
+                self.frozen_edges += [edge.as_tuple() for edge in edges]
+            else:
+                edges = [edge.as_tuple() for edge in edges]
+                self.slave.load_from_json(JSONEncoder().encode({'history': edges, 'immutableobjects': []}))
+        def freeze_dc_comms(self):
+            self.frozen = True
+        def unfreeze_dc_comms(self):
+            self.frozen = False
+            self.slave.load_from_json(JSONEncoder().encode({'history': self.frozen_edges, 'immutableobjects': []}))
+            self.frozen_edges = []
+
+    class SlaveListener(object):
+        def __init__(self, dc):
+            self.slave = dc
+            self.master = dc.master
+            self.frozen = False
+            self.frozen_edges = []
+        def document_object_added(self, dc, obj):
+            pass
+        def immutable_object_added(self, dc, obj):
+            pass
+        def edges_added(self, dc, edges):
+            if self.frozen:
+                self.frozen_edges += [edge.as_tuple() for edge in edges]
+            else:
+                edges = [edge.as_tuple() for edge in edges]
+                self.master.load_from_json(JSONEncoder().encode({'history': edges, 'immutableobjects': []}))
+        def freeze_dc_comms(self):
+            self.frozen = True
+        def unfreeze_dc_comms(self):
+            self.frozen = False
+            self.master.load_from_json(JSONEncoder().encode({'history': self.frozen_edges, 'immutableobjects': []}))
+            self.frozen_edges = []
+
+
     # This class is an inmemory simulation of two document collections which are
     # linked by exchanging edges
     def __init__(self, master=None):
@@ -22,15 +69,25 @@ class DocumentCollection(_DocumentCollection):
         if master is not None:
             master.slave = self
             self.master = master
-            self.slave = slave
-            self.master.add_listener(self.master_edges_added)
-            self.add_listener(self.slave_edges_added)
+            self.slave = self
+            self.master_listener = DocumentCollection.MasterListener(self)
+            self.slave_listener = DocumentCollection.SlaveListener(self)
+            self.master.add_listener(self.master_listener)
+            self.add_listener(self.slave_listener)
 
     def master_edges_added(self, edges):
         self.load_from_json(json.dumps(edges))
         
     def slave_edges_added(self, edges):
         self.master.load_from_json(json.dumps(edges))
+
+    def freeze_dc_comms(self):
+        self.master_listener.freeze_dc_comms()
+        self.slave_listener.freeze_dc_comms()
+
+    def unfreeze_dc_comms(self):
+        self.master_listener.unfreeze_dc_comms()
+        self.slave_listener.unfreeze_dc_comms()
 
 class TestPropertyOwner2(DocumentObject):
     cover = fields.IntRegister()
@@ -46,70 +103,62 @@ class TestPropertyOwner1(Document):
 class Covers(Document):
     covers = fields.IntRegister()
 
-#TODO: Remove the Document's Clone function it is not compatible with requiring all
-# Documents to belong to a dc because the merge is done when DC's shared edges
-"""
 class SimpleCoversTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection()
-        self.dc.register(Covers)
+        self.dc1 = DocumentCollection()
+        self.dc1.register(Covers)
+        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2.register(Covers)
 
-    def runTest(self):
+    def test_covers_with_single_edge(self):
         #Test merging together simple covers documents
         test = Covers()
-        self.dc.add_document_object(test)
+        self.dc1.add_document_object(test)
         test.covers = 1
         #Test we can set a value
         self.assertEqual(test.covers, 1)
-        dc2 = DocumentCollection()
-        dc2.register(Covers)
-        test2 = Covers(test.id)
-        dc2.add_document_object(test2)
-        test.history.replay(test2)
-        #Test we can rebuild a simple object by playing an edge
+        #Test we can rebuild a simple object by playing an edge via sharing in linked DCs
+        test2 = self.dc2.get_object_by_id(Covers.__name__, test.id)
         self.assertEqual(test2.covers, 1)
-        #Test these are just the same history object but it was actually copied
+        #Test these are not just the same document but it was actually copied
+        assert test is not test2
         assert test.history is not test2.history
-        
-        test3 = test2.clone()
-        #Test the clone is the same as the original. But not just referin4g to the same object
-        self.assertEqual(test3.covers, test2.covers)
-        assert test2 is not test3
-        assert test2.history is not test3.history
-        
-        dc1 = DocumentCollection()
-        dc1.register(Covers)
+                
+    def test_covers_with_two_edges(self):
         test = Covers()
-        dc1.add_document_object(test)
+        self.dc1.add_document_object(test)
         test.covers = 1
         test.covers = 2
-        dc2 = DocumentCollection()
-        dc2.register(Covers)
-        test2 = Covers(test.id)
-        dc2.add_document_object(test2)
-        test.history.replay(test2)
+        test2 = self.dc2.get_object_by_id(Covers.__name__, test.id)
         self.assertEqual(test.covers, 2)
         assert test.history is not test2.history
         assert test is not test2
-"""    
 
 #TODO: Remove the Document's Merge function it is not compatible with requiring all
 # Documents to belong to a dc because the merge is done when DC's shared edges
-"""
 class MergeHistoryCoverTestCase(unittest.TestCase):
+    def setUp(self):
+        self.dc1 = DocumentCollection()
+        self.dc1.register(Covers)
+        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2.register(Covers)
+
     def runTest(self):
         #Test merge together two simple covers objects
-        dc1 = DocumentCollection()
-        dc1.register(Covers)
         test = Covers()
+        self.dc1.add_document_object(test)
         test.covers = 1
-        test2 = test.clone()
+        test2 = self.dc2.get_object_by_id(Covers.__name__, test.id)
+        self.dc2.freeze_dc_comms()
         test.covers = 2
+        self.assertEqual(test2.covers, 1)
         test2.covers = 3
-        test3 = test.merge(test2)
+        self.assertEqual(test.covers, 2)
+        self.assertEqual(test2.covers, 3)
+        self.dc2.unfreeze_dc_comms()
         #In a merge conflict between two integers the greater one is the winner
-        self.assertEqual(test3.covers, 3)
-"""
+        self.assertEqual(test2.covers, 3)
+        self.assertEqual(test.covers, 3)
 
 class TestPropertyOwner2(DocumentObject):
     cover = fields.IntRegister()
