@@ -21,6 +21,7 @@ class AddListItem(Edge):
         (objid, added_node_id, added_node_parent, added_node_timestamp, added_node_data) = JSONDecoder().decode(self.propertyvalue)
         if objid not in doc.documentobjects:
             newobj = doc.dc.classes[self.propertytype](objid)
+            newobj.dc = doc.dc
             doc.documentobjects[newobj.id] = newobj
         else:
             newobj = doc.documentobjects[objid]

@@ -31,7 +31,7 @@ class DocumentCollection(object):
         immutableobjects = list()
         for classname in self.objects:
             documentdict = self.objects[classname]
-            if issubclass(self.classes[classname], DocumentObject):
+            if issubclass(self.classes[classname], Document):
                 for (documentid, document) in documentdict.iteritems():
                     history = document.history
                     for edgeid in history.edgesbyendnode:
@@ -55,6 +55,8 @@ class DocumentCollection(object):
             elif issubclass(self.classes[classname], ImmutableObject):
                 for (objid, obj) in documentdict.iteritems():
                     immutableobjects.append(obj.as_dict())
+            elif issubclass(self.classes[classname], DocumentObject):
+                pass
             else:
                 assert False
         return (historyedges, immutableobjects)
@@ -157,6 +159,7 @@ class DocumentCollection(object):
     def add_document_object(self, obj):
         assert isinstance(obj, DocumentObject)
         obj.get_document().dc = self
+        obj.dc = self
         assert obj.__class__.__name__  in self.classes
         for propname in obj._field:
             propvalue = obj._field[propname]

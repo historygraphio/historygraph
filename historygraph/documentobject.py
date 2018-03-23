@@ -20,6 +20,7 @@ class DocumentObject(object):
     
     def __init__(self, id=None):
         self.insetattr = True
+        self.dc = None
         self._field = dict()
         self.change_handlers = list()
         self.parent = None
@@ -40,6 +41,7 @@ class DocumentObject(object):
             return
         self.insetattr = True
         if name in self._field:
+            assert self.get_document().dc is not None
             if type(self._field[name]) != fields.Collection and type(self._field[name]) != fields.IntCounter and type(self._field[name]) != fields.List:
                 self.was_changed(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self._field[name].get_type_name())
         self.insetattr = False
@@ -52,6 +54,7 @@ class DocumentObject(object):
             self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
     def copy_document_object(self, src):
+        self.dc = src.dc
         for k in src._field:
             v = src._field[k]
             setattr(self, k, v.clone(k, src, self))

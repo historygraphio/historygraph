@@ -31,16 +31,19 @@ class Covers(Document):
 class SimpleCoversTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.register(TestPropertyOwner1)
-        self.dc.register(TestPropertyOwner2)
+        self.dc.register(Covers)
 
     def runTest(self):
         #Test merging together simple covers documents
         test = Covers()
+        self.dc.add_document_object(test)
         test.covers = 1
         #Test we can set a value
         self.assertEqual(test.covers, 1)
+        dc2 = DocumentCollection()
+        dc2.register(Covers)
         test2 = Covers(test.id)
+        dc2.add_document_object(test2)
         test.history.replay(test2)
         #Test we can rebuild a simple object by playing an edge
         self.assertEqual(test2.covers, 1)
@@ -48,27 +51,35 @@ class SimpleCoversTestCase(unittest.TestCase):
         assert test.history is not test2.history
         
         test3 = test2.clone()
-        #Test the clone is the same as the original. But not just refering to the same object
+        #Test the clone is the same as the original. But not just referin4g to the same object
         self.assertEqual(test3.covers, test2.covers)
         assert test2 is not test3
         assert test2.history is not test3.history
         
+        dc1 = DocumentCollection()
+        dc1.register(Covers)
         test = Covers()
+        dc1.add_document_object(test)
         test.covers = 1
         test.covers = 2
+        dc2 = DocumentCollection()
+        dc2.register(Covers)
         test2 = Covers(test.id)
+        dc2.add_document_object(test2)
         test.history.replay(test2)
         self.assertEqual(test.covers, 2)
         assert test.history is not test2.history
         assert test is not test2
     
 
+#TODO: Remove the Document's Merge function it is not compatible with requiring all
+# Documents to belong to a dc because the merge is done when DC's shared edges
+"""
 class MergeHistoryCoverTestCase(unittest.TestCase):
-    def setUp(self):
-        self.dc = DocumentCollection()
-
     def runTest(self):
         #Test merge together two simple covers objects
+        dc1 = DocumentCollection()
+        dc1.register(Covers)
         test = Covers()
         test.covers = 1
         test2 = test.clone()
@@ -77,6 +88,7 @@ class MergeHistoryCoverTestCase(unittest.TestCase):
         test3 = test.merge(test2)
         #In a merge conflict between two integers the greater one is the winner
         self.assertEqual(test3.covers, 3)
+"""
 
 class TestPropertyOwner2(DocumentObject):
     cover = fields.IntRegister()
@@ -89,6 +101,9 @@ class TestPropertyOwner1(Document):
         super(TestPropertyOwner1, self).was_changed(changetype, propertyowner, propertyname, propertyvalue, propertytype)
         self.bWasChanged = True
 
+#TODO: Cloning Documents is not compatible with requiring all Documents to be
+# members of a DocumentCollection there this test is irrelevant and that function must be removed
+"""
 class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
@@ -160,15 +175,18 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
         test6.add_edges([edgenull])
         self.assertEqual(test6.covers, 2)
         self.assertEqual(test6._clockhash, oldnode)
-        
+"""        
 
 class ListItemChangeHistoryTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
 
     def runTest(self):
         #Test that various types of changes create was changed events
         test1 = TestPropertyOwner1()
+        self.dc.add_document_object(test1)
         test1.bWasChanged = False
         test2 = TestPropertyOwner2()
         test1.propertyowner2s.add(test2)
@@ -182,6 +200,8 @@ class ListItemChangeHistoryTestCase(unittest.TestCase):
         test1.propertyowner2s.remove(test2.id)
         self.assertEqual(len(test1.propertyowner2s), 0)
 
+#TODO: Clone is not supported if docs need to be members of DCs
+"""
 class SimpleItemTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
@@ -190,8 +210,10 @@ class SimpleItemTestCase(unittest.TestCase):
 
     def runTest(self):
         test1 = TestPropertyOwner1()
+        self.dc.add_document_object(test1)
         testitem = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem)
+        self.dc.add_document_object(testitem)
         testitem.cover = 1
         #Test semantics for retriving objects
         self.assertEqual(len(test1.propertyowner2s), 1)
@@ -200,8 +222,10 @@ class SimpleItemTestCase(unittest.TestCase):
             self.assertEqual(po2.cover, 1)
 
         test1 = TestPropertyOwner1()
+        self.dc.add_document_object(test1)
         testitem = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem)
+        self.dc.add_document_object(testitem)
         testitem.cover = 1
         test1.propertyowner2s.remove(testitem.id)
 
@@ -215,9 +239,14 @@ class SimpleItemTestCase(unittest.TestCase):
         #Check that replaying correctly removes the object
         self.assertEqual(len(test2.propertyowner2s), 0)
 
+        dc3 = DocumentCollection()
+        dc3.register(TestPropertyOwner1)
+        dc3.register(TestPropertyOwner2)
         test1 = TestPropertyOwner1()
+        dc2.add_document_object(test1)
         testitem = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem)
+        dc2.add_document_object(testitem)
         testitem.cover = 1
         test2 = test1.clone()
         
@@ -225,7 +254,10 @@ class SimpleItemTestCase(unittest.TestCase):
         for po2 in test2.propertyowner2s:
             self.assertEqual(po2.__class__.__name__, TestPropertyOwner2.__name__)
             self.assertEqual(po2.cover, 1)
+"""
 
+#TODO: Clone is not supported if docs need to be members of DCs
+"""
 class AdvancedItemTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
@@ -318,10 +350,14 @@ class AdvancedItemTestCase(unittest.TestCase):
         self.assertEqual(testitem2.quantity, 2)
         self.assertEqual(testitem1.cover, 2)
         self.assertEqual(testitem1.quantity, 3)
+"""
     
 class Comments(Document):
     comment = fields.CharRegister()
 
+#TODO: Cloning document objects is not compatible with requiring them belong to a DC
+# since the equivalent will be to clone them into another DC
+"""
 class MergeHistoryCommentTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
@@ -348,7 +384,10 @@ class MergeHistoryCommentTestCase(unittest.TestCase):
         test3 = test.merge(test2)
         #In a merge conflict between two string the one that is sooner in alphabetical order is the winner
         self.assertEqual(test3.comment, "CCC")
+"""
 
+#TODO: Clone is not supported if docs need to be members of DCs
+"""
 class StoreObjectsInJSONTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
@@ -363,6 +402,7 @@ class StoreObjectsInJSONTestCase(unittest.TestCase):
         testitem1 = TestPropertyOwner2()
         testitem1id = testitem1.id
         test1.propertyowner2s.add(testitem1)
+        self.dc.add_document_object(testitem1)
         test2 = test1.clone()
         testitem1.cover = 3
         test2.covers=2        
@@ -392,6 +432,7 @@ class StoreObjectsInJSONTestCase(unittest.TestCase):
             self.assertEqual(testitem1id, testitem1.id)
             self.assertEqual(testitem1.cover, 3)
         self.assertEqual(test1.covers, 2)
+"""
     
 class MergeChangesMadeInJSONTestCase(unittest.TestCase):
     def setUp(self):
@@ -405,6 +446,7 @@ class MergeChangesMadeInJSONTestCase(unittest.TestCase):
         self.dc.add_document_object(test1)
         test1id = test1.id
         testitem1 = TestPropertyOwner2()
+        #self.dc.add_document_object(testitem1)
         testitem1id = testitem1.id
         test1.propertyowner2s.add(testitem1)
         testitem1.cover = 3
@@ -470,6 +512,7 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
     def runTest(self):
         #Create an object and set some values
         test1 = TestPropertyOwner1()
+        self.dc.add_document_object(test1)
         test1id = test1.id
         testitem1 = TestPropertyOwner2()
         testitem1id = testitem1.id
@@ -563,6 +606,8 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
         self.assertEqual(testitem2.cover, 4)
 
 
+#TODO: Cloning not supported if docs must belong to DCs
+"""
 class FreezeTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
@@ -585,7 +630,10 @@ class FreezeTestCase(unittest.TestCase):
         test.unfreeze()
         self.assertFalse(test.history.has_dangling_edges())
         self.assertEqual(test.covers, 3)
+"""
 
+#TODO: Cloning not supported if docs must belong to DCs
+"""
 class FreezeThreeWayMergeTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
@@ -612,7 +660,10 @@ class FreezeThreeWayMergeTestCase(unittest.TestCase):
         #print "test.id=",test.id
         self.assertFalse(test.history.has_dangling_edges())
         self.assertEqual(test.covers, 4)
+"""
 
+#TODO: Clone is not supported if docs need to be members of DCs
+"""
 class LargeMergeTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
@@ -621,6 +672,7 @@ class LargeMergeTestCase(unittest.TestCase):
     def runTest(self):
         #Test merging together performance by receiving large numbers of edges
         test = Covers()
+        self.dc.add_document_object(test)
         test.covers = 1
         test2 = test.clone()
         for i in range(2,52):
@@ -637,6 +689,7 @@ class LargeMergeTestCase(unittest.TestCase):
         wrapped = wrapper(test_add_edges, test, test2)
         time_taken = timeit.timeit(wrapped, number=1)
         self.assertEqual(test.covers, 101)
+"""
 
 class MessageTest(ImmutableObject):
     # A demo class of an immutable object. It emulated a simple text message broadcast at a certain time
@@ -694,12 +747,12 @@ class TestUpdateHandler(object):
 class SimpleCoversUpdateTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.register(TestPropertyOwner1)
-        self.dc.register(TestPropertyOwner2)
+        self.dc.register(Covers)
 
     def runTest(self):
         #Test merging together simple covers documents
         test = Covers()
+        self.dc.add_document_object(test)
         test.covers = 1
         handler = TestUpdateHandler()
         test.add_handler(handler.WasChanged)
@@ -711,6 +764,9 @@ class SimpleCoversUpdateTestCase(unittest.TestCase):
         test.covers = 3
         self.assertEqual(handler.covers, 2)
     
+
+#TODO: Cloneing not supported if docs must belong to DCs
+"""
 class FreezeUpdateTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
@@ -739,7 +795,7 @@ class FreezeUpdateTestCase(unittest.TestCase):
         self.assertFalse(test.history.has_dangling_edges())
         self.assertEqual(test.covers, 3)
         self.assertEqual(handler.covers, 3)
-
+"""
 
 class CounterTestContainer(Document):
     testcounter = fields.IntCounter()
@@ -758,6 +814,8 @@ class SimpleCounterTestCase(unittest.TestCase):
         test.testcounter.subtract(1)
         self.assertEqual(test.testcounter.get(), 1)
 
+#TODO: The merge function is removed when we require Docs to belong to DC's
+"""
 class MergeCounterTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
@@ -772,7 +830,7 @@ class MergeCounterTestCase(unittest.TestCase):
         test2.testcounter.add(1)
         test3 = test.merge(test2)
         self.assertEqual(test3.testcounter.get(), 1)
-
+"""
 
 class UncleanReplayCounterTestCase(unittest.TestCase):
     def setUp(self):
@@ -840,7 +898,8 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
 
         self.assertEqual(test2.testcounter.get(), 1)
 
-
+#TODO: This test uses clone which is not supported if Docs must belong to DCs
+"""
 class HistoryGraphDepthTestCase(unittest.TestCase):
     def runTest(self):
         test = Covers()
@@ -899,6 +958,7 @@ class HistoryGraphDepthTestCase(unittest.TestCase):
         self.assertEqual(test3.depth(), 4)
         self.assertTrue(test3.depth() > test2.depth())
         self.assertTrue(test3.depth() > test.depth())
+"""
 
 
 class FieldListFunctionsTestCase(unittest.TestCase):
@@ -1106,3 +1166,26 @@ class FieldCollofCollMergeTestCase(unittest.TestCase):
             for l2 in l.propertyowner2s:
                 assert l2.get_document().id == test1.id
                 assert l2.comment == 'Hello'
+
+class DocumentCollectionCompulsoryTestCase(unittest.TestCase):
+    # Test that we assert when we change Document or DocumentObject without adding to a DC
+    def runTest(self):
+        self.dc = DocumentCollection()
+        self.dc.register(TestPropertyOwner1)
+        self.dc.register(TestPropertyOwner2)
+
+        # Test that if we add everything to the dc it all is OK
+        test1 = TestPropertyOwner1()
+        self.dc.add_document_object(test1)
+        test1.covers = 1
+
+        test2 = TestPropertyOwner2()
+        test1.propertyowner2s.add(test2)
+        test2.cover = 1
+
+        # Test if we don't add the Document to the dc we get an assertion
+        test3 = TestPropertyOwner1()
+        with self.assertRaises(AssertionError):
+            test3.covers = 1
+
+        
