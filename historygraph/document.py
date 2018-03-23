@@ -9,7 +9,9 @@ from .changetype import ChangeType
 from . import edges
 
 class Document(DocumentObject):
+    #TODO: Delete this function
     def clone(self):
+        assert False, 'Scheduled for deleting we will not clone documents but synchronise document collections'
         # Return a deep copy of this object. This object all of it's children and
         # it's history are cloned
         ret = self.__class__(self.id)

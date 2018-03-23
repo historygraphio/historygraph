@@ -46,6 +46,9 @@ class TestPropertyOwner1(Document):
 class Covers(Document):
     covers = fields.IntRegister()
 
+#TODO: Remove the Document's Clone function it is not compatible with requiring all
+# Documents to belong to a dc because the merge is done when DC's shared edges
+"""
 class SimpleCoversTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
@@ -88,7 +91,7 @@ class SimpleCoversTestCase(unittest.TestCase):
         self.assertEqual(test.covers, 2)
         assert test.history is not test2.history
         assert test is not test2
-    
+"""    
 
 #TODO: Remove the Document's Merge function it is not compatible with requiring all
 # Documents to belong to a dc because the merge is done when DC's shared edges
