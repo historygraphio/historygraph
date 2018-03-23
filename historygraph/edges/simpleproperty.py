@@ -17,7 +17,7 @@ class SimpleProperty(Edge):
         self.propertytype = propertytype
 
     def replay(self, doc):
-        if self._inactive:
+        if self.inactive:
             return
         edgeobject = doc.get_document_object(self.propertyownerid)
         field = edgeobject._field[self.propertyname]

@@ -7,7 +7,7 @@ import hashlib
 class Edge(object):
     def __init__(self, start_hashes, documentid, documentclassname):
         self._start_hashes = sorted(start_hashes)
-        self._inactive = False
+        self.inactive = False
         self.documentid = documentid
         self.documentclassname = documentclassname
 
@@ -39,12 +39,12 @@ class Edge(object):
     def compare_for_conflicts(self, edge2):
 	    if (self.__class__ != edge2.__class__):
 		    return; #Different edge types can never conflict
-	    if (self._inactive or edge2.inactive):
+	    if (self.inactive or edge2.inactive):
 		    return; #Inactive edges can never conflict with active edges
 	    conflictwinner = self.get_conflict_winner(edge2)
 	    assert conflictwinner == -1 or conflictwinner == 0 or conflictwinner == 1
 	    if conflictwinner == 1:
-	        self._inactive = True
+	        self.inactive = True
 	    elif conflictwinner == -1:
 	        edge2.inactive = True
         
