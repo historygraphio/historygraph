@@ -2,7 +2,7 @@
 from __future__ import absolute_import, unicode_literals, print_function
 
 import unittest
-from historygraph import DocumentCollection
+from historygraph import DocumentCollection as _DocumentCollection
 from historygraph import DocumentObject
 from historygraph import Document
 from historygraph import fields
@@ -13,6 +13,24 @@ import timeit
 import uuid
 import hashlib
 from json import JSONEncoder, JSONDecoder
+
+class DocumentCollection(_DocumentCollection):
+    # This class is an inmemory simulation of two document collections which are
+    # linked by exchanging edges
+    def __init__(self, master=None):
+        super(DocumentCollection, self).__init__()
+        if master is not None:
+            master.slave = self
+            self.master = master
+            self.slave = slave
+            self.master.add_listener(self.master_edges_added)
+            self.add_listener(self.slave_edges_added)
+
+    def master_edges_added(self, edges):
+        self.load_from_json(json.dumps(edges))
+        
+    def slave_edges_added(self, edges):
+        self.master.load_from_json(json.dumps(edges))
 
 class TestPropertyOwner2(DocumentObject):
     cover = fields.IntRegister()
