@@ -452,6 +452,8 @@ class StoreObjectsInJSONTestCase(unittest.TestCase):
         self.assertEqual(test1.covers, 2)
 """
     
+#TODO: Merge is not supported if docs need to be members of DCs
+"""
 class MergeChangesMadeInJSONTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
@@ -517,7 +519,7 @@ class MergeChangesMadeInJSONTestCase(unittest.TestCase):
         for testitem3 in test3.propertyowner2s:
             self.assertEqual(testitem3.cover, 4)
         self.assertEqual(test3.covers, 4)
-
+"""
     
 class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
     #Similar to merge changes test but testing things such as out of order reception of edges

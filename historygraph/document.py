@@ -19,7 +19,9 @@ class Document(DocumentObject):
         ret._clockhash = self._clockhash
         return ret
 
+    #TODO: Delete this function
     def merge(self, doc2):
+        assert False, 'Scheduled for deleting we will not merge documents like this in the future but use document collections'
         assert self.id == doc2.id
         assert isinstance(doc2, Document)
         # Make a copy of self's history
