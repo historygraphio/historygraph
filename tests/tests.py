@@ -119,6 +119,7 @@ class SimpleCoversTestCase(unittest.TestCase):
         assert test.history is not test2.history
         assert test is not test2
 
+#TODO: This test seems to fail intermittent with test.cover == 1 and test2.covers == 1
 class MergeHistoryCoverTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()
@@ -140,8 +141,8 @@ class MergeHistoryCoverTestCase(unittest.TestCase):
         self.assertEqual(test2.covers, 3)
         self.dc2.unfreeze_dc_comms()
         #In a merge conflict between two integers the greater one is the winner
-        self.assertEqual(test2.covers, 3)
-        self.assertEqual(test.covers, 3)
+        self.assertEqual(test2.covers, 3, 'test.covers={} test2.covers={}'.format(test.covers, test2.covers))
+        self.assertEqual(test.covers, 3, 'test.covers={} test2.covers={}'.format(test.covers, test2.covers))
 
 class TestPropertyOwner2(DocumentObject):
     cover = fields.IntRegister()
@@ -154,81 +155,49 @@ class TestPropertyOwner1(Document):
         super(TestPropertyOwner1, self).was_changed(changetype, propertyowner, propertyname, propertyvalue, propertytype)
         self.bWasChanged = True
 
-#TODO: Cloning Documents is not compatible with requiring all Documents to be
-# members of a DocumentCollection there this test is irrelevant and that function must be removed
-"""
 class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection()
-        self.dc.register(Covers)
+        self.dc1 = DocumentCollection()
+        self.dc1.register(Covers)
+        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2.register(Covers)
 
-    def runTest(self):
-        #Test merging together by receiving an edge
-        test = Covers()
-        test.covers = 1
-        test2 = test.clone()
-        test.covers = 2
-        test2.covers = 3
-        edge = test2.history.edgesbyendnode[test2._clockhash]
-        history = test.history.clone()
-        history.add_edges([edge])
-        test3 = Covers(test.id)
-        history.replay(test3)
-        #In a merge conflict between two integers the greater one is the winner
-        self.assertEqual(test3.covers, 3)
+        self.test = Covers()
+        self.dc1.add_document_object(self.test)
+        self.test.covers = 1
+        self.test2 = self.dc2.get_object_by_id(Covers.__name__, self.test.id)
+        self.dc2.freeze_dc_comms()
 
-        #Test the behaviour of receiving edges out of order
-        test = Covers()
-        test.covers = 1
-        test2 = test.clone()
-        test.covers = 2
-        test5 = test2.clone()
-        test6 = test2.clone()
-        test2.covers = 3
-        test2.covers = 4
-        edge4 = test2.history.edgesbyendnode[test2._clockhash]
-        edge3 = test2.history.edgesbyendnode[list(edge4._start_hashes)[0]]
-        history = test.history.clone()
-        history.add_edges([edge4])
-        test3 = Covers(test.id)
-        history.replay(test3)
-        #edge4 should be orphaned and not played
-        self.assertEqual(test3.covers, 2)
-        #Once edge3 is added we should replay automatically to 4
-        history.add_edges([edge3])
-        test4 = Covers(test.id)
-        history.replay(test4)
-        #edge4 should be orphaned and not played
-        self.assertEqual(test4.covers, 4)
+        self.test2.covers = 3
+        self.test2.covers = 4
+        self.edge3 = self.test2.history.edgesbyendnode[self.test2._clockhash]
+        self.edge2 = self.test2.history.edgesbyendnode[list(self.edge3._start_hashes)[0]]
 
-        #Test live adding of edges
-        test5.add_edges([edge3])
-        self.assertEqual(test5.covers, 3)
-        
-        #Test live adding of orphaned edges
-        test6.add_edges([edge4])
-        self.assertEqual(test6.covers, 1)
-        test6.add_edges([edge3])
-        self.assertEqual(test6.covers, 4)
+    def test_sending_edges_manually(self):
+        # This function test that manually invocation of the send_edges method works correctly
 
-        #Test adding a Null edge where we don't  have one of the start nodes.
-        #In the old way        
+        self.dc2.slave_listener.send_edges([self.edge2.as_tuple(), self.edge3.as_tuple()])
+        self.assertEqual(self.test.covers, 4)
+
+    def test_sending_edges_out_of_order(self):
+        # First sent and orhaned edge and verify it is ignore
+        self.dc2.slave_listener.send_edges([self.edge3.as_tuple()])
+        self.assertEqual(self.test.covers, 1)
+
+        self.dc2.slave_listener.send_edges([self.edge2.as_tuple()])
+        self.assertEqual(self.test.covers, 4)
+
+    def test_sending_merge_edge_with_one_invalid_start_hash(self):
         dummysha = hashlib.sha256('Invalid node').hexdigest()
-        history = test.history.clone()
-        edgenull = edges.Merge({test6._clockhash, dummysha}, "", "", "", "", test6.id, test6.__class__.__name__)
-        history.add_edges([edgenull])
-        test6 = Covers(test.id)
-        history.replay(test6)
-        self.assertEqual(test6.covers, 2)
+        old_clockhash = self.test._clockhash
+        edgenull = edges.Merge({self.test._clockhash, dummysha}, "", "", "", "", self.test.id, self.test.__class__.__name__)
+        self.dc2.slave_listener.send_edges([edgenull.as_tuple()])
+        self.assertEqual(self.test.covers, 1)
+        self.assertEqual(self.test._clockhash, old_clockhash)
 
-        #In the new way
-        test6 = test.clone()
-        oldnode = test6._clockhash
-        edgenull = edges.Merge({test6._clockhash, dummysha}, "", "", "", "", test6.id, test6.__class__.__name__)
-        test6.add_edges([edgenull])
-        self.assertEqual(test6.covers, 2)
-        self.assertEqual(test6._clockhash, oldnode)
-"""        
+        # Test if we send more matching edges they work
+        self.dc2.slave_listener.send_edges([self.edge2.as_tuple(), self.edge3.as_tuple()])
+        self.assertEqual(self.test.covers, 4)
 
 class ListItemChangeHistoryTestCase(unittest.TestCase):
     def setUp(self):
