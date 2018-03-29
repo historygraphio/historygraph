@@ -131,7 +131,10 @@ class DocumentCollection(object):
             history.record_past_edges()
             history.process_conflict_winners()
             #Create the return object and replay the history in to it
+            doc.insetattr = True
+            doc.history = history
             history.replay(doc)
+            doc.insetattr = False
 
             if not wasexisting:
                 self.add_document_object(doc)

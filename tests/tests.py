@@ -141,8 +141,10 @@ class MergeHistoryCoverTestCase(unittest.TestCase):
         self.assertEqual(test2.covers, 3)
         self.dc2.unfreeze_dc_comms()
         #In a merge conflict between two integers the greater one is the winner
-        self.assertEqual(test2.covers, 3, 'test.covers={} test2.covers={}'.format(test.covers, test2.covers))
-        self.assertEqual(test.covers, 3, 'test.covers={} test2.covers={}'.format(test.covers, test2.covers))
+        edges = [e.as_tuple() for e in test2.history.get_all_edges()]
+        self.assertEqual(test2.covers, 3, 'test.covers={} test2.covers={} edges={}'.format(test.covers, test2.covers, edges))
+        edges = [e.as_tuple() for e in test.history.get_all_edges()]
+        self.assertEqual(test.covers, 3, 'test.covers={} test2.covers={} edges={}'.format(test.covers, test2.covers, edges))
 
 class TestPropertyOwner2(DocumentObject):
     cover = fields.IntRegister()
@@ -918,7 +920,6 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
         test2s = self.dc.get_by_class(CounterTestContainer)
         self.assertEqual(len(test2s), 1)
         test2 = test2s[0]
-        #print "test2 edges=",[str(edge) for edge in test2.history.GetAllEdges()]
 
         self.assertEqual(test2.testcounter.get(), 1)
 
