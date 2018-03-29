@@ -30,7 +30,8 @@ class Collection(Field):
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             assert isinstance(propertyownerid, basestring)
-            self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
+            if not self.parent.insetattr:
+                self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
         def __len__(self):
             return len(self.l)

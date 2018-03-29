@@ -224,61 +224,51 @@ class ListItemChangeHistoryTestCase(unittest.TestCase):
         test1.propertyowner2s.remove(test2.id)
         self.assertEqual(len(test1.propertyowner2s), 0)
 
-#TODO: Clone is not supported if docs need to be members of DCs
-"""
+#TODO: Write a test that test the equivalent functionality with lists
 class SimpleItemTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection()
-        self.dc.register(TestPropertyOwner1)
-        self.dc.register(TestPropertyOwner2)
+        self.dc1 = DocumentCollection()
+        self.dc1.register(TestPropertyOwner1)
+        self.dc1.register(TestPropertyOwner2)
+        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2.register(TestPropertyOwner1)
+        self.dc2.register(TestPropertyOwner2)
 
-    def runTest(self):
+    def test_replicating_an_object_in_a_collection(self):
         test1 = TestPropertyOwner1()
-        self.dc.add_document_object(test1)
+        self.dc1.add_document_object(test1)
         testitem = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem)
-        self.dc.add_document_object(testitem)
+        self.dc1.add_document_object(testitem)
         testitem.cover = 1
+
         #Test semantics for retriving objects
         self.assertEqual(len(test1.propertyowner2s), 1)
         for po2 in test1.propertyowner2s:
             self.assertEqual(po2.__class__.__name__ , TestPropertyOwner2.__name__)
             self.assertEqual(po2.cover, 1)
 
-        test1 = TestPropertyOwner1()
-        self.dc.add_document_object(test1)
-        testitem = TestPropertyOwner2()
-        test1.propertyowner2s.add(testitem)
-        self.dc.add_document_object(testitem)
-        testitem.cover = 1
-        test1.propertyowner2s.remove(testitem.id)
-
-        dc2 = DocumentCollection()
-        dc2.register(TestPropertyOwner1)
-        dc2.register(TestPropertyOwner2)
-        test2 = TestPropertyOwner1(test1.id)
-        dc2.add_document_object(test2)
-        test1.history.replay(test2)
-
-        #Check that replaying correctly removes the object
-        self.assertEqual(len(test2.propertyowner2s), 0)
-
-        dc3 = DocumentCollection()
-        dc3.register(TestPropertyOwner1)
-        dc3.register(TestPropertyOwner2)
-        test1 = TestPropertyOwner1()
-        dc2.add_document_object(test1)
-        testitem = TestPropertyOwner2()
-        test1.propertyowner2s.add(testitem)
-        dc2.add_document_object(testitem)
-        testitem.cover = 1
-        test2 = test1.clone()
-        
+        test2 = self.dc2.get_object_by_id(TestPropertyOwner1.__name__, test1.id)
         self.assertEqual(len(test2.propertyowner2s), 1)
         for po2 in test2.propertyowner2s:
             self.assertEqual(po2.__class__.__name__, TestPropertyOwner2.__name__)
             self.assertEqual(po2.cover, 1)
-"""
+
+    def test_replicating_then_deleting_an_object_from_a_collection(self):
+        test1 = TestPropertyOwner1()
+        self.dc1.add_document_object(test1)
+        testitem = TestPropertyOwner2()
+        test1.propertyowner2s.add(testitem)
+        self.dc1.add_document_object(testitem)
+        testitem.cover = 1
+        test1.propertyowner2s.remove(testitem.id)
+
+        #Test semantics for retriving objects
+        self.assertEqual(len(test1.propertyowner2s), 0)
+
+        test2 = self.dc2.get_object_by_id(TestPropertyOwner1.__name__, test1.id)
+        self.assertEqual(len(test2.propertyowner2s), 0)
+
 
 #TODO: Clone is not supported if docs need to be members of DCs
 """
