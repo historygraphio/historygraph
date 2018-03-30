@@ -435,7 +435,6 @@ class MergeHistoryCommentTestCase(unittest.TestCase):
         self.assertEqual(test2.comment, "CCC")
 
 
-#TODO: Clone is not supported if docs need to be members of DCs
 class StoreObjectsInJSONTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()
@@ -485,81 +484,81 @@ class StoreObjectsInJSONTestCase(unittest.TestCase):
         self.assertEqual(len(test1s), 1)
         test3 = test1s[0]
         test3id = test3.id
-        self.assertEqual(len(test1.propertyowner2s), 1)
+        self.assertEqual(len(test3.propertyowner2s), 1)
         for testitem3 in test3.propertyowner2s:
             self.assertEqual(testitem3.id, testitem1.id)
             self.assertEqual(testitem3.cover, 3)
-        self.assertEqual(test1.covers, 1)
+        self.assertEqual(test3.covers, 1)
 
     
 #TODO: Merge is not supported if docs need to be members of DCs
-"""
 class MergeChangesMadeInJSONTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection()
-        self.dc.register(TestPropertyOwner1)
-        self.dc.register(TestPropertyOwner2)
+        self.dc1 = DocumentCollection()
+        self.dc1.register(TestPropertyOwner1)
+        self.dc1.register(TestPropertyOwner2)
+        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2.register(TestPropertyOwner1)
+        self.dc2.register(TestPropertyOwner2)
 
     def runTest(self):
-        #Create an object and set some values
+        # Generate a complex historygraph with a merge to make this test more testing on the software
         test1 = TestPropertyOwner1()
-        self.dc.add_document_object(test1)
-        test1id = test1.id
+        self.dc1.add_document_object(test1)
+        test1.covers = 1
         testitem1 = TestPropertyOwner2()
-        #self.dc.add_document_object(testitem1)
-        testitem1id = testitem1.id
         test1.propertyowner2s.add(testitem1)
-        testitem1.cover = 3
-        test1.covers=2        
+        self.dc1.add_document_object(testitem1)
+        testitem1.cover = 1
+        self.dc2.freeze_dc_comms()
+        test2 = self.dc2.get_object_by_id(TestPropertyOwner1.__name__, test1.id)
+        testitem2 = test2.get_document_object(testitem1.id)
+        testitem1.cover = 2
+        testitem1.quantity = 3
+        testitem2.cover = 3
+        testitem2.quantity = 2
+        self.assertEqual(testitem2.cover, 3)
+        self.assertEqual(testitem2.quantity, 2)
+        self.assertEqual(testitem1.cover, 2)
+        self.assertEqual(testitem1.quantity, 3)
+        self.dc2.unfreeze_dc_comms()
 
-        self.dc.add_document_object(test1)
+        #TODO: The two lines below were needed to update the object but they
+        # shouldn't be this object should just update in place
+        testitem2 = test2.get_document_object(testitem2.id)
+        testitem1 = test1.get_document_object(testitem1.id)
+        self.assertEqual(testitem2.cover, 3)
+        self.assertEqual(testitem2.quantity, 3)
+        self.assertEqual(testitem1.cover, 3)
+        self.assertEqual(testitem1.quantity, 3)
 
-        #Simulate sending the object to another user via conversion to JSON and emailing
-        jsontext = self.dc.as_json()
-
-        #Make some local changes
-        test1.covers = 4
-
-        #Simulate the other user (who received the email with the edges) getting the document and loading it into memory
-        self.dc = DocumentCollection()
-        self.dc.register(TestPropertyOwner1)
-        self.dc.register(TestPropertyOwner2)
-        self.dc.load_from_json(jsontext)
-        tpo1s = self.dc.get_by_class(TestPropertyOwner1)
-        self.assertEqual(len(tpo1s), 1)
-        test2 = tpo1s[0]
-
-        self.assertEqual(len(test2.propertyowner2s), 1)
-
-        #The second user makes some changes and sends them back to the first
-        for testitem2 in test2.propertyowner2s:
-            testitem2.cover = 4
-
-        test2.covers = 3
-        
-        jsontext = self.dc.as_json()
-        
-        #Simulate the first user received the second users changes
-        self.dc = DocumentCollection()
-        self.dc.register(TestPropertyOwner1)
-        self.dc.register(TestPropertyOwner2)
-        self.dc.load_from_json(jsontext)
-        test2s = self.dc.get_by_class(TestPropertyOwner1)
-        self.assertEqual(len(test2s), 1)
-        test2 = test2s[0]
-
-        self.assertEqual(test2.covers, 3)
-        for testitem2 in test2.propertyowner2s:
-            self.assertEqual(testitem2.cover, 4)
-        self.assertEqual(testitem2.cover, 4)
-         
-        #The first user merges the changes back with his own
-        test3 = test2.merge(test1)
+        jsontext = self.dc1.as_json()
+        dc3 = DocumentCollection()
+        dc3.register(TestPropertyOwner1)
+        dc3.register(TestPropertyOwner2)
+        dc3.load_from_json(jsontext)
+        test1s = dc3.get_by_class(TestPropertyOwner1)
+        self.assertEqual(len(test1s), 1)
+        test3 = test1s[0]
+        test3id = test3.id
         self.assertEqual(len(test3.propertyowner2s), 1)
         for testitem3 in test3.propertyowner2s:
-            self.assertEqual(testitem3.cover, 4)
-        self.assertEqual(test3.covers, 4)
-"""
+            self.assertEqual(testitem3.id, testitem1.id)
+            self.assertEqual(testitem3.cover, 3)
+        self.assertEqual(test3.covers, 1)
+
+        # Change the value then load everything back in via JSON
+        test3.covers = 4
+        testitem3.cover = 4
+        jsontext = dc3.as_json()
+        self.dc1.load_from_json(jsontext)
+
+        self.assertEqual(test1.covers, 4)
+        self.assertEqual(len(test1.propertyowner2s), 1)
+        #TODO: We should not have to reget the object here it should update in place
+        testitem1 = test1.get_document_object(testitem1.id)
+        self.assertEqual(testitem1.cover, 4)
+
     
 class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
     #Similar to merge changes test but testing things such as out of order reception of edges
