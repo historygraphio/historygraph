@@ -916,66 +916,76 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
         self.assertEqual(test2.testcounter.get(), 1)
 
 #TODO: This test uses clone which is not supported if Docs must belong to DCs
-"""
 class HistoryGraphDepthTestCase(unittest.TestCase):
-    def runTest(self):
-        test = Covers()
+    def setUp(self):
+        self.dc1 = DocumentCollection()
+        self.dc1.register(Covers)
+        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2.register(Covers)
+
+    def test_depth_simple_case(self):
+        test1 = Covers()
+        self.dc1.add_document_object(test1)
         #Test there are no edges in the object just created
-        self.assertEqual(test.depth(), 0)
+        self.assertEqual(test1.depth(), 0)
 
         #Test just adding edge very simply
-        test.covers = 1
-        self.assertEqual(test.depth(), 1)
+        test1.covers = 1
+        self.assertEqual(test1.depth(), 1)
 
-        test.covers = 2
+        test1.covers = 2
 
-        self.assertEqual(test.depth(), 2)
+        self.assertEqual(test1.depth(), 2)
 
-        test2 = test.clone()
+        test2 = self.dc2.get_object_by_id(Covers.__name__, test1.id)
+        self.dc2.freeze_dc_comms()
 
         self.assertEqual(test2.depth(), 2)
 
         test2.covers = 3
 
-        self.assertEqual(test.depth(), 2)
+        self.assertEqual(test1.depth(), 2)
         self.assertEqual(test2.depth(), 3)
 
         #Test merging back together simply
-        test3 = test.merge(test2)
+        self.dc2.unfreeze_dc_comms()
 
-        self.assertEqual(test.depth(), 2)
+        self.assertEqual(test1.depth(), 3)
         self.assertEqual(test2.depth(), 3)
-        self.assertEqual(test3.depth(), 3)
 
-        #Test with a conflicting merge
-        test1 = None
-        test2 = None
-        test3 = None
+    def test_depth_conflicting_merge(self):
 
-        test = Covers()
-        self.assertEqual(test.depth(), 0)
-        test.covers = 1
-        self.assertEqual(test.depth(), 1)
+        test1 = Covers()
+        self.dc1.add_document_object(test1)
+        #Test there are no edges in the object just created
+        self.assertEqual(test1.depth(), 0)
 
-        test2 = test.clone()
-        test2.covers = 3
+        #Test just adding edge very simply
+        test1.covers = 1
+        self.assertEqual(test1.depth(), 1)
 
-        self.assertEqual(test.depth(), 1)
+        test1.covers = 2
+
+        self.assertEqual(test1.depth(), 2)
+
+        test2 = self.dc2.get_object_by_id(Covers.__name__, test1.id)
+        self.dc2.freeze_dc_comms()
+
         self.assertEqual(test2.depth(), 2)
 
-        test.covers = 4
-        self.assertEqual(test.depth(), 2)
-        test.covers = 5
-        self.assertEqual(test.depth(), 3)
-        self.assertEqual(test2.depth(), 2)
+        test1.covers = 3
+        test2.covers = 4
 
-        #Test merging back together this time there is a conflict
-        test3 = test2.merge(test)
-        self.assertEqual(test3.covers, 5)
-        self.assertEqual(test3.depth(), 4)
-        self.assertTrue(test3.depth() > test2.depth())
-        self.assertTrue(test3.depth() > test.depth())
-"""
+        self.assertEqual(test1.depth(), 3)
+        self.assertEqual(test2.depth(), 3)
+
+        #Test merging back together simply
+        self.dc2.unfreeze_dc_comms()
+
+        # The merge should have resulted in another edge being added
+        # the merge edge
+        self.assertEqual(test1.depth(), 4)
+        self.assertEqual(test2.depth(), 4)
 
 
 class FieldListFunctionsTestCase(unittest.TestCase):
