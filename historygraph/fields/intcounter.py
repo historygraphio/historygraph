@@ -25,7 +25,8 @@ class IntCounter(Field):
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             assert isinstance(propertyownerid, basestring)
-            self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
+            if not self.parent.insetattr:
+                self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
         def clone(self, owner, name):
             ret = IntCounter._FieldIntCounterImpl(self.parent, self.name)

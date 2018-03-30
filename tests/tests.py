@@ -828,22 +828,27 @@ class SimpleCounterTestCase(unittest.TestCase):
         self.assertEqual(test.testcounter.get(), 1)
 
 #TODO: The merge function is removed when we require Docs to belong to DC's
-"""
 class MergeCounterTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection()
+        self.dc1 = DocumentCollection()
+        self.dc1.register(CounterTestContainer)
+        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2.register(CounterTestContainer)
 
     def runTest(self):
         #Test merge together two simple covers objects
-        test = CounterTestContainer()
-        test.testcounter.add(1)
-        self.assertEqual(test.testcounter.get(), 1)
-        test2 = test.clone()
-        test.testcounter.subtract(1)
+        test1 = CounterTestContainer()
+        self.dc1.add_document_object(test1)
+        test1.testcounter.add(1)
+        self.assertEqual(test1.testcounter.get(), 1)
+        test2 = self.dc2.get_object_by_id(CounterTestContainer.__name__, test1.id)
+        self.dc2.freeze_dc_comms()
+        test1.testcounter.subtract(1)
         test2.testcounter.add(1)
-        test3 = test.merge(test2)
-        self.assertEqual(test3.testcounter.get(), 1)
-"""
+        self.dc2.unfreeze_dc_comms()
+        self.assertEqual(test1.testcounter.get(), 1)
+        self.assertEqual(test2.testcounter.get(), 1)
+
 
 class UncleanReplayCounterTestCase(unittest.TestCase):
     def setUp(self):
