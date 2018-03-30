@@ -80,6 +80,9 @@ class Document(DocumentObject):
             return self
         return self.documentobjects[id]
 
+    def has_document_object(self, id):
+        return id == self.id or id in self.documentobjects
+
     def get_document(self):
         #Return the document
         return self

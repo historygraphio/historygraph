@@ -18,8 +18,9 @@ class RemoveListItem(Edge):
         self.propertytype = propertytype
 
     def replay(self, doc):
-        parent = doc.get_document_object(self.propertyownerid)
-        getattr(parent, self.propertyname).remove_by_nodeid(self.propertyvalue)
+        if doc.has_document_object(self.propertyownerid):
+            parent = doc.get_document_object(self.propertyownerid)
+            getattr(parent, self.propertyname).remove_by_nodeid(self.propertyvalue)
 
     def clone(self):
         return RemoveListItem(self._start_hashes, 

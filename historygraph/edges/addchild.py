@@ -26,8 +26,9 @@ class AddChild(Edge):
         if isinstance(self, AddChild) and self.propertyownerid == "" and self.propertyname == "":
             pass #There is no parent object and this edge is creating a stand alone object
         else:
-            parent = doc.get_document_object(self.propertyownerid)
-            getattr(parent, self.propertyname).add(newobj)
+            if doc.has_document_object(self.propertyownerid):
+                parent = doc.get_document_object(self.propertyownerid)
+                getattr(parent, self.propertyname).add(newobj)
 
     def clone(self):
         return AddChild(self._start_hashes, 
