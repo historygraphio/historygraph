@@ -313,83 +313,87 @@ class AdvancedItemTestCase(unittest.TestCase):
         self.assertEqual(len(test2.propertyowner2s), 0)
         self.assertEqual(len(test1.propertyowner2s), 0)
 
-        """
-        assert False
 
-
-        test1 = TestPropertyOwner1()
-        self.dc.add_document_object(test1)
-        testitem1 = TestPropertyOwner2()
-        test1.propertyowner2s.add(testitem1)
-        testitem1.cover = 1
-        test2 = test1.clone()
-        testitem2 = test2.get_document_object(testitem1.id)
-        testitem2.cover = 2
-        test2.propertyowner2s.remove(testitem2.id)
-        test3 = test2.merge(test1)
-        self.assertEqual(len(test3.propertyowner2s), 0)
-        assert False
-
+    def test_merging_changes_to_different_objects_in_the_same_doc_works(self):
         #Test merging changes to different objects in the same document works
         test1 = TestPropertyOwner1()
-        self.dc.add_document_object(test1)
+        self.dc1.add_document_object(test1)
+        test1.covers = 1
         testitem1 = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem1)
-        test2 = test1.clone()
-        testitem1.cover = 3
-        test2.covers=2
-        test3 = test2.merge(test1)
-        self.assertEqual(len(test3.propertyowner2s), 1)
-        for item1 in test3.propertyowner2s:
-            self.assertEqual(item1.cover, 3)
-        self.assertEqual(test3.covers, 2)
+        self.dc1.add_document_object(testitem1)
+        testitem1.cover = 1
+        self.dc2.freeze_dc_comms()
+        test1.covers = 3
+        test2 = self.dc2.get_object_by_id(TestPropertyOwner1.__name__, test1.id)
+        testitem2 = test2.get_document_object(testitem1.id)
+        testitem2.cover = 2
+        self.dc2.unfreeze_dc_comms()
+        self.assertEqual(test1.covers, 3)
+        self.assertEqual(test2.covers, 3)
+        self.assertEqual(len(test2.propertyowner2s), 1)
+        self.assertEqual(len(test1.propertyowner2s), 1)
+        for item1 in test2.propertyowner2s:
+            self.assertEqual(item1.cover, 2)
+        for item1 in test1.propertyowner2s:
+            self.assertEqual(item1.cover, 2)
 
+    def test_changing_objects_on_different_branches_works(self):
         #Test changing different objects on different branches works
         test1 = TestPropertyOwner1()
-        self.dc.add_document_object(test1)
+        self.dc1.add_document_object(test1)
+        test1.covers = 1
         testitem1 = TestPropertyOwner2()
-        id1 = testitem1.id
         test1.propertyowner2s.add(testitem1)
-        testitem2 = TestPropertyOwner2()
-        test1.propertyowner2s.add(testitem2)
-        id2 = testitem2.id
-        test2 = test1.clone()
-        testitem2 = test2.get_document_object(id2)
+        self.dc1.add_document_object(testitem1)
+        testitem1.cover = 1
+        self.dc2.freeze_dc_comms()
+        test2 = self.dc2.get_object_by_id(TestPropertyOwner1.__name__, test1.id)
+        testitem2 = test2.get_document_object(testitem1.id)
         testitem1.cover = 2
         testitem1.quantity = 3
         testitem2.cover = 3
         testitem2.quantity = 2
-        test3 = test2.merge(test1)
-        testitem1 = test3.get_document_object(id1)
-        testitem2 = test3.get_document_object(id2)
         self.assertEqual(testitem2.cover, 3)
         self.assertEqual(testitem2.quantity, 2)
         self.assertEqual(testitem1.cover, 2)
         self.assertEqual(testitem1.quantity, 3)
-        
+        self.dc2.unfreeze_dc_comms()
+
+        #TODO: The two lines below were needed to update the object but they
+        # shouldn't be this object should just update in place
+        testitem2 = test2.get_document_object(testitem2.id)
+        testitem1 = test1.get_document_object(testitem1.id)
+        self.assertEqual(testitem2.cover, 3)
+        self.assertEqual(testitem2.quantity, 3)
+        self.assertEqual(testitem1.cover, 3)
+        self.assertEqual(testitem1.quantity, 3)
+
+    def test_changing_objects_on_different_branches_works_reverse_order(self):
         #Test changing different objects on different branches works reverse merge of above
         test1 = TestPropertyOwner1()
-        self.dc.add_document_object(test1)
+        self.dc1.add_document_object(test1)
         testitem1 = TestPropertyOwner2()
-        id1 = testitem1.id
         test1.propertyowner2s.add(testitem1)
-        testitem2 = TestPropertyOwner2()
-        test1.propertyowner2s.add(testitem2)
-        id2 = testitem2.id
-        test2 = test1.clone()
-        testitem2 = test2.get_document_object(id2)
-        testitem1.cover = 2
-        testitem1.quantity = 3
-        testitem2.cover = 3
-        testitem2.quantity = 2
-        test3 = test1.merge(test2)
-        testitem1 = test3.get_document_object(id1)
-        testitem2 = test3.get_document_object(id2)
+        self.dc1.add_document_object(testitem1)
+        self.dc2.freeze_dc_comms()
+        test2 = self.dc2.get_object_by_id(TestPropertyOwner1.__name__, test1.id)
+        testitem2 = test2.get_document_object(testitem1.id)
+        testitem1.cover = 3
+        testitem1.quantity = 2
+        testitem2.cover = 2
+        testitem2.quantity = 3
+        self.dc2.unfreeze_dc_comms()
+
+        #TODO: The two lines below were needed to update the object but they
+        # shouldn't be this object should just update in place
+        testitem2 = test2.get_document_object(testitem2.id)
+        testitem1 = test1.get_document_object(testitem1.id)
         self.assertEqual(testitem2.cover, 3)
-        self.assertEqual(testitem2.quantity, 2)
-        self.assertEqual(testitem1.cover, 2)
+        self.assertEqual(testitem2.quantity, 3)
+        self.assertEqual(testitem1.cover, 3)
         self.assertEqual(testitem1.quantity, 3)
-        """
+
     
 class Comments(Document):
     comment = fields.CharRegister()
@@ -1228,4 +1232,7 @@ class DocumentCollectionCompulsoryTestCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             test3.covers = 1
 
-        
+# Code that is useful for running tests inside IDLE        
+#if __name__ == '__main__':
+#    suite = unittest.TestLoader().loadTestsFromName( 'tests.AdvancedItemTestCase.test_changing_objects_on_different_branches_works' )
+#    unittest.TextTestRunner(verbosity=2).run( suite )

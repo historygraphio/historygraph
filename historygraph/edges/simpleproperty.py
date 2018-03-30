@@ -19,7 +19,7 @@ class SimpleProperty(Edge):
     def replay(self, doc):
         if self.inactive:
             return
-        if self.propertyownerid in doc.documentobjects:
+        if self.propertyownerid in doc.documentobjects or self.propertyownerid == doc.id:
             # Is needed if the document object has been delete somewhere
             edgeobject = doc.get_document_object(self.propertyownerid)
             field = edgeobject._field[self.propertyname]
@@ -34,7 +34,6 @@ class SimpleProperty(Edge):
         if self.propertyownerid != edge2.propertyownerid:
             return 0
         if self.propertyname != edge2.propertyname:
-            assert False
             return 0
         if self.propertytype == "int":
             if int(self.propertyvalue) > int(edge2.propertyvalue):
