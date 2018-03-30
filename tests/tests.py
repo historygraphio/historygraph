@@ -12,6 +12,7 @@ import timeit
 import uuid
 import hashlib
 from json import JSONEncoder, JSONDecoder
+from collections import defaultdict
 
 class DocumentCollection(_DocumentCollection):
     class GenericListener(object):
@@ -117,6 +118,32 @@ class SimpleCoversTestCase(unittest.TestCase):
         self.assertEqual(test.covers, 2)
         assert test.history is not test2.history
         assert test is not test2
+
+    def test_add_document_listener(self):
+        result = defaultdict(int)
+        class TestListener(object):
+            def document_object_added(self, dc, obj):
+                result['document_object_added'] += 1
+            def immutable_object_added(self, dc, obj):
+                pass
+            def edges_added(self, dc, edges):
+                pass
+        self.dc1.add_listener(TestListener())
+
+        self.assertEqual(result['document_object_added'], 0)
+        #Test merging together simple covers documents
+        test = Covers()
+        self.dc1.add_document_object(test)
+        self.assertEqual(result['document_object_added'], 1)
+        test.covers = 1
+        #Test we can set a value
+        self.assertEqual(test.covers, 1)
+        #Test we can rebuild a simple object by playing an edge via sharing in linked DCs
+        test2 = self.dc2.get_object_by_id(Covers.__name__, test.id)
+        self.assertEqual(test2.covers, 1)
+        #Test these are not just the same document but it was actually copied
+        assert test is not test2
+        assert test.history is not test2.history
 
 class MergeHistoryCoverTestCase(unittest.TestCase):
     def setUp(self):
