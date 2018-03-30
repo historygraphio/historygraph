@@ -16,9 +16,13 @@ class AddChild(Edge):
         self.propertytype = propertytype
 
     def replay(self, doc):
-        newobj = doc.dc.classes[self.propertytype](self.propertyvalue)
-        newobj.dc = doc.dc
-        doc.documentobjects[newobj.id] = newobj
+        objid = self.propertyvalue
+        if objid not in doc.documentobjects:
+            newobj = doc.dc.classes[self.propertytype](objid)
+            newobj.dc = doc.dc
+            doc.documentobjects[newobj.id] = newobj
+        else:
+            newobj = doc.documentobjects[objid]
         if isinstance(self, AddChild) and self.propertyownerid == "" and self.propertyname == "":
             pass #There is no parent object and this edge is creating a stand alone object
         else:

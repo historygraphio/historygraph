@@ -16,7 +16,7 @@ class Collection(Field):
         def add(self, obj):
             assert isinstance(obj, self.theclass)
             self.l.add(obj.id)
-            assert obj.parent is None
+            assert obj.parent is None or obj.parent is self
             obj.parent = self
             self.parent.get_document().documentobjects[obj.id] = obj
             self.was_changed(ChangeType.ADD_CHILD, self.parent.id, self.name, obj.id, obj.__class__.__name__)

@@ -222,7 +222,6 @@ class ListItemChangeHistoryTestCase(unittest.TestCase):
         test1.propertyowner2s.remove(test2.id)
         self.assertEqual(len(test1.propertyowner2s), 0)
 
-#TODO: Write a test that test the equivalent functionality with lists
 class SimpleItemTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()
@@ -357,10 +356,6 @@ class AdvancedItemTestCase(unittest.TestCase):
         self.assertEqual(testitem1.quantity, 3)
         self.dc2.unfreeze_dc_comms()
 
-        #TODO: The two lines below were needed to update the object but they
-        # shouldn't be this object should just update in place
-        testitem2 = test2.get_document_object(testitem2.id)
-        testitem1 = test1.get_document_object(testitem1.id)
         self.assertEqual(testitem2.cover, 3)
         self.assertEqual(testitem2.quantity, 3)
         self.assertEqual(testitem1.cover, 3)
@@ -382,10 +377,6 @@ class AdvancedItemTestCase(unittest.TestCase):
         testitem2.quantity = 3
         self.dc2.unfreeze_dc_comms()
 
-        #TODO: The two lines below were needed to update the object but they
-        # shouldn't be this object should just update in place
-        testitem2 = test2.get_document_object(testitem2.id)
-        testitem1 = test1.get_document_object(testitem1.id)
         self.assertEqual(testitem2.cover, 3)
         self.assertEqual(testitem2.quantity, 3)
         self.assertEqual(testitem1.cover, 3)
@@ -463,10 +454,6 @@ class StoreObjectsInJSONTestCase(unittest.TestCase):
         self.assertEqual(testitem1.quantity, 3)
         self.dc2.unfreeze_dc_comms()
 
-        #TODO: The two lines below were needed to update the object but they
-        # shouldn't be this object should just update in place
-        testitem2 = test2.get_document_object(testitem2.id)
-        testitem1 = test1.get_document_object(testitem1.id)
         self.assertEqual(testitem2.cover, 3)
         self.assertEqual(testitem2.quantity, 3)
         self.assertEqual(testitem1.cover, 3)
@@ -519,10 +506,6 @@ class MergeChangesMadeInJSONTestCase(unittest.TestCase):
         self.assertEqual(testitem1.quantity, 3)
         self.dc2.unfreeze_dc_comms()
 
-        #TODO: The two lines below were needed to update the object but they
-        # shouldn't be this object should just update in place
-        testitem2 = test2.get_document_object(testitem2.id)
-        testitem1 = test1.get_document_object(testitem1.id)
         self.assertEqual(testitem2.cover, 3)
         self.assertEqual(testitem2.quantity, 3)
         self.assertEqual(testitem1.cover, 3)
@@ -551,8 +534,6 @@ class MergeChangesMadeInJSONTestCase(unittest.TestCase):
 
         self.assertEqual(test1.covers, 4)
         self.assertEqual(len(test1.propertyowner2s), 1)
-        #TODO: We should not have to reget the object here it should update in place
-        testitem1 = test1.get_document_object(testitem1.id)
         self.assertEqual(testitem1.cover, 4)
 
     
