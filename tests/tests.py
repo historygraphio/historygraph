@@ -398,8 +398,6 @@ class AdvancedItemTestCase(unittest.TestCase):
 class Comments(Document):
     comment = fields.CharRegister()
 
-#TODO: Cloning document objects is not compatible with requiring them belong to a DC
-# since the equivalent will be to clone them into another DC
 class MergeHistoryCommentTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()
@@ -438,52 +436,61 @@ class MergeHistoryCommentTestCase(unittest.TestCase):
 
 
 #TODO: Clone is not supported if docs need to be members of DCs
-"""
 class StoreObjectsInJSONTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection()
-        self.dc.register(TestPropertyOwner1)
-        self.dc.register(TestPropertyOwner2)
+        self.dc1 = DocumentCollection()
+        self.dc1.register(TestPropertyOwner1)
+        self.dc1.register(TestPropertyOwner2)
+        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2.register(TestPropertyOwner1)
+        self.dc2.register(TestPropertyOwner2)
 
     def runTest(self):
-        #Test writing the history to a sql lite database
+        # Generate a complex historygraph with a merge to make this test more testing on the software
         test1 = TestPropertyOwner1()
-        self.dc.add_document_object(test1)
-        test1id = test1.id
+        self.dc1.add_document_object(test1)
+        test1.covers = 1
         testitem1 = TestPropertyOwner2()
-        testitem1id = testitem1.id
         test1.propertyowner2s.add(testitem1)
-        self.dc.add_document_object(testitem1)
-        test2 = test1.clone()
-        testitem1.cover = 3
-        test2.covers=2        
-        self.assertEqual(len(test1.propertyowner2s), 1)
+        self.dc1.add_document_object(testitem1)
+        testitem1.cover = 1
+        self.dc2.freeze_dc_comms()
+        test2 = self.dc2.get_object_by_id(TestPropertyOwner1.__name__, test1.id)
+        testitem2 = test2.get_document_object(testitem1.id)
+        testitem1.cover = 2
+        testitem1.quantity = 3
+        testitem2.cover = 3
+        testitem2.quantity = 2
+        self.assertEqual(testitem2.cover, 3)
+        self.assertEqual(testitem2.quantity, 2)
+        self.assertEqual(testitem1.cover, 2)
+        self.assertEqual(testitem1.quantity, 3)
+        self.dc2.unfreeze_dc_comms()
 
-        test3 = test2.merge(test1)
-        self.assertEqual(len(test3.propertyowner2s), 1)
-        for item1 in test3.propertyowner2s:
-            self.assertEqual(item1.cover, 3)
-        self.assertEqual(test3.covers, 2)
-        self.dc.add_document_object(test3)
+        #TODO: The two lines below were needed to update the object but they
+        # shouldn't be this object should just update in place
+        testitem2 = test2.get_document_object(testitem2.id)
+        testitem1 = test1.get_document_object(testitem1.id)
+        self.assertEqual(testitem2.cover, 3)
+        self.assertEqual(testitem2.quantity, 3)
+        self.assertEqual(testitem1.cover, 3)
+        self.assertEqual(testitem1.quantity, 3)
 
-        test1s = self.dc.get_by_class(TestPropertyOwner1)
+        jsontext = self.dc1.as_json()
+        dc3 = DocumentCollection()
+        dc3.register(TestPropertyOwner1)
+        dc3.register(TestPropertyOwner2)
+        dc3.load_from_json(jsontext)
+        test1s = dc3.get_by_class(TestPropertyOwner1)
         self.assertEqual(len(test1s), 1)
-
-        jsontext = self.dc.as_json()
-        self.dc = DocumentCollection()
-        self.dc.register(TestPropertyOwner1)
-        self.dc.register(TestPropertyOwner2)
-        self.dc.load_from_json(jsontext)
-        test1s = self.dc.get_by_class(TestPropertyOwner1)
-        self.assertEqual(len(test1s), 1)
-        test1 = test1s[0]
-        test1id = test1.id
+        test3 = test1s[0]
+        test3id = test3.id
         self.assertEqual(len(test1.propertyowner2s), 1)
-        for testitem1 in test3.propertyowner2s:
-            self.assertEqual(testitem1id, testitem1.id)
-            self.assertEqual(testitem1.cover, 3)
-        self.assertEqual(test1.covers, 2)
-"""
+        for testitem3 in test3.propertyowner2s:
+            self.assertEqual(testitem3.id, testitem1.id)
+            self.assertEqual(testitem3.cover, 3)
+        self.assertEqual(test1.covers, 1)
+
     
 #TODO: Merge is not supported if docs need to be members of DCs
 """
