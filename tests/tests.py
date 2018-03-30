@@ -693,35 +693,24 @@ class FreezeTestCase(unittest.TestCase):
         self.assertFalse(test1.history.has_dangling_edges())
         self.assertEqual(test1.covers, 3)
 
-#TODO: Cloning not supported if docs must belong to DCs
-"""
-class FreezeThreeWayMergeTestCase(unittest.TestCase):
-    def setUp(self):
-        self.dc = DocumentCollection()
-        self.dc.register(Covers)
-
-    def runTest(self):
-        #Test merging together by receiving an edge
-        test = Covers()
-        test.covers = 1
-        test2 = test.clone()
-        test3 = test.clone()
-        test.covers = 2
+    def test_remotes_merge_correctly_with_changes_made_while_frozen(self):
+        test1 = Covers() 
+        self.dc1.add_document_object(test1)
+        test1.covers = 1
+        test2 = self.dc2.get_object_by_id(Covers.__name__, test1.id)
+        self.dc2.freeze_dc_comms()
+        
+        test1.covers = 2
         test2.covers = 3
-        test3.covers = 4
-        test.freeze()
-        edge2 = test2.history.edgesbyendnode[test2._clockhash]
-        edge3 = test3.history.edgesbyendnode[test3._clockhash]
-        test.add_edges([edge2, edge3])
-        # Normally we would receive the edge and play it. The new edge would win the conflict and update the object but that shouldn't
-        # happened because we are frozen
-        self.assertEqual(test.covers, 2)
+        self.assertEqual(test1.covers, 2)
+        test1.freeze()
+        self.dc2.unfreeze_dc_comms()
+        edge = test2.history.edgesbyendnode[test2._clockhash]
+        self.assertEqual(test1.covers, 2)
         # Once we unfreeze the updates should play
-        test.unfreeze()
-        #print "test.id=",test.id
-        self.assertFalse(test.history.has_dangling_edges())
-        self.assertEqual(test.covers, 4)
-"""
+        test1.unfreeze()
+        self.assertFalse(test1.history.has_dangling_edges())
+        self.assertEqual(test1.covers, 3)
 
 #TODO: Clone is not supported if docs need to be members of DCs
 """
