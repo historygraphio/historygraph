@@ -748,7 +748,7 @@ class MessageTest(ImmutableObject):
 class ImmutableClassTestCase(unittest.TestCase):
     def setUp(self):
         self.dc = DocumentCollection()
-        self.dc.register(Covers)
+        self.dc.register(MessageTest)
 
     def test_cant_mutate(self):
         t = int(round(time.time() * 1000))
@@ -759,6 +759,24 @@ class ImmutableClassTestCase(unittest.TestCase):
         was_exception = False
         with self.assertRaises(AssertionError):
             m.messagetime = int(round(time.time() * 1000))
+
+    def test_triggers_a_listener_when_added_to_dc(self):
+        result = defaultdict(int)
+        class TestListener(object):
+            def document_object_added(self, dc, obj):
+                pass
+            def immutable_object_added(self, dc, obj):
+                result['immutable_object_added'] += 1
+            def edges_added(self, dc, edges):
+                pass
+        self.dc.add_listener(TestListener())
+        self.assertEqual(result['immutable_object_added'], 0)
+
+        t = int(round(time.time() * 1000))
+        m = MessageTest(messagetime=t, text="Hello")
+        self.dc.add_immutable_object(m)
+
+        self.assertEqual(result['immutable_object_added'], 1)
             
 
 class StoreImmutableObjectsInJSONTestCase(unittest.TestCase):
