@@ -52,6 +52,8 @@ class Document(DocumentObject):
         self.insetattr = False
         
     def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
+        if self.history.isreplaying:
+            return
         nodeset = set()
         nodeset.add(self._clockhash)
         if changetype == ChangeType.SET_PROPERTY_VALUE:

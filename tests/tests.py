@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
 
 import unittest
@@ -119,7 +118,6 @@ class SimpleCoversTestCase(unittest.TestCase):
         assert test.history is not test2.history
         assert test is not test2
 
-#TODO: This test seems to fail intermittent with test.cover == 1 and test2.covers == 1
 class MergeHistoryCoverTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()
@@ -270,7 +268,6 @@ class SimpleItemTestCase(unittest.TestCase):
         self.assertEqual(len(test2.propertyowner2s), 0)
 
 
-#TODO: Clone is not supported if docs need to be members of DCs
 class AdvancedItemTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()
@@ -491,7 +488,6 @@ class StoreObjectsInJSONTestCase(unittest.TestCase):
         self.assertEqual(test3.covers, 1)
 
     
-#TODO: Merge is not supported if docs need to be members of DCs
 class MergeChangesMadeInJSONTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()
@@ -665,7 +661,6 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
         self.assertEqual(testitem2.cover, 4)
 
 
-#TODO: Cloning not supported if docs must belong to DCs
 class FreezeTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()
@@ -827,7 +822,6 @@ class SimpleCounterTestCase(unittest.TestCase):
         test.testcounter.subtract(1)
         self.assertEqual(test.testcounter.get(), 1)
 
-#TODO: The merge function is removed when we require Docs to belong to DC's
 class MergeCounterTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()
@@ -915,7 +909,6 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
 
         self.assertEqual(test2.testcounter.get(), 1)
 
-#TODO: This test uses clone which is not supported if Docs must belong to DCs
 class HistoryGraphDepthTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()
@@ -1102,44 +1095,61 @@ class TestListofLists1(Document):
 
 
 class FieldListMergeTestCase(unittest.TestCase):
+    def setUp(self):
+        self.dc1 = DocumentCollection()
+        self.dc1.register(TestListofLists1)
+        self.dc1.register(TestListofLists2)
+        self.dc1.register(TestListofLists3)
+        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2.register(TestListofLists1)
+        self.dc2.register(TestListofLists2)
+        self.dc2.register(TestListofLists3)
+
     # Test each individual function in the fields.List and FieldListImpl classes
     def runTest(self):
-        dc = DocumentCollection()
-        dc.register(TestListofLists1)
-        dc.register(TestListofLists2)
-        dc.register(TestListofLists3)
         test1 = TestListofLists1()
-        dc.add_document_object(test1)
+        self.dc1.add_document_object(test1)
         l0 = TestListofLists2()
         l1 = TestListofLists2()
         test1.propertyowner2s.insert(0, l0)
+        self.dc1.add_document_object(l0)
         test1.propertyowner2s.insert(1, l1)
+        self.dc1.add_document_object(l1)
 
         ll0 = TestListofLists3()
         l0.propertyowner2s.insert(0, ll0)
+        self.dc1.add_document_object(ll0)
 
         assert test1.propertyowner2s[0].id == l0.id
         assert test1.propertyowner2s[1].id == l1.id
         assert test1.propertyowner2s[0].propertyowner2s[0].id == ll0.id
+        self.assertEqual(len(test1.propertyowner2s[0].propertyowner2s), 1)
         assert test1.propertyowner2s[0].propertyowner2s[0].get_document().id == test1.id
         assert test1.propertyowner2s[0].get_document().id == test1.id
 
-        ll0.comment = 'Hello'
+        test2 = self.dc2.get_object_by_id(TestListofLists1.__name__, test1.id)
+        self.assertEqual(len(test2.propertyowner2s), 2)
+        self.assertEqual(len(test1.propertyowner2s[0].propertyowner2s), 1)
 
-        dc2 = DocumentCollection()
-        dc2.register(TestListofLists1)
-        dc2.register(TestListofLists2)
-        dc2.register(TestListofLists3)
-        test2 = TestListofLists1(test1.id)
-        dc2.add_document_object(test2)
-        test1.history.replay(test2)
+        self.assertEqual(len(test2.propertyowner2s[0].propertyowner2s), 1)
+
+        ll0.comment = 'Hello'
 
         assert test2.propertyowner2s[0].id == l0.id
         assert test2.propertyowner2s[1].id == l1.id
         assert test2.propertyowner2s[0].propertyowner2s[0].id == ll0.id
+        self.assertEqual(len(test2.propertyowner2s[0].propertyowner2s), 1)
         assert test2.propertyowner2s[0].propertyowner2s[0].comment == 'Hello'
         assert test2.propertyowner2s[0].get_document().id == test1.id
         assert test2.propertyowner2s[0].propertyowner2s[0].get_document().id == test1.id
+        self.assertEqual(len(test2.propertyowner2s[0].propertyowner2s), 1)
+
+        test1.propertyowner2s[0].propertyowner2s.remove(0)
+        self.assertEqual(len(test1.propertyowner2s[0].propertyowner2s), 0)
+
+        assert test2.propertyowner2s[0].id == l0.id
+        assert test2.propertyowner2s[1].id == l1.id
+        self.assertEqual(len(test2.propertyowner2s[0].propertyowner2s), 0)
 
 class TestColofCols3(DocumentObject):
     comment = fields.CharRegister()

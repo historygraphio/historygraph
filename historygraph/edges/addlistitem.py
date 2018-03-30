@@ -33,6 +33,14 @@ class AddListItem(Edge):
             parent = doc.get_document_object(self.propertyownerid)
             newobj.parent = parent
             flImpl = getattr(parent, self.propertyname)
+            # TODO: Rewrite the section below so that instead of a list of classes we use a set of named tuples
+            # and there fore do not need manually determine are we add a duplicate
+            for n in flImpl._listnodes:
+                # Test if this listnode is a deuplicate of a existing one and don't add it if it is
+                if n.parent == added_node.parent and n.timestamp == added_node.timestamp and \
+                   n.data == added_node.data and n.obj == added_node.obj:
+                    return
+                
             if hasattr(flImpl, "_rendered_list"):
                 delattr(flImpl, "_rendered_list")
             flImpl._listnodes.append(added_node)
