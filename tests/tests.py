@@ -271,28 +271,52 @@ class SimpleItemTestCase(unittest.TestCase):
 
 
 #TODO: Clone is not supported if docs need to be members of DCs
-"""
 class AdvancedItemTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection()
-        self.dc.register(TestPropertyOwner1)
-        self.dc.register(TestPropertyOwner2)
+        self.dc1 = DocumentCollection()
+        self.dc1.register(TestPropertyOwner1)
+        self.dc1.register(TestPropertyOwner2)
+        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2.register(TestPropertyOwner1)
+        self.dc2.register(TestPropertyOwner2)
 
-    def runTest(self):
+    def test_adding_and_deleting_a_sub_item(self):
         #Test changing them deleting a sub element
         test1 = TestPropertyOwner1()
-        self.dc.add_document_object(test1)
+        self.dc1.add_document_object(test1)
         testitem1 = TestPropertyOwner2()
         test1.propertyowner2s.add(testitem1)
+        self.dc1.add_document_object(testitem1)
         testitem1.cover = 1
-        test2 = test1.clone()
+        self.dc2.freeze_dc_comms()
+        test2 = self.dc2.get_object_by_id(TestPropertyOwner1.__name__, test1.id)
         testitem2 = test2.get_document_object(testitem1.id)
         testitem2.cover = 2
         test2.propertyowner2s.remove(testitem2.id)
-        test3 = test1.merge(test2)
-        self.assertEqual(len(test3.propertyowner2s), 0)
+        self.dc2.unfreeze_dc_comms()
+        self.assertEqual(len(test1.propertyowner2s), 0)
 
+    def test_adding_and_deleting_a_sub_item_in_reverse_order(self):
         #Test changing them deleting a sub element. Test merging in the opposition order to previous test
+        test1 = TestPropertyOwner1()
+        self.dc1.add_document_object(test1)
+        testitem1 = TestPropertyOwner2()
+        test1.propertyowner2s.add(testitem1)
+        self.dc1.add_document_object(testitem1)
+        testitem1.cover = 1
+        self.dc2.freeze_dc_comms()
+        test2 = self.dc2.get_object_by_id(TestPropertyOwner1.__name__, test1.id)
+        testitem2 = test2.get_document_object(testitem1.id)
+        testitem2.cover = 2
+        test1.propertyowner2s.remove(testitem1.id)
+        self.dc2.unfreeze_dc_comms()
+        self.assertEqual(len(test2.propertyowner2s), 0)
+        self.assertEqual(len(test1.propertyowner2s), 0)
+
+        """
+        assert False
+
+
         test1 = TestPropertyOwner1()
         self.dc.add_document_object(test1)
         testitem1 = TestPropertyOwner2()
@@ -304,6 +328,7 @@ class AdvancedItemTestCase(unittest.TestCase):
         test2.propertyowner2s.remove(testitem2.id)
         test3 = test2.merge(test1)
         self.assertEqual(len(test3.propertyowner2s), 0)
+        assert False
 
         #Test merging changes to different objects in the same document works
         test1 = TestPropertyOwner1()
@@ -364,7 +389,7 @@ class AdvancedItemTestCase(unittest.TestCase):
         self.assertEqual(testitem2.quantity, 2)
         self.assertEqual(testitem1.cover, 2)
         self.assertEqual(testitem1.quantity, 3)
-"""
+        """
     
 class Comments(Document):
     comment = fields.CharRegister()

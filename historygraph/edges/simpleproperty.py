@@ -19,9 +19,11 @@ class SimpleProperty(Edge):
     def replay(self, doc):
         if self.inactive:
             return
-        edgeobject = doc.get_document_object(self.propertyownerid)
-        field = edgeobject._field[self.propertyname]
-        setattr(edgeobject, self.propertyname, field.translate_from_string(self.propertyvalue))
+        if self.propertyownerid in doc.documentobjects:
+            # Is needed if the document object has been delete somewhere
+            edgeobject = doc.get_document_object(self.propertyownerid)
+            field = edgeobject._field[self.propertyname]
+            setattr(edgeobject, self.propertyname, field.translate_from_string(self.propertyvalue))
 
     def clone(self):
         return SimpleProperty(self._start_hashes, 
