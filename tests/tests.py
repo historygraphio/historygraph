@@ -750,7 +750,7 @@ class ImmutableClassTestCase(unittest.TestCase):
         self.dc = DocumentCollection()
         self.dc.register(Covers)
 
-    def runTest(self):
+    def test_cant_mutate(self):
         t = int(round(time.time() * 1000))
         m = MessageTest(messagetime=t, text="Hello")
         self.assertEqual(m.messagetime, t)
