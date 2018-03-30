@@ -400,34 +400,42 @@ class Comments(Document):
 
 #TODO: Cloning document objects is not compatible with requiring them belong to a DC
 # since the equivalent will be to clone them into another DC
-"""
 class MergeHistoryCommentTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection()
-        self.dc.register(TestPropertyOwner1)
-        self.dc.register(TestPropertyOwner2)
+        self.dc1 = DocumentCollection()
+        self.dc1.register(Comments)
+        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2.register(Comments)
 
-    def runTest(self):
-        #Test merge together two simple covers objects
-        test = Comments()
-        test.comment = "AAA"
-        test2 = test.clone()
-        test.comment = "BBB"
+    def test_merge_text_register_objects(self):
+        #Test merge together two simple Comment objects
+        test1 = Comments()
+        self.dc1.add_document_object(test1)
+        test1.comment = "AAA"
+        test2 = self.dc2.get_object_by_id(Comments.__name__, test1.id)
+        self.dc2.freeze_dc_comms()
+        test1.comment = "BBB"
         test2.comment = "CCC"
-        test3 = test.merge(test2)
+        self.dc2.unfreeze_dc_comms()
         #In a merge conflict between two string the one that is sooner in alphabetical order is the winner
-        self.assertEqual(test3.comment, "CCC")
+        self.assertEqual(test1.comment, "CCC")
+        self.assertEqual(test2.comment, "CCC")
 
-        #Test merge together two simple covers objects
-        test = Comments()
-        test.comment = "AAA"
-        test2 = test.clone()
-        test.comment = "CCC"
+
+    def test_merge_text_register_objects_reverse_order(self):
+        #Test merge together two simple Comment objects
+        test1 = Comments()
+        self.dc1.add_document_object(test1)
+        test1.comment = "AAA"
+        test2 = self.dc2.get_object_by_id(Comments.__name__, test1.id)
+        self.dc2.freeze_dc_comms()
+        test1.comment = "CCC"
         test2.comment = "BBB"
-        test3 = test.merge(test2)
+        self.dc2.unfreeze_dc_comms()
         #In a merge conflict between two string the one that is sooner in alphabetical order is the winner
-        self.assertEqual(test3.comment, "CCC")
-"""
+        self.assertEqual(test1.comment, "CCC")
+        self.assertEqual(test2.comment, "CCC")
+
 
 #TODO: Clone is not supported if docs need to be members of DCs
 """
