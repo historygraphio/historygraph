@@ -810,38 +810,6 @@ class SimpleCoversUpdateTestCase(unittest.TestCase):
         self.assertEqual(handler.covers, 2)
     
 
-#TODO: Cloneing not supported if docs must belong to DCs
-"""
-class FreezeUpdateTestCase(unittest.TestCase):
-    def setUp(self):
-        self.dc = DocumentCollection()
-        self.dc.register(Covers)
-
-    def runTest(self):
-        #Test merging together by receiving an edge
-        test = Covers() 
-        test.covers = 1
-
-        test2 = test.clone()
-        handler = TestUpdateHandler()
-        test.add_handler(handler.WasChanged)
-        test.covers = 2
-        test2.covers = 3
-        test.freeze()
-        self.assertEqual(handler.covers, 2)
-        edge = test2.history.edgesbyendnode[test2._clockhash]
-        test.add_edges([edge])
-        # Normally we would receive the edge and play it. The new edge would win the conflict and update the object but that shouldn't
-        # happened because we are frozen
-        self.assertEqual(test.covers, 2)
-        self.assertEqual(handler.covers, 2)
-        # Once we unfreeze the updates should play
-        test.unfreeze()
-        self.assertFalse(test.history.has_dangling_edges())
-        self.assertEqual(test.covers, 3)
-        self.assertEqual(handler.covers, 3)
-"""
-
 class CounterTestContainer(Document):
     testcounter = fields.IntCounter()
 
