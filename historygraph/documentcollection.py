@@ -133,7 +133,10 @@ class DocumentCollection(object):
             #Create the return object and replay the history in to it
             doc.insetattr = True
             doc.history = history
-            history.replay(doc)
+            if doc.isfrozen:
+                doc.edges_received_while_frozen = True
+            else:
+                history.replay(doc)
             doc.insetattr = False
 
             if not wasexisting:
