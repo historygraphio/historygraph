@@ -686,7 +686,6 @@ class FreezeTestCase(unittest.TestCase):
         self.assertEqual(test1.covers, 2)
         test1.freeze()
         self.dc2.unfreeze_dc_comms()
-        edge = test2.history.edgesbyendnode[test2._clockhash]
         self.assertEqual(test1.covers, 2)
         # Once we unfreeze the updates should play
         test1.unfreeze()
@@ -705,41 +704,37 @@ class FreezeTestCase(unittest.TestCase):
         self.assertEqual(test1.covers, 2)
         test1.freeze()
         self.dc2.unfreeze_dc_comms()
-        edge = test2.history.edgesbyendnode[test2._clockhash]
         self.assertEqual(test1.covers, 2)
         # Once we unfreeze the updates should play
         test1.unfreeze()
         self.assertFalse(test1.history.has_dangling_edges())
         self.assertEqual(test1.covers, 3)
 
-#TODO: Clone is not supported if docs need to be members of DCs
-"""
+
 class LargeMergeTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection()
-        self.dc.register(Covers)
+        self.dc1 = DocumentCollection()
+        self.dc1.register(Covers)
+        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2.register(Covers)
 
     def runTest(self):
-        #Test merging together performance by receiving large numbers of edges
-        test = Covers()
-        self.dc.add_document_object(test)
-        test.covers = 1
-        test2 = test.clone()
+        test1 = Covers() 
+        self.dc1.add_document_object(test1)
+        test1.covers = 1
+        test2 = self.dc2.get_object_by_id(Covers.__name__, test1.id)
+        self.dc2.freeze_dc_comms()
+        
         for i in range(2,52):
-            test.covers = i
+            test1.covers = i
         for i in range(52,102):
             test2.covers = i
-        # Perform this merge. This simulate databases that have been disconnected for a long time
-        def wrapper(func, *args, **kwargs):
-            def wrapped():
-                return func(*args, **kwargs)
-            return wrapped
-        def test_add_edges(test, test2):
-            test.add_edges([v for (k, v) in test2.history.edgesbyendnode.iteritems()])
-        wrapped = wrapper(test_add_edges, test, test2)
-        time_taken = timeit.timeit(wrapped, number=1)
-        self.assertEqual(test.covers, 101)
-"""
+        #self.dc2.unfreeze_dc_comms()
+        time_taken = timeit.timeit(self.dc2.unfreeze_dc_comms, number=10)
+        #print('LargeMergeTestCase time_taken=', time_taken, 'sec')
+        # Once we unfreeze the updates should play
+        self.assertEqual(test1.covers, 101)
+
 
 class MessageTest(ImmutableObject):
     # A demo class of an immutable object. It emulated a simple text message broadcast at a certain time
