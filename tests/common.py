@@ -68,4 +68,7 @@ class DocumentCollection(_DocumentCollection):
 class CounterTestContainer(Document):
     testcounter = fields.IntCounter()
 
+class Covers(Document):
+    covers = fields.IntRegister()
+
 

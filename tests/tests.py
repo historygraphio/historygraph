@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals, print_function
 
 import unittest
-from .common import DocumentCollection, CounterTestContainer
+from .common import DocumentCollection, CounterTestContainer, Covers
 from historygraph import DocumentObject
 from historygraph import Document
 from historygraph import fields
@@ -24,9 +24,6 @@ class TestPropertyOwner1(Document):
     def was_changed(self, changetype, propertyowner, propertyname, propertyvalue, propertytype):
         super(TestPropertyOwner1, self).was_changed(changetype, propertyowner, propertyname, propertyvalue, propertytype)
         self.bWasChanged = True
-
-class Covers(Document):
-    covers = fields.IntRegister()
 
 class SimpleCoversTestCase(unittest.TestCase):
     def setUp(self):
