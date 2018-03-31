@@ -584,51 +584,6 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
         self.assertEqual(testitem2.cover, 4)
 
 
-class FreezeTestCase(unittest.TestCase):
-    def setUp(self):
-        self.dc1 = DocumentCollection()
-        self.dc1.register(Covers)
-        self.dc2 = DocumentCollection(master=self.dc1)
-        self.dc2.register(Covers)
-
-    def test_changes_from_remotes_kept_out_while_freezing(self):
-        #Test merging together by receiving an edge
-        test1 = Covers() 
-        self.dc1.add_document_object(test1)
-        test1.covers = 1
-        test2 = self.dc2.get_object_by_id(Covers.__name__, test1.id)
-        self.dc2.freeze_dc_comms()
-        
-        test1.covers = 2
-        test2.covers = 3
-        self.assertEqual(test1.covers, 2)
-        test1.freeze()
-        self.dc2.unfreeze_dc_comms()
-        self.assertEqual(test1.covers, 2)
-        # Once we unfreeze the updates should play
-        test1.unfreeze()
-        self.assertFalse(test1.history.has_dangling_edges())
-        self.assertEqual(test1.covers, 3)
-
-    def test_remotes_merge_correctly_with_changes_made_while_frozen(self):
-        test1 = Covers() 
-        self.dc1.add_document_object(test1)
-        test1.covers = 1
-        test2 = self.dc2.get_object_by_id(Covers.__name__, test1.id)
-        self.dc2.freeze_dc_comms()
-        
-        test1.covers = 2
-        test2.covers = 3
-        self.assertEqual(test1.covers, 2)
-        test1.freeze()
-        self.dc2.unfreeze_dc_comms()
-        self.assertEqual(test1.covers, 2)
-        # Once we unfreeze the updates should play
-        test1.unfreeze()
-        self.assertFalse(test1.history.has_dangling_edges())
-        self.assertEqual(test1.covers, 3)
-
-
 class LargeMergeTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()

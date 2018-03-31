@@ -46,8 +46,6 @@ class Document(DocumentObject):
         self.documentobjects = dict()
         self._clockhash = ""
         self.dc = None #The document collection this document belongs to
-        self.isfrozen = False
-        self.edges_received_while_frozen = False
         self.edgeslistener = list()
         self.insetattr = False
         
@@ -164,24 +162,6 @@ class Document(DocumentObject):
         history.record_past_edges()
         history.process_conflict_winners()
         history.replay(self)
-
-    def freeze(self):
-        assert self.isfrozen == False
-        self.isfrozen = True
-        self.edges_received_while_frozen = False
-
-    def unfreeze(self):
-        assert self.isfrozen == True
-        self.isfrozen = False
-        if self.edges_received_while_frozen:
-            history = self.history.clone()
-            history.process_graph()
-            history.record_past_edges()
-            history.process_conflict_winners()
-            history.replay(self)
-            edges = history.get_all_edges()
-            for l in self.edgeslistener:
-                l.edges_added(edges)
 
     def add_edges_listener(self, listener):
         self.edgeslistener.append(listener)
