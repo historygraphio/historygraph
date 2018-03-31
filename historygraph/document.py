@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 #A HistoryGraph document
 from .documentobject import DocumentObject
 import uuid
-from .historygraph import HistoryGraph
+from .historygraph import HistoryGraph, FrozenHistoryGraph
 from .changetype import ChangeType
 from . import edges
 
@@ -192,3 +192,14 @@ class Document(DocumentObject):
 
     def depth(self):
         return self.history.depth(self._clockhash)
+
+    def frozen(self):
+        # Return a deep copy of this object. This object all of it's children and
+        # it's history are cloned. It's history is a frozen history so it writes back to the parent
+        ret = self.__class__(self.id)
+        ret.copy_document_object(self)
+        ret.history = FrozenHistoryGraph(self.history, self)
+        ret.dc = self.dc
+        ret._clockhash = self._clockhash
+        return ret
+

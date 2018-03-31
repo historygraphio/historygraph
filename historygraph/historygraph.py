@@ -122,3 +122,35 @@ class HistoryGraph(object):
             #    print ('self.edgesbyendnode=',[e.asTuple() for e in self.edgesbyendnode.values()])
             return self.edgesbyendnode[_clockhash].depth(self)
         
+
+class FrozenHistoryGraph(HistoryGraph):
+    # This subclass handles the case of a history graph that writes any new edges it receives
+    # into the historygraph it was cloned from
+    def __init__(self, source_historygraph, source_doc):
+        super(FrozenHistoryGraph, self).__init__()
+        self.source_historygraph = source_historygraph
+        self.source_doc = source_doc
+        self.in_init = True
+        edgeclones = list()
+        for k in self.edgesbyendnode:
+            edge = self.edgesbyendnode[k]
+            edge2 = edge.clone()
+            edgeclones.append(edge2)
+            assert edge.get_end_node() == edge2.get_end_node(), 'Mismatch edge = ' + repr(edge.as_dict()) + ', edge2 = ' + repr(edge2.as_dict())
+        self.add_edges(edgeclones)
+        self.in_init = False
+
+    def add_edges(self, edges_list):
+        if self.in_init:
+            return
+        super(FrozenHistoryGraph, self).add_edges(edges_list)
+        cloned_edges_list = [e.clone() for e in edges_list]
+        source_historygraph.add_edges(edges_list)
+        source_historygraph.process_graph()
+        source_historygraph.record_past_edges()
+        source_historygraph.process_conflict_winners()
+        source_historygraph.replay(self.source_doc)
+        edges = history.get_all_edges()
+        for l in self.edgeslistener:
+            l.edges_added(edges_list)
+
