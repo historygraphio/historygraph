@@ -6,8 +6,8 @@ from . import Edge
 
 class SimpleProperty(Edge):
     def __init__(self, startnodes, propertyownerid,
-                 propertyname, propertyvalue, propertytype, documentid, documentclassname):
-        super(SimpleProperty, self).__init__(startnodes, documentid, documentclassname)
+                 propertyname, propertyvalue, propertytype, documentid, documentclassname, nonce=''):
+        super(SimpleProperty, self).__init__(startnodes, documentid, documentclassname, nonce)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
         assert propertytype == 'int' or propertytype == 'basestring'
@@ -28,7 +28,7 @@ class SimpleProperty(Edge):
     def clone(self):
         return SimpleProperty(self._start_hashes, 
                 self.propertyownerid, self.propertyname, self.propertyvalue,
-                self.propertytype, self.documentid, self.documentclassname)
+                self.propertytype, self.documentid, self.documentclassname, self.nonce)
 
     def get_conflict_winner(self, edge2):
         if self.propertyownerid != edge2.propertyownerid:

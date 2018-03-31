@@ -5,11 +5,12 @@ from __future__ import absolute_import, unicode_literals, print_function
 import hashlib
 
 class Edge(object):
-    def __init__(self, start_hashes, documentid, documentclassname):
+    def __init__(self, start_hashes, documentid, documentclassname, nonce):
         self._start_hashes = sorted(start_hashes)
         self.inactive = False
         self.documentid = documentid
         self.documentclassname = documentclassname
+        self.nonce = nonce
 
         
     def record_past_edges(self, pastedges, graph):
@@ -58,6 +59,7 @@ class Edge(object):
             "propertytype":self.propertytype,
             "documentid":self.documentid,
             "documentclassname":self.documentclassname,
+            "nonce":self.nonce,
          }
 
     def __str__(self):
@@ -80,6 +82,7 @@ class Edge(object):
             "propertytype",str(self.propertytype),
             "documentid",str(self.documentid),
             "documentclassname",str(self.documentclassname),
+            "nonce",str(self.nonce),
          )
         return hashlib.sha256(str(s)).hexdigest()
 
@@ -100,7 +103,8 @@ class Edge(object):
                 str(self.propertyownerid),
                 str(self.propertyname), 
                 str(self.propertyvalue),
-                str(self.propertytype))
+                str(self.propertytype),
+                str(self.nonce))
     
     def depth(self, historygraph):
         start_hashes = list(self._start_hashes)

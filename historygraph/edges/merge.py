@@ -5,8 +5,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 from . import Edge
 
 class Merge(Edge):
-    def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname):
-        super(Merge, self).__init__(startnodes, documentid, documentclassname)
+    def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname, nonce=''):
+        super(Merge, self).__init__(startnodes, documentid, documentclassname, nonce)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
         assert isinstance(propertyvalue, basestring)
@@ -16,7 +16,7 @@ class Merge(Edge):
         self.propertytype = propertytype
 
     def clone(self):
-        return Merge(self._start_hashes, self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
+        return Merge(self._start_hashes, self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname, self.nonce)
 
     def replay(self, doc):
         pass

@@ -5,8 +5,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 from . import Edge
 
 class AddChild(Edge):
-    def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname):
-        super(AddChild, self).__init__(startnodes, documentid, documentclassname)
+    def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname, nonce=''):
+        super(AddChild, self).__init__(startnodes, documentid, documentclassname, nonce)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
         assert isinstance(propertyvalue, basestring)
@@ -32,7 +32,7 @@ class AddChild(Edge):
 
     def clone(self):
         return AddChild(self._start_hashes, 
-            self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname)
+            self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname, self.nonce)
 
     def get_conflict_winner(self, edge2):
         return 0 #There can never be a conflict because all edges are new

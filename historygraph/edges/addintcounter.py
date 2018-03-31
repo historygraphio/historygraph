@@ -3,11 +3,14 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 #An edge that changes a value in a document
 from . import Edge
+import uuid
 
 class AddIntCounter(Edge):
     def __init__(self, startnodes, propertyownerid,
-                 propertyname, propertyvalue, propertytype, documentid, documentclassname):
-        super(AddIntCounter, self).__init__(startnodes, documentid, documentclassname)
+                 propertyname, propertyvalue, propertytype, documentid, documentclassname, nonce=''):
+        if nonce == '':
+            nonce = str(uuid.uuid4())
+        super(AddIntCounter, self).__init__(startnodes, documentid, documentclassname, nonce)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring), "propertytype should be basestring but it actually is " + str(type(propertytype))
         assert propertytype == 'int' or propertytype == 'basestring' or propertytype == 'IntCounter', "Expected int or basestring for property type, actually got " + propertytype
@@ -27,7 +30,7 @@ class AddIntCounter(Edge):
     def clone(self):
         return AddIntCounter(self._start_hashes, 
                 self.propertyownerid, self.propertyname, self.propertyvalue,
-                self.propertytype, self.documentid, self.documentclassname)
+                self.propertytype, self.documentid, self.documentclassname, self.nonce)
 
     def get_conflict_winner(self, edge2):
         return 0 # Counter CRDT edges can never conflict

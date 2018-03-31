@@ -45,7 +45,7 @@ class HistoryGraph(object):
             edge = self.edgesbyendnode[k]
             edge2 = edge.clone()
             edgeclones.append(edge2)
-            assert edge.get_end_node() == edge2.get_end_node(), 'Mismatch edge = ' + repr(edge.asDict()) + ', edge2 = ' + repr(edge2.asDict())
+            assert edge.get_end_node() == edge2.get_end_node(), 'Mismatch edge = ' + repr(edge.as_dict()) + ', edge2 = ' + repr(edge2.as_dict())
         ret.add_edges(edgeclones)
         return ret
 

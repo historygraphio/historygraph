@@ -27,4 +27,7 @@ class IntCounterTestCase(unittest.TestCase):
         self.assertEqual(test1.testcounter.get(), 3)
         self.assertEqual(test2.testcounter.get(), 3)
 
-
+# Code that is useful for running tests inside IDLE        
+#if __name__ == '__main__':
+#    suite = unittest.TestLoader().loadTestsFromName( 'test_intcounter.IntCounterTestCase.test_parallel_int_counters_of_the_same_value' )
+#    unittest.TextTestRunner(verbosity=2).run( suite )
