@@ -55,9 +55,11 @@ class DocumentObject(object):
 
     def copy_document_object(self, src):
         self.dc = src.dc
+        self.insetattr = True
         for k in src._field:
             v = src._field[k]
             setattr(self, k, v.clone(k, src, self))
+        self.insetattr = False
 
     def get_document(self):
         #Return the document

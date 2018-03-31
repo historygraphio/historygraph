@@ -3,6 +3,7 @@ from historygraph import DocumentCollection as _DocumentCollection
 from json import JSONEncoder, JSONDecoder
 from historygraph import Document
 from historygraph import fields
+from historygraph import DocumentObject
 
 
 class DocumentCollection(_DocumentCollection):
@@ -70,5 +71,16 @@ class CounterTestContainer(Document):
 
 class Covers(Document):
     covers = fields.IntRegister()
+
+class TestPropertyOwner2(DocumentObject):
+    cover = fields.IntRegister()
+    quantity = fields.IntRegister()
+
+class TestPropertyOwner1(Document):
+    covers = fields.IntRegister()
+    propertyowner2s = fields.Collection(TestPropertyOwner2)
+    def was_changed(self, changetype, propertyowner, propertyname, propertyvalue, propertytype):
+        super(TestPropertyOwner1, self).was_changed(changetype, propertyowner, propertyname, propertyvalue, propertytype)
+        self.bWasChanged = True
 
 

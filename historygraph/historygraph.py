@@ -145,12 +145,11 @@ class FrozenHistoryGraph(HistoryGraph):
             return
         super(FrozenHistoryGraph, self).add_edges(edges_list)
         cloned_edges_list = [e.clone() for e in edges_list]
-        source_historygraph.add_edges(edges_list)
-        source_historygraph.process_graph()
-        source_historygraph.record_past_edges()
-        source_historygraph.process_conflict_winners()
-        source_historygraph.replay(self.source_doc)
-        edges = history.get_all_edges()
-        for l in self.edgeslistener:
+        self.source_historygraph.add_edges(edges_list)
+        self.source_historygraph.process_graph()
+        self.source_historygraph.record_past_edges()
+        self.source_historygraph.process_conflict_winners()
+        self.source_historygraph.replay(self.source_doc)
+        for l in self.source_doc.edgeslistener:
             l.edges_added(edges_list)
 

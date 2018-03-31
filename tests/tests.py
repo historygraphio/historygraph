@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals, print_function
 
 import unittest
-from .common import DocumentCollection, CounterTestContainer, Covers
+from .common import DocumentCollection, CounterTestContainer, Covers, TestPropertyOwner2, TestPropertyOwner1
 from historygraph import DocumentObject
 from historygraph import Document
 from historygraph import fields
@@ -13,17 +13,6 @@ import uuid
 import hashlib
 from json import JSONEncoder, JSONDecoder
 from collections import defaultdict
-
-class TestPropertyOwner2(DocumentObject):
-    cover = fields.IntRegister()
-    quantity = fields.IntRegister()
-
-class TestPropertyOwner1(Document):
-    covers = fields.IntRegister()
-    propertyowner2s = fields.Collection(TestPropertyOwner2)
-    def was_changed(self, changetype, propertyowner, propertyname, propertyvalue, propertytype):
-        super(TestPropertyOwner1, self).was_changed(changetype, propertyowner, propertyname, propertyvalue, propertytype)
-        self.bWasChanged = True
 
 class SimpleCoversTestCase(unittest.TestCase):
     def setUp(self):
@@ -107,17 +96,6 @@ class MergeHistoryCoverTestCase(unittest.TestCase):
         self.assertEqual(test2.covers, 3, 'test.covers={} test2.covers={} edges={}'.format(test.covers, test2.covers, edges))
         edges = [e.as_tuple() for e in test.history.get_all_edges()]
         self.assertEqual(test.covers, 3, 'test.covers={} test2.covers={} edges={}'.format(test.covers, test2.covers, edges))
-
-class TestPropertyOwner2(DocumentObject):
-    cover = fields.IntRegister()
-    quantity = fields.IntRegister()
-
-class TestPropertyOwner1(Document):
-    covers = fields.IntRegister()
-    propertyowner2s = fields.Collection(TestPropertyOwner2)
-    def was_changed(self, changetype, propertyowner, propertyname, propertyvalue, propertytype):
-        super(TestPropertyOwner1, self).was_changed(changetype, propertyowner, propertyname, propertyvalue, propertytype)
-        self.bWasChanged = True
 
 class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
     def setUp(self):
