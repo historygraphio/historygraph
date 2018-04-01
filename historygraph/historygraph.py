@@ -86,7 +86,8 @@ class HistoryGraph(object):
                 documentid = edge.documentid
                 documentclassname = edge.documentclassname
         if len(presentnodes) > 1:
-            nulledge = edges.Merge(presentnodes, "", "", "", "", documentid, documentclassname)
+            presentnodes = list(presentnodes)
+            nulledge = edges.Merge(set(presentnodes[:2]), "", "", "", "", documentid, documentclassname)
             self.add_edges([nulledge])
             if len(presentnodes) > 2:
                 self.process_graph()

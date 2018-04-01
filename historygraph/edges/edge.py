@@ -6,6 +6,7 @@ import hashlib
 
 class Edge(object):
     def __init__(self, start_hashes, documentid, documentclassname, nonce):
+        assert len(start_hashes) <= 2
         self._start_hashes = sorted(start_hashes)
         self.inactive = False
         self.documentid = documentid
