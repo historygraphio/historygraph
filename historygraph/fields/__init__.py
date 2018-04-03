@@ -10,4 +10,6 @@ from .collection import Collection
 from .charregister import CharRegister
 from .intcounter import IntCounter
 from .list import List
+from .floatregister import FloatRegister
+
 

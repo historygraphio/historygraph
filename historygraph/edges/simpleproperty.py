@@ -10,7 +10,7 @@ class SimpleProperty(Edge):
         super(SimpleProperty, self).__init__(startnodes, documentid, documentclassname, nonce)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
-        assert propertytype == 'int' or propertytype == 'basestring'
+        assert propertytype == 'int' or propertytype == 'basestring' or propertytype == 'float'
         self.propertyownerid = propertyownerid
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
@@ -42,6 +42,11 @@ class SimpleProperty(Edge):
                 return 1
         elif self.propertytype == "basestring":
             if self.propertyvalue > edge2.propertyvalue:
+                return -1
+            else:
+                return 1
+        elif self.propertytype == "float":
+            if float(self.propertyvalue) > float(edge2.propertyvalue):
                 return -1
             else:
                 return 1
