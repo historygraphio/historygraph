@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
 
-#Add list of all of the possible change types that can happen to a document object
 
 class ChangeType(object):
+    # A list of all of the possible change types that can happen to a document
     SET_PROPERTY_VALUE = 0
     ADD_CHILD = 1
     REMOVE_CHILD = 2

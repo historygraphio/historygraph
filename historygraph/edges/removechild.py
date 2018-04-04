@@ -6,7 +6,8 @@ from . import Edge
 
 class RemoveChild(Edge):
     def __init__(self, startnodes, propertyownerid,
-                 propertyname, propertyvalue, propertytype, documentid, documentclassname, nonce=''):
+                 propertyname, propertyvalue, propertytype, documentid, 
+                 documentclassname, nonce=''):
         super(RemoveChild, self).__init__(startnodes, documentid, documentclassname, nonce)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
@@ -17,6 +18,7 @@ class RemoveChild(Edge):
         self.propertytype = propertytype
 
     def replay(self, doc):
+        # Remove the item if it's parent exits
         if doc.has_document_object(self.propertyownerid):
             parent = doc.get_document_object(self.propertyownerid)
             getattr(parent, self.propertyname).remove(self.propertyvalue)

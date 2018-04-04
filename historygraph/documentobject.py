@@ -8,6 +8,7 @@ from . import fields
 
 class DocumentObject(object):
     def clone(self):
+        # Make a copy of this object and return it
         ret = self.__class__(self.id)
         ret.copy_document_object(self)
         for prop in self._field:
@@ -27,6 +28,7 @@ class DocumentObject(object):
         if id is None:
             id = str(uuid.uuid4())
         self.id = id
+        # Get the fields from the class and create an instance of each one for this instance
         variables = [a for a in dir(self.__class__) if not a.startswith('__') and not callable(getattr(self.__class__,a))]
         for k in variables:
             var = getattr(self.__class__, k)
@@ -36,6 +38,7 @@ class DocumentObject(object):
         self.insetattr = False
         
     def __setattr__(self, name, value):
+        # Handle setting an attribute and building the HistoryGraph edge that represents it
         super(DocumentObject, self).__setattr__(name, value)
         if name == "insetattr" or self.insetattr:
             return
@@ -49,6 +52,7 @@ class DocumentObject(object):
             h(self)
          
     def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
+        # If we are just a document object cascade the changes up to the parent
         if self.parent is not None:
             assert isinstance(propertyownerid, basestring)
             self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
@@ -66,6 +70,7 @@ class DocumentObject(object):
         return self.parent.get_document()
 
     def __str__(self):
+        # Return a string representation which is useful for debugging
         return '\n'.join([str(k) + ':' + str(getattr(self, k)) for k in self._field])
 
     def add_handler(self, h):

@@ -27,6 +27,8 @@ class DocumentCollection(object):
         
 
     def get_all_edges(self):
+        # Retreive all the edges for all of the documents in this dc
+        # and all of the immutable objects
         historyedges = list()
         immutableobjects = list()
         for classname in self.objects:
@@ -62,10 +64,13 @@ class DocumentCollection(object):
         return (historyedges, immutableobjects)
 
     def as_json(self):
+        # Encode the entire dc in a form suitable to send over the internet
         (historyedges, immutableobjects) = self.get_all_edges()
         return JSONEncoder().encode({"history":historyedges,"immutableobjects":immutableobjects})
 
     def load_from_json(self, jsontext):
+        # Load the sent edges as JSON. This will handle full or partial
+        # updates to the dc correctly
         historygraphdict = defaultdict(HistoryGraph)
         documentclassnamedict = dict()
 
@@ -73,6 +78,7 @@ class DocumentCollection(object):
         rows = rawdc["history"]
 
         for row in rows:
+            # Loop over each record in the JSON array and build the appropriate edge
             documentid = str(row[0])
             documentclassname = str(row[1])
             edgeclassname = str(row[2])
@@ -108,11 +114,15 @@ class DocumentCollection(object):
                 start_hashes = {start_hash_1}
             else:
                 start_hashes = {start_hash_1, start_hash_2}
-            edge = self.historyedgeclasses[edgeclassname](start_hashes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname, nonce)
+            edge = self.historyedgeclasses[edgeclassname](start_hashes, propertyownerid, propertyname,
+                                                          propertyvalue, propertytype, documentid,
+                                                          documentclassname, nonce)
             history = historygraphdict[documentid]
             history.add_edges([edge])
 
         for documentid in historygraphdict:
+            # Merge the received historygraph edges in with the ones currently in the
+            # database
             doc = None
             wasexisting = False
             if documentclassnamedict[documentid] in self.objects:
@@ -125,13 +135,13 @@ class DocumentCollection(object):
                 doc.dc = self
                 assert len(doc.history.edgesbyendnode) == 0
 
-            #Make a copy of self's history
+            # Make a copy of self's history
             history = doc.history.clone()
-            #Merge doc2's history
+            # Merge doc2's history
             history.merge_graphs(historygraphdict[documentid])
             history.record_past_edges()
             history.process_conflict_winners()
-            #Create the return object and replay the history in to it
+            # Create the target object and replay the history in to it
             doc.insetattr = True
             doc.history = history
             history.replay(doc)
@@ -142,6 +152,7 @@ class DocumentCollection(object):
             
         rows = rawdc["immutableobjects"]
         for d in rows:
+            # Loop over each immutable object and recreate it
             classname = d["classname"]
             theclass = self.classes[classname]
             assert issubclass(theclass, ImmutableObject)
@@ -161,6 +172,8 @@ class DocumentCollection(object):
         return [obj for (objid, obj) in self.objects[theclass.__name__].iteritems()]
 
     def add_document_object(self, obj):
+        # Add a newly created document object to the dc. This function needs to be called
+        # before any changes are made to the document object
         assert isinstance(obj, DocumentObject)
         obj.get_document().dc = self
         obj.dc = self
@@ -177,6 +190,7 @@ class DocumentCollection(object):
             l.document_object_added(self, obj)
 
     def add_immutable_object(self, obj):
+        # Add a newly created immutable object to the dc. 
         assert isinstance(obj, ImmutableObject)
         assert obj.__class__.__name__  in self.classes
         self.objects[obj.__class__.__name__][obj.get_hash()] = obj
@@ -188,17 +202,9 @@ class DocumentCollection(object):
 
     def get_object_by_id(self, classname, id):
         return self.objects[classname][id]
-        """
-        matches = [a for a in self.objects[classname] if a.id == id]
-        if len(matches) == 1:
-            return matches[0]
-        elif len(matches) == 0:
-            return None
-        else:
-            assert False
-        """
 
     def edges_added(self, edges):
+        # Inform the listeners that edges were added
         for l in self.listeners:
             l.edges_added(self, edges)
         

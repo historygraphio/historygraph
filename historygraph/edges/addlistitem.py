@@ -18,7 +18,9 @@ class AddListItem(Edge):
         self.propertytype = propertytype
 
     def replay(self, doc):
+        # List items are actually listnodes (or tombstone) they are then replayed via their own algorithm
         (objid, added_node_id, added_node_parent, added_node_timestamp, added_node_data) = JSONDecoder().decode(self.propertyvalue)
+        # Create the document object if it doesn't already exist
         if objid not in doc.documentobjects:
             newobj = doc.dc.classes[self.propertytype](objid)
             newobj.dc = doc.dc
@@ -34,9 +36,9 @@ class AddListItem(Edge):
             newobj.parent = parent
             flImpl = getattr(parent, self.propertyname)
             # TODO: Rewrite the section below so that instead of a list of classes we use a set of named tuples
-            # and there fore do not need manually determine are we add a duplicate
+            # and there fore do not need manually determine are we are adding a duplicate
             for n in flImpl._listnodes:
-                # Test if this listnode is a deuplicate of a existing one and don't add it if it is
+                # Test if this listnode is a duplicate of a existing one and don't add it if it is
                 if n.parent == added_node.parent and n.timestamp == added_node.timestamp and \
                    n.data == added_node.data and n.obj == added_node.obj:
                     return
@@ -47,7 +49,8 @@ class AddListItem(Edge):
 
     def clone(self):
         return AddListItem(self._start_hashes, 
-            self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname, self.nonce)
+            self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype,
+            self.documentid, self.documentclassname, self.nonce)
 
     def get_conflict_winner(self, edge2):
         return 0 #There can never be a conflict because all edges are new

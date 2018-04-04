@@ -20,7 +20,7 @@ class SimpleProperty(Edge):
         if self.inactive:
             return
         if doc.has_document_object(self.propertyownerid):
-            # Is needed if the document object has been delete somewhere
+            # Is needed if the document object has been deleted somewhere else
             edgeobject = doc.get_document_object(self.propertyownerid)
             field = edgeobject._field[self.propertyname]
             setattr(edgeobject, self.propertyname, field.translate_from_string(self.propertyvalue))
@@ -31,6 +31,8 @@ class SimpleProperty(Edge):
                 self.propertytype, self.documentid, self.documentclassname, self.nonce)
 
     def get_conflict_winner(self, edge2):
+        # For a numeric register the maximum value is the conflict winner
+        # For a character register the minimum value is the conflict winner
         if self.propertyownerid != edge2.propertyownerid:
             return 0
         if self.propertyname != edge2.propertyname:

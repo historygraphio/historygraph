@@ -9,11 +9,12 @@ class AddIntCounter(Edge):
     def __init__(self, startnodes, propertyownerid,
                  propertyname, propertyvalue, propertytype, documentid, documentclassname, nonce=''):
         if nonce == '':
+            # If the nonce isn't set it
             nonce = str(uuid.uuid4())
         super(AddIntCounter, self).__init__(startnodes, documentid, documentclassname, nonce)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring), "propertytype should be basestring but it actually is " + str(type(propertytype))
-        assert propertytype == 'int' or propertytype == 'basestring' or propertytype == 'IntCounter', "Expected int or basestring for property type, actually got " + propertytype
+        assert propertytype == 'int' or propertytype == 'basestring' or propertytype == 'IntCounter', "Unexpected property type, actually got " + propertytype
         self.propertyownerid = propertyownerid
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
@@ -23,6 +24,7 @@ class AddIntCounter(Edge):
         if self.inactive:
             return
         if doc.has_document_object(self.propertyownerid):
+            # Find the relevant field on the relavant document object and increment/decrement it's value
             edgeobject = doc.get_document_object(self.propertyownerid)
             field = edgeobject._field[self.propertyname]
             getattr(edgeobject, self.propertyname).add(field.translate_from_string(self.propertyvalue))

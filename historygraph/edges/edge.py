@@ -12,17 +12,20 @@ class Edge(object):
         self.documentid = documentid
         self.documentclassname = documentclassname
         self.nonce = nonce
-
         
     def record_past_edges(self, pastedges, graph):
+        # Add all the passed in edges to the current class. This is a set union
+        # because for a merge edge this function is called twice
         self.pastedges = self.pastedges | set(pastedges)
         edges = graph.edgesbystartnode[self.get_end_node()]
+        # Add this edge to the set of edges and recursively called our future edges
         pastedges.add(self.get_end_node())
         for edge in edges:
             edge.record_past_edges(set(pastedges), graph)
-
     
     def can_replay(self, graph):
+        # Return true if this edge can be played. Only a merge edge will ever
+        # return false from here
         for node in self._start_hashes:
             if node != "":
                 if node not in graph.edgesbyendnode:
@@ -43,6 +46,7 @@ class Edge(object):
 		    return; #Different edge types can never conflict
 	    if (self.inactive or edge2.inactive):
 		    return; #Inactive edges can never conflict with active edges
+        # Determine the conflict loser and mark it as inactive
 	    conflictwinner = self.get_conflict_winner(edge2)
 	    assert conflictwinner == -1 or conflictwinner == 0 or conflictwinner == 1
 	    if conflictwinner == 1:
@@ -67,6 +71,7 @@ class Edge(object):
         return str(self.as_dict())
 
     def get_end_node(self):
+        # Get the end node value it is a SHA256 hash of our current contents
         start_hashes= list(self._start_hashes)
         start_hash_1 = start_hashes[0]
         if len(start_hashes) > 1:
@@ -88,7 +93,7 @@ class Edge(object):
         return hashlib.sha256(str(s)).hexdigest()
 
     def as_tuple(self):
-        #Return a tuple that represents the edge when it is turned in JSON
+        # Return a tuple that represents the edge when it is turned in JSON
         start_hashes = list(self._start_hashes)
         start_hash_1 = start_hashes[0]
         if len(start_hashes) > 1:
@@ -108,6 +113,7 @@ class Edge(object):
                 str(self.nonce))
     
     def depth(self, historygraph):
+        # The depth from this edge is the longest distance back to the start
         start_hashes = list(self._start_hashes)
         if len(start_hashes) == 1:
             if start_hashes[0] == '':

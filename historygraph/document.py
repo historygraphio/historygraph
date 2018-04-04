@@ -8,49 +8,24 @@ from .historygraph import HistoryGraph, FrozenHistoryGraph
 from .changetype import ChangeType
 from . import edges
 
+
 class Document(DocumentObject):
-    #TODO: Delete this function
-    def clone(self):
-        assert False, 'Scheduled for deleting we will not clone documents but synchronise document collections'
-        # Return a deep copy of this object. This object all of it's children and
-        # it's history are cloned
-        ret = self.__class__(self.id)
-        ret.copy_document_object(self)
-        ret.history = self.history.clone()
-        ret.dc = self.dc
-        ret._clockhash = self._clockhash
-        return ret
-
-    #TODO: Delete this function
-    def merge(self, doc2):
-        assert False, 'Scheduled for deleting we will not merge documents like this in the future but use document collections'
-        assert self.id == doc2.id
-        assert isinstance(doc2, Document)
-        # Make a copy of self's history
-        history = self.history.clone()
-        # Merge doc2's history
-        history.merge_graphs(doc2.history)
-        history.record_past_edges()
-        history.process_conflict_winners()
-        # Create the return object and replay the history in to it
-        ret = self.__class__(self.id)
-        ret.dc = self.dc
-        history.replay(ret)
-        return ret
-
     def __init__(self, id=None):
         super(Document, self).__init__(id)
         self.insetattr = True
         self.parent = None
         self.history = HistoryGraph()
         self.documentobjects = dict()
-        self._clockhash = ""
+        self._clockhash = "" # Clock hash is what time it is for document. The end node hash for the last edge. 
         self.dc = None #The document collection this document belongs to
         self.edgeslistener = list()
         self.insetattr = False
         
     def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
+        # Called whenever this there is a change to this document or one of it's child
+        # DocumentObjects
         if self.history.isreplaying:
+            # Don't build new edges if we are replaying
             return
         nodeset = set()
         nodeset.add(self._clockhash)
@@ -71,9 +46,11 @@ class Document(DocumentObject):
         self._clockhash = edge.get_end_node()
         self.history.add_edges([edge])
         for l in self.edgeslistener:
+            # Signal the listener that there was a change
             l.edges_added([edge])
 
     def get_document_object(self, id):
+        # Lookup document object by id
         if id == self.id:
             return self
         return self.documentobjects[id]
@@ -86,6 +63,7 @@ class Document(DocumentObject):
         return self
 
     def add_edges(self, edges_list):
+        # Add the passed in edges to the historygraph for this document
         if self.isfrozen:
             #If we are frozen just add the edge to the history graph. We will be a full replay on unfreezing
             self.history.add_edges(edges_list)
@@ -126,7 +104,8 @@ class Document(DocumentObject):
             self.full_replay(edges_list)
             return
 
-        #Play each edge in the list in sequence
+        # Play each edge in the list in sequence. If we don't need a full replay we do
+        # a partial replay for better performance
         edgesdict = dict([(list(edge._start_hashes)[0], edge) for edge in edges_list])
         while len(edgesdict) > 0:
             #Get the next edge
@@ -135,7 +114,7 @@ class Document(DocumentObject):
             #Play it
             self.history.add_edges([edge])
             edge.replay(self)
-            assert self._clockhash == edge.get_end_node()
+            assert self._clockhash == edge.get_end_node() # Sanity check
             assert self._clockhash != oldnode
             if edge.get_end_node() in self.history.edgesbystartnode:
                 l = self.history.edgesbystartnode[edge.get_end_node()]
@@ -153,9 +132,8 @@ class Document(DocumentObject):
             del edgesdict[oldnode]
             
             
-        
-        
     def full_replay(self, edges_list):
+        # full_replay of the historygraph
         history = self.history.clone()
         history.add_edges(edges_list)
         history.process_graph()
@@ -171,6 +149,8 @@ class Document(DocumentObject):
             prop.clean(self, propname)
 
     def depth(self):
+        # Calculate the depth of the graph (number of steps back to the start)
+        # needed for FieldList
         return self.history.depth(self._clockhash)
 
     def frozen(self):

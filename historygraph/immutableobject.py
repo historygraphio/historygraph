@@ -12,6 +12,7 @@ import hashlib
 class ImmutableObject(object):
     
     def __init__(self, **kwargs):
+        # Initialise the immutable object from the kwargs. It can never be changed once initialise
         self.insetup = True
         self._field = dict()
         variables = [a for a in dir(self.__class__) if not a.startswith('__') and not callable(getattr(self.__class__,a))]
@@ -37,7 +38,7 @@ class ImmutableObject(object):
         super(ImmutableObject, self).__setattr__(name, value)
 
     def get_hash(self):
-        #Immutable objects don't have UUIDs have have SHA256 hashes of their content
+        #Immutable objects don't have UUIDs they have SHA256 hashes of their content
         s = sorted([(k,str(getattr(self, k))) for (k,v) in self._field.iteritems()], key=itemgetter(0)) + [('_prevhash', str(self._prevhash))]
 
         return hashlib.sha256(str(s)).hexdigest()

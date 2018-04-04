@@ -7,6 +7,8 @@ from ..changetype import ChangeType
 
 class Collection(Field):
     class _FieldCollectionImpl(object):
+        # This implementation class is what actually get attacted to the document object to implement the required
+        # behaviour
         def __init__(self, theclass, parent, name):
             self.theclass = theclass
             self.parent = parent
@@ -14,6 +16,7 @@ class Collection(Field):
             self.l = set()
 
         def add(self, obj):
+            # Add a new document object to the collection
             assert isinstance(obj, self.theclass)
             self.l.add(obj.id)
             assert obj.parent is None or obj.parent is self
@@ -29,6 +32,7 @@ class Collection(Field):
             self.was_changed(ChangeType.REMOVE_CHILD, self.parent.id, self.name, objid, obj.__class__.__name__)            
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
+            # TODO: Possible balloonian function
             assert isinstance(propertyownerid, basestring)
             if not self.parent.insetattr:
                 self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
@@ -42,6 +46,7 @@ class Collection(Field):
                 yield doc.documentobjects[item]
 
         def clone(self, owner, name):
+            # Create a deepcopy style clone of this collection
             ret = Collection._FieldCollectionImpl(self.theclass, owner, name)
             srcdoc = self.parent.get_document()
             for objid in self.l:

@@ -7,6 +7,8 @@ from ..changetype import ChangeType
 
 class IntCounter(Field):
     class _FieldIntCounterImpl(object):
+        # This implementation class is what actually get attacted to the document object to implement the required
+        # behaviour
         def __init__(self, owner, name):
             self.parent = owner
             self.name = name
@@ -24,6 +26,7 @@ class IntCounter(Field):
             return self.value
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
+            # TODO: Possible balloonian function
             assert isinstance(propertyownerid, basestring)
             if not self.parent.insetattr:
                 self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)

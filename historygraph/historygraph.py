@@ -8,16 +8,17 @@ from . import edges
 
 class HistoryGraph(object):
     def __init__(self):
+        # We maintain dictionaries by the start and end nodes. The various functions
+        # inside this class need to lookup on that basis
         self.edgesbystartnode = defaultdict(list)
         self.edgesbyendnode = dict()
         self.isreplaying = False
 
     def add_edges(self, edges_list):
+        # Add edges to this graph. This only updates the dictionaries
         if self.isreplaying:
             return
         edges2 = [edge for edge in edges_list if edge.get_end_node() not in self.edgesbyendnode]
-        if len(edges2) == 0:
-            return
         for edge in edges2:
             nodes = edge._start_hashes
             for node in nodes:
@@ -25,6 +26,8 @@ class HistoryGraph(object):
             self.edgesbyendnode[edge.get_end_node()] = edge
 
     def replay(self, doc):
+        # Replay the entrie HistoryGraph. This marks every edge as not played and the starts
+        # playing them recursively from the start edge
         self.isreplaying = True
         doc.clean()
         for k in self.edgesbyendnode:
@@ -39,6 +42,7 @@ class HistoryGraph(object):
         assert doc._clockhash in doc.history.edgesbyendnode, doc._clockhash + ' not found'
 
     def clone(self):
+        # Return a copy of this HistoryGraph
         ret = HistoryGraph()
         edgeclones = list()
         for k in self.edgesbyendnode:
@@ -50,21 +54,29 @@ class HistoryGraph(object):
         return ret
 
     def replay_edges(self, doc, edge):
+        # Replay this edge and then the next edge.
         if edge.can_replay(self) == False:
+            # An edge would not be playable usually if it is a merge and both previous edges have
+            # not been played
             return
         edge.replay(doc)
         edge.isplayed = True
-        edges = self.edgesbystartnode[edge.get_end_node()]
         doc._clockhash = edge.get_end_node()
+        # Find the next edges and recursively play them
+        edges = self.edgesbystartnode[edge.get_end_node()]
         for edge2 in edges:
             self.replay_edges(doc, edge2)
 
     def record_past_edges(self):
+        # Each edge needs to know which edges are in their past because edges that
+        # 'know' about each other can never conflict
         if len(self.edgesbyendnode) == 0:
             return
+        # Clear any previous edges
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
             edge.reset_past_edges()
+        # Get the first edge and then start recuring over it
         l = self.edgesbystartnode[""]
         assert len(l) == 1
         pastedges = set()
@@ -77,6 +89,8 @@ class HistoryGraph(object):
         self.process_graph()
 
     def process_graph(self):
+        # Look over the graph. We are looking for end edges. If there is
+        # more than one end node their needs to be a merge
         presentnodes = set()
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
@@ -93,6 +107,7 @@ class HistoryGraph(object):
                 self.process_graph()
 
     def process_conflict_winners(self):
+        # Iterate over the graph and look for conflict and determine the winners
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
             edge.inactive = False
@@ -119,8 +134,6 @@ class HistoryGraph(object):
         if _clockhash == '':
             return 0
         else:
-            #if _clockhash not in self.edgesbyendnode:
-            #    print ('self.edgesbyendnode=',[e.asTuple() for e in self.edgesbyendnode.values()])
             return self.edgesbyendnode[_clockhash].depth(self)
         
 
@@ -142,6 +155,7 @@ class FrozenHistoryGraph(HistoryGraph):
         self.in_init = False
 
     def add_edges(self, edges_list):
+        # When we add edges they also need to go into the source historygraph
         if self.in_init:
             return
         super(FrozenHistoryGraph, self).add_edges(edges_list)
