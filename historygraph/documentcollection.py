@@ -139,12 +139,15 @@ class DocumentCollection(object):
             history = doc.history.clone()
             # Merge doc2's history
             history.merge_graphs(historygraphdict[documentid])
-            history.record_past_edges()
-            history.process_conflict_winners()
+            has_start_edge = history.has_start_edge()
+            if has_start_edge:
+                history.record_past_edges()
+                history.process_conflict_winners()
             # Create the target object and replay the history in to it
             doc.insetattr = True
             doc.history = history
-            history.replay(doc)
+            if has_start_edge:
+                history.replay(doc)
             doc.insetattr = False
 
             if not wasexisting:

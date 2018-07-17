@@ -67,6 +67,9 @@ class HistoryGraph(object):
         for edge2 in edges:
             self.replay_edges(doc, edge2)
 
+    def has_start_edge(self):
+        return len(self.edgesbystartnode[""]) == 1
+
     def record_past_edges(self):
         # Each edge needs to know which edges are in their past because edges that
         # 'know' about each other can never conflict
@@ -78,7 +81,7 @@ class HistoryGraph(object):
             edge.reset_past_edges()
         # Get the first edge and then start recuring over it
         l = self.edgesbystartnode[""]
-        assert len(l) == 1
+        assert len(l) == 1, 'len(l) == {} should be 1'.format(len(l))
         pastedges = set()
         l[0].record_past_edges(pastedges, self)
 
