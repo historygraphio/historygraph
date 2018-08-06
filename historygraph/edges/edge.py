@@ -12,7 +12,8 @@ class Edge(object):
         self.documentid = documentid
         self.documentclassname = documentclassname
         self.nonce = nonce
-        
+        self._transaction_hash = ''
+
     def record_past_edges(self, pastedges, graph):
         # Add all the passed in edges to the current class. This is a set union
         # because for a merge edge this function is called twice
@@ -22,7 +23,7 @@ class Edge(object):
         pastedges.add(self.get_end_node())
         for edge in edges:
             edge.record_past_edges(set(pastedges), graph)
-    
+
     def can_replay(self, graph):
         # Return true if this edge can be played. Only a merge edge will ever
         # return false from here
@@ -53,7 +54,7 @@ class Edge(object):
 	        self.inactive = True
 	    elif conflictwinner == -1:
 	        edge2.inactive = True
-        
+
     def as_dict(self):
         return {"classname":self.__class__.__name__,
             "start_hashes":list(self._start_hashes),
@@ -107,11 +108,11 @@ class Edge(object):
                 str(start_hash_1),
                 str(start_hash_2),
                 str(self.propertyownerid),
-                str(self.propertyname), 
+                str(self.propertyname),
                 str(self.propertyvalue),
                 str(self.propertytype),
                 str(self.nonce))
-    
+
     def depth(self, historygraph):
         # The depth from this edge is the longest distance back to the start
         start_hashes = list(self._start_hashes)
@@ -126,4 +127,3 @@ class Edge(object):
             return max(depth1, depth2)
         else:
             assert False
-

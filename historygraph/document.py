@@ -16,11 +16,11 @@ class Document(DocumentObject):
         self.parent = None
         self.history = HistoryGraph()
         self.documentobjects = dict()
-        self._clockhash = "" # Clock hash is what time it is for document. The end node hash for the last edge. 
+        self._clockhash = "" # Clock hash is what time it is for document. The end node hash for the last edge.
         self.dc = None #The document collection this document belongs to
         self.edgeslistener = list()
         self.insetattr = False
-        
+
     def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
         # Called whenever this there is a change to this document or one of it's child
         # DocumentObjects
@@ -63,7 +63,8 @@ class Document(DocumentObject):
         return self
 
     def add_edges(self, edges_list):
-        # Add the passed in edges to the historygraph for this document
+        # Add the passed in edges to the historygraph for this documentt
+        #TODO: This appear to be obsolete code left left from the old freeze function
         if self.isfrozen:
             #If we are frozen just add the edge to the history graph. We will be a full replay on unfreezing
             self.history.add_edges(edges_list)
@@ -83,7 +84,7 @@ class Document(DocumentObject):
                 assert edge.get_end_node() == self.history.edgesbystartnode[''][0].get_end_node()
 
             #If any of startnodes in the list are in the history but not the current node we need to do a full replay
-            
+
             if startnode != self._clockhash and startnode in self.history.edgesbyendnode:
                 self.full_replay(edges_list)
                 return
@@ -100,7 +101,7 @@ class Document(DocumentObject):
             return
 
         if list(startnodes_not_in_endnodes)[0] != self._clockhash:
-            #If the first node in the chain is not the current node 
+            #If the first node in the chain is not the current node
             self.full_replay(edges_list)
             return
 
@@ -130,8 +131,8 @@ class Document(DocumentObject):
                     self.full_replay(edges)
                     return
             del edgesdict[oldnode]
-            
-            
+
+
     def full_replay(self, edges_list):
         # full_replay of the historygraph
         history = self.history.clone()
@@ -155,7 +156,7 @@ class Document(DocumentObject):
 
     def frozen(self):
         # Return a deep copy of this object. This object all of it's children and
-        # it's history are cloned. It's history is a frozen history so it writes back to the parent
+        # it's history is cloned. It's history is a frozen history so it writes back to the parent
         ret = self.__class__(self.id)
         ret.copy_document_object(self)
         ret.history = FrozenHistoryGraph(self.history, self)
@@ -163,3 +164,12 @@ class Document(DocumentObject):
         ret._clockhash = self._clockhash
         return ret
 
+    def transaction(self):
+        # Return a deep copy of this object. This object all of it's children and
+        # it's history is cloned. It's history is a frozen history so it writes back to the parent
+        ret = self.__class__(self.id)
+        ret.copy_document_object(self)
+        ret.history = FrozenHistoryGraph(self.history, self)
+        ret.dc = self.dc
+        ret._clockhash = self._clockhash
+        return ret

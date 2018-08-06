@@ -122,7 +122,7 @@ class HistoryGraph(object):
                 if k1 != k2:
                     if not edge2.has_past_edge(k1) and not edge1.has_past_edge(k2):
                         edge1.compare_for_conflicts(edge2)
-                        
+
     def has_dangling_edges(self):
         # A sanity check a graph has dangling edges if there is more than one endnode that does not have a start node
         # It means that a Merge needs to be run
@@ -132,13 +132,16 @@ class HistoryGraph(object):
 
     def get_all_edges(self):
         return [v for (k, v) in self.edgesbyendnode.iteritems()]
-        
+
     def depth(self, _clockhash):
         if _clockhash == '':
             return 0
         else:
             return self.edgesbyendnode[_clockhash].depth(self)
-        
+
+    def get_edges_clones(self):
+        # Return a list of clones of all of the edges
+        return [v.clone() for k, v in self.edgesbyendnode.iteritems()]
 
 class FrozenHistoryGraph(HistoryGraph):
     # This subclass handles the case of a history graph that writes any new edges it receives
@@ -148,12 +151,7 @@ class FrozenHistoryGraph(HistoryGraph):
         self.source_historygraph = source_historygraph
         self.source_doc = source_doc
         self.in_init = True
-        edgeclones = list()
-        for k in self.edgesbyendnode:
-            edge = self.edgesbyendnode[k]
-            edge2 = edge.clone()
-            edgeclones.append(edge2)
-            assert edge.get_end_node() == edge2.get_end_node(), 'Mismatch edge = ' + repr(edge.as_dict()) + ', edge2 = ' + repr(edge2.as_dict())
+        edgeclones = self.get_edges_clones()
         self.add_edges(edgeclones)
         self.in_init = False
 
@@ -171,3 +169,31 @@ class FrozenHistoryGraph(HistoryGraph):
         for l in self.source_doc.edgeslistener:
             l.edges_added(edges_list)
 
+class TransactionHistoryGraph(HistoryGraph):
+    # This subclass handles the case of a history graph that writes any new edges it receives
+    # into the historygraph it was cloned from
+    def __init__(self, source_historygraph, source_doc):
+        super(TransactionHistoryGraph, self).__init__()
+        self.source_historygraph = source_historygraph.clone()
+        self.source_doc = source_doc
+        self.in_init = True
+        edgeclones = self.get_edges_clones()
+        self.add_edges(edgeclones)
+        self.in_init = False
+        self._added_edges = list()
+
+    def add_edges(self, edges_list):
+        assert len(edges_list) == 1
+        # When we add edges they also need to go into the source historygraph
+        if self.in_init:
+            return
+        
+        super(TransactionHistoryGraph, self).add_edges(edges_list)
+        cloned_edges_list = [e.clone() for e in edges_list]
+        self.source_historygraph.add_edges(edges_list)
+        self.source_historygraph.process_graph()
+        self.source_historygraph.record_past_edges()
+        self.source_historygraph.process_conflict_winners()
+        self.source_historygraph.replay(self.source_doc)
+        for l in self.source_doc.edgeslistener:
+            l.edges_added(edges_list)

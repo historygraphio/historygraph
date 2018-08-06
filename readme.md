@@ -18,7 +18,7 @@ pip install -r requirements.txt
 To run the unittests
 
 ```
-python -m unittest discover
+python -B -m unittest discover
 ```
 
 Set up a virtualenv for Python 3 and install the necessary stuff
@@ -47,6 +47,3 @@ pip install -r requirements.txt
 
 tox
 ```
-
-
-

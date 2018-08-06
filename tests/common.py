@@ -54,7 +54,7 @@ class DocumentCollection(_DocumentCollection):
 
     def master_edges_added(self, edges):
         self.load_from_json(json.dumps(edges))
-        
+
     def slave_edges_added(self, edges):
         self.master.load_from_json(json.dumps(edges))
 
@@ -71,6 +71,7 @@ class CounterTestContainer(Document):
 
 class Covers(Document):
     covers = fields.IntRegister()
+    table = fields.IntRegister()
 
 class TestPropertyOwner2(DocumentObject):
     cover = fields.IntRegister()
@@ -82,5 +83,3 @@ class TestPropertyOwner1(Document):
     def was_changed(self, changetype, propertyowner, propertyname, propertyvalue, propertytype):
         super(TestPropertyOwner1, self).was_changed(changetype, propertyowner, propertyname, propertyvalue, propertytype)
         self.bWasChanged = True
-
-
