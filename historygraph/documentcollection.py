@@ -24,7 +24,7 @@ class DocumentCollection(object):
 
     def register(self, theclass):
         self.classes[theclass.__name__] = theclass
-        
+
 
     def get_all_edges(self):
         # Retreive all the edges for all of the documents in this dc
@@ -36,8 +36,7 @@ class DocumentCollection(object):
             if issubclass(self.classes[classname], Document):
                 for (documentid, document) in documentdict.iteritems():
                     history = document.history
-                    for edgeid in history.edgesbyendnode:
-                        edge = history.edgesbyendnode[edgeid]
+                    for edge in history.get_all_edges():
                         start_hashes = list(edge._start_hashes)
                         if len(edge._start_hashes) == 1:
                             start_hash_1 = start_hashes[0]
@@ -48,7 +47,7 @@ class DocumentCollection(object):
                             start_hash_2 = start_hashes[1]
                         else:
                             assert False
-                        
+
                         if edge.propertytype is None:
                             propertytypename = ""
                         else:
@@ -133,7 +132,6 @@ class DocumentCollection(object):
             if doc is None:
                 doc = self.classes[documentclassnamedict[documentid]](documentid)
                 doc.dc = self
-                assert len(doc.history.edgesbyendnode) == 0
 
             # Make a copy of self's history
             history = doc.history.clone()
@@ -152,7 +150,7 @@ class DocumentCollection(object):
 
             if not wasexisting:
                 self.add_document_object(doc)
-            
+
         rows = rawdc["immutableobjects"]
         for d in rows:
             # Loop over each immutable object and recreate it
@@ -169,8 +167,8 @@ class DocumentCollection(object):
                     wasexisting = True
             if wasexisting == False:
                 self.objects[classname][io.get_hash()] = io
-            
-       
+
+
     def get_by_class(self, theclass):
         return [obj for (objid, obj) in self.objects[theclass.__name__].iteritems()]
 
@@ -193,7 +191,7 @@ class DocumentCollection(object):
             l.document_object_added(self, obj)
 
     def add_immutable_object(self, obj):
-        # Add a newly created immutable object to the dc. 
+        # Add a newly created immutable object to the dc.
         assert isinstance(obj, ImmutableObject)
         assert obj.__class__.__name__  in self.classes
         self.objects[obj.__class__.__name__][obj.get_hash()] = obj
@@ -210,6 +208,3 @@ class DocumentCollection(object):
         # Inform the listeners that edges were added
         for l in self.listeners:
             l.edges_added(self, edges)
-        
-
-

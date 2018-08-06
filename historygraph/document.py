@@ -81,7 +81,7 @@ class Document(DocumentObject):
             startnode = list(edge._start_hashes)[0]
             if startnode == '':
                 #If we received a start edge it's OK as long as it is the same as the one we already have
-                assert edge.get_end_node() == self.history.edgesbystartnode[''][0].get_end_node()
+                assert edge.get_end_node() == self.history.get_edges_by_start_node('')[0].get_end_node()
 
             #If any of startnodes in the list are in the history but not the current node we need to do a full replay
 
@@ -118,7 +118,7 @@ class Document(DocumentObject):
             assert self._clockhash == edge.get_end_node() # Sanity check
             assert self._clockhash != oldnode
             if edge.get_end_node() in self.history.edgesbystartnode:
-                l = self.history.edgesbystartnode[edge.get_end_node()]
+                l = self.history.get_edges_by_start_node(edge.get_end_node())
                 if len(l) > 0:
                     #If multiple edge match this one we need to do a full replay
                     self.full_replay(edges_list)

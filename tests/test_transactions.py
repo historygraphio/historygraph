@@ -20,7 +20,7 @@ class TransactionTestCase(unittest.TestCase):
         self.dc2.freeze_dc_comms()
 
         #Test edges have a transaction hash
-        edge1 = test2.history.edgesbyendnode[test2._clockhash]
+        edge1 = test2.history.get_edges_by_end_node(test2._clockhash)
         self.assertEqual(edge1._transaction_hash,'')
 
         transaction_test1 = test1.transaction()
@@ -41,6 +41,6 @@ class TransactionTestCase(unittest.TestCase):
         self.assertEqual(test2,table, 1)
 
         #Test the last two edges in the graph have the same hash
-        edge1 = test2.history.edgesbyendnode[test2._clockhash]
-        edge2 = test2.history.edgesbyendnode[list(edge1._start_hashes)[0]]
+        edge1 = test2.history.get_edges_by_end_node(test2._clockhash)
+        edge2 = test2.history.get_edges_by_end_node(list(edge1._start_hashes)[0])
         self.assertEqual(edge1._transaction_hash, edge2._transaction_hash)

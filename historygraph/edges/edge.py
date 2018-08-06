@@ -18,7 +18,7 @@ class Edge(object):
         # Add all the passed in edges to the current class. This is a set union
         # because for a merge edge this function is called twice
         self.pastedges = self.pastedges | set(pastedges)
-        edges = graph.edgesbystartnode[self.get_end_node()]
+        edges = graph.get_edges_by_start_node(self.get_end_node())
         # Add this edge to the set of edges and recursively called our future edges
         pastedges.add(self.get_end_node())
         for edge in edges:
@@ -29,9 +29,9 @@ class Edge(object):
         # return false from here
         for node in self._start_hashes:
             if node != "":
-                if node not in graph.edgesbyendnode:
+                if not graph.has_edge(node):
                     return False
-                edge = graph.edgesbyendnode[node]
+                edge = graph.get_edges_by_end_node(node)
                 if edge.isplayed == False:
                     return False
         return True
@@ -120,10 +120,10 @@ class Edge(object):
             if start_hashes[0] == '':
                 return 1
             else:
-                return historygraph.edgesbyendnode[start_hashes[0]].depth(historygraph) + 1
+                return historygraph.get_edges_by_end_node(start_hashes[0]).depth(historygraph) + 1
         elif len(self._start_hashes) == 2:
-            depth1 = historygraph.edgesbyendnode[start_hashes[0]].depth(historygraph) + 1
-            depth2 = historygraph.edgesbyendnode[start_hashes[1]].depth(historygraph) + 1
+            depth1 = historygraph.get_edges_by_end_node(start_hashes[0]).depth(historygraph) + 1
+            depth2 = historygraph.get_edges_by_end_node(start_hashes[1]).depth(historygraph) + 1
             return max(depth1, depth2)
         else:
             assert False
