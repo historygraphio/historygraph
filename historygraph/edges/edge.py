@@ -5,14 +5,14 @@ from __future__ import absolute_import, unicode_literals, print_function
 import hashlib
 
 class Edge(object):
-    def __init__(self, start_hashes, documentid, documentclassname, nonce):
+    def __init__(self, start_hashes, documentid, documentclassname, nonce, transaction_hash):
         assert len(start_hashes) <= 2
         self._start_hashes = sorted(start_hashes)
         self.inactive = False
         self.documentid = documentid
         self.documentclassname = documentclassname
         self.nonce = nonce
-        self._transaction_hash = ''
+        self.transaction_hash = transaction_hash
 
     def record_past_edges(self, pastedges, graph):
         # Add all the passed in edges to the current class. This is a set union
@@ -66,6 +66,7 @@ class Edge(object):
             "documentid":self.documentid,
             "documentclassname":self.documentclassname,
             "nonce":self.nonce,
+            "transaction_hash": self.transaction_hash,
          }
 
     def __str__(self):
@@ -90,6 +91,7 @@ class Edge(object):
             "documentid",str(self.documentid),
             "documentclassname",str(self.documentclassname),
             "nonce",str(self.nonce),
+            "transaction_hash", str(self.transaction_hash)
          )
         return hashlib.sha256(str(s)).hexdigest()
 
@@ -111,7 +113,8 @@ class Edge(object):
                 str(self.propertyname),
                 str(self.propertyvalue),
                 str(self.propertytype),
-                str(self.nonce))
+                str(self.nonce),
+                str(self.transaction_hash))
 
     def depth(self, historygraph):
         # The depth from this edge is the longest distance back to the start

@@ -11,7 +11,6 @@ class TransactionTestCase(unittest.TestCase):
         self.dc2 = DocumentCollection(master=self.dc1)
         self.dc2.register(Covers)
 
-    @unittest.skip("Expected failure functionality incompelete")
     def test_frozen_function_basic(self):
         test1 = Covers()
         self.dc1.add_document_object(test1)
@@ -21,26 +20,40 @@ class TransactionTestCase(unittest.TestCase):
 
         #Test edges have a transaction hash
         edge1 = test2.history.get_edges_by_end_node(test2._clockhash)
-        self.assertEqual(edge1._transaction_hash,'')
+        self.assertEqual(edge1.transaction_hash,'')
 
         transaction_test1 = test1.transaction()
-        transaction_test1.covers = 2
+        self.assertEqual(transaction_test1.covers, 1)
         transaction_test1.table = 1
+        transaction_test1.covers = 2
         self.assertEqual(transaction_test1.covers, 2)
         self.assertEqual(test1.covers, 1)
-        self.assertEqual(testtransaction_test1.table, 1)
+        self.assertEqual(transaction_test1.table, 1)
         self.assertNotEqual(transaction_test1, test1)
         self.assertNotEqual(transaction_test1, self.dc1.get_object_by_id(Covers.__name__, test1.id))
         transaction_test1.endtransaction()
         self.dc2.unfreeze_dc_comms()
         self.assertEqual(transaction_test1.covers, 2)
+        self.assertEqual(transaction_test1.table, 1)
         # The unfrozen version should be normal
         self.assertEqual(test1.covers,2)
         self.assertEqual(test1.table, 1)
-        self.assertEqual(test2.covers, 2)
-        self.assertEqual(test2,table, 1)
 
-        #Test the last two edges in the graph have the same hash
-        edge1 = test2.history.get_edges_by_end_node(test2._clockhash)
-        edge2 = test2.history.get_edges_by_end_node(list(edge1._start_hashes)[0])
-        self.assertEqual(edge1._transaction_hash, edge2._transaction_hash)
+        #Test the last two edges in the remote copy of the graph have the same hash
+        test1_edge1 = test1.history.get_edges_by_end_node(test1._clockhash)
+        test1_edge2 = test1.history.get_edges_by_end_node(list(test1_edge1._start_hashes)[0])
+        self.assertNotEqual(test1_edge1.transaction_hash, '')
+        self.assertNotEqual(test1_edge2.transaction_hash, '')
+        self.assertEqual(test1_edge1.transaction_hash, test1_edge2.transaction_hash)
+
+        #Test the last two edges in the remote copy of the graph have the same hash
+        test2_edge1 = test2.history.get_edges_by_end_node(test2._clockhash)
+        test2_edge2 = test2.history.get_edges_by_end_node(list(test2_edge1._start_hashes)[0])
+        self.assertNotEqual(test2_edge1.transaction_hash, '')
+        self.assertNotEqual(test2_edge2.transaction_hash, '')
+        self.assertEqual(test2_edge1.transaction_hash, test2_edge2.transaction_hash)
+        self.assertEqual(test2.covers, 2)
+        self.assertEqual(test2.table, 1)
+
+        self.assertEqual(test2_edge1.transaction_hash, test1_edge1.transaction_hash)
+        self.assertEqual(test2_edge2.transaction_hash, test1_edge2.transaction_hash)

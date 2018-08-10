@@ -5,6 +5,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 from collections import defaultdict
 import uuid
 from . import edges
+import hashlib
 
 class HistoryGraph(object):
     def __init__(self):
@@ -29,6 +30,7 @@ class HistoryGraph(object):
         if self.isreplaying:
             return
         edges2 = [edge for edge in edges_list if edge.get_end_node() not in self._edgesbyendnode]
+        #print('add_edges edges2=', [edge.as_dict() for edge in edges2])
         for edge in edges2:
             #nodes = edge._start_hashes
             #for node in nodes:
@@ -144,6 +146,9 @@ class HistoryGraph(object):
         # Return a list of clones of all of the edges
         return [edge.clone() for edge in self.get_all_edges()]
 
+    def is_in_transaction(self):
+        return False
+
 class FrozenHistoryGraph(HistoryGraph):
     # This subclass handles the case of a history graph that writes any new edges it receives
     # into the historygraph it was cloned from
@@ -175,26 +180,44 @@ class TransactionHistoryGraph(HistoryGraph):
     # into the historygraph it was cloned from
     def __init__(self, source_historygraph, source_doc):
         super(TransactionHistoryGraph, self).__init__()
-        self.source_historygraph = source_historygraph.clone()
+        self.source_historygraph = source_historygraph
         self.source_doc = source_doc
         self.in_init = True
-        edgeclones = self.get_edges_clones()
-        self.add_edges(edgeclones)
+        edgeclones = self.source_historygraph.get_edges_clones()
+        super(TransactionHistoryGraph, self).add_edges(edgeclones)
         self.in_init = False
         self._added_edges = list()
 
     def add_edges(self, edges_list):
-        assert len(edges_list) == 1
         # When we add edges they also need to go into the source historygraph
         if self.in_init:
             return
 
-        super(TransactionHistoryGraph, self).add_edges(edges_list)
-        cloned_edges_list = [e.clone() for e in edges_list]
-        self.source_historygraph.add_edges(edges_list)
+        assert len(edges_list) == 1
+        self._added_edges.append(edges_list[0])
+        transaction_hash = hashlib.sha256(''.join([str(edge.get_end_node()) for edge in self._added_edges])).hexdigest()
+        #print('add_edges transaction_hash=', transaction_hash)
+        #print('add_edges type(transaction_hash)=', type(transaction_hash))
+        for i in range(len(self._added_edges)):
+            edge = self._added_edges[i]
+            edge.transaction_hash = transaction_hash
+            if i > 0:
+                edge._start_hashes = [self._added_edges[i - 1].get_end_node()]
+
+    def is_in_transaction(self):
+        return False
+
+    def end_transaction(self):
+        cloned_edges_list = [e.clone() for e in self._edgesbyendnode.values()] + \
+            [e.clone() for e in self._added_edges]
+        #print("end_transaction self._added_edges=", [edge.as_dict() for edge in self._added_edges])
+        #print("end_transaction cloned_edges_list=", [edge.as_dict() for edge in cloned_edges_list])
+        #print("end_transaction self.source_historygraph._edgesbyendnode.values()=", [edge.as_dict() for edge in self.source_historygraph._edgesbyendnode.values()])
+        self.source_historygraph.add_edges(cloned_edges_list)
+        #print("end_transaction self.source_historygraph.add_edges completed")
         self.source_historygraph.process_graph()
         self.source_historygraph.record_past_edges()
         self.source_historygraph.process_conflict_winners()
         self.source_historygraph.replay(self.source_doc)
         for l in self.source_doc.edgeslistener:
-            l.edges_added(edges_list)
+            l.edges_added(cloned_edges_list)

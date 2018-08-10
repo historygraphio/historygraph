@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 #A HistoryGraph document
 from .documentobject import DocumentObject
 import uuid
-from .historygraph import HistoryGraph, FrozenHistoryGraph
+from .historygraph import HistoryGraph, FrozenHistoryGraph, TransactionHistoryGraph
 from .changetype import ChangeType
 from . import edges
 
@@ -65,11 +65,11 @@ class Document(DocumentObject):
     def add_edges(self, edges_list):
         # Add the passed in edges to the historygraph for this documentt
         #TODO: This appear to be obsolete code left left from the old freeze function
-        if self.isfrozen:
-            #If we are frozen just add the edge to the history graph. We will be a full replay on unfreezing
-            self.history.add_edges(edges_list)
-            self.edges_received_while_frozen = True
-            return
+        #if self.isfrozen:
+        #    #If we are frozen just add the edge to the history graph. We will be a full replay on unfreezing
+        #    self.history.add_edges(edges_list)
+        #    self.edges_received_while_frozen = True
+        #    return
         fullreplay = False
         startnodes = set()
         endnodes = set()
@@ -169,7 +169,10 @@ class Document(DocumentObject):
         # it's history is cloned. It's history is a frozen history so it writes back to the parent
         ret = self.__class__(self.id)
         ret.copy_document_object(self)
-        ret.history = FrozenHistoryGraph(self.history, self)
+        ret.history = TransactionHistoryGraph(self.history, self)
         ret.dc = self.dc
         ret._clockhash = self._clockhash
         return ret
+
+    def endtransaction(self):
+        self.history.end_transaction()
