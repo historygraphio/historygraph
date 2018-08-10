@@ -33,7 +33,7 @@ pip install -r requirements.txt
 To run the unittests
 
 ```
-python -m unittest discover
+python -B -m unittest discover
 ```
 
 Run all of the tests in tox
