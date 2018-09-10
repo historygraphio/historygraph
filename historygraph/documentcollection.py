@@ -89,7 +89,7 @@ class DocumentCollection(object):
             propertyvaluestr = str(row[8])
             propertytypestr = str(row[9])
             nonce = str(row[10])
-            transaction_hash = str(row[11])
+            transaction_id = str(row[11])
 
             if documentid in historygraphdict:
                 historygraph = historygraphdict[documentid]
@@ -116,7 +116,7 @@ class DocumentCollection(object):
                 start_hashes = {start_hash_1, start_hash_2}
             edge = self.historyedgeclasses[edgeclassname](start_hashes, propertyownerid, propertyname,
                                                           propertyvalue, propertytype, documentid,
-                                                          documentclassname, nonce, transaction_hash)
+                                                          documentclassname, nonce, transaction_id)
             history = historygraphdict[documentid]
             history.add_edges([edge])
 

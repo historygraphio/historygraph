@@ -7,11 +7,11 @@ import uuid
 
 class AddIntCounter(Edge):
     def __init__(self, startnodes, propertyownerid,
-                 propertyname, propertyvalue, propertytype, documentid, documentclassname, nonce='', transaction_hash=''):
+                 propertyname, propertyvalue, propertytype, documentid, documentclassname, nonce='', transaction_id=''):
         if nonce == '':
             # If the nonce isn't set it
             nonce = str(uuid.uuid4())
-        super(AddIntCounter, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_hash)
+        super(AddIntCounter, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_id)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring), "propertytype should be basestring but it actually is " + str(type(propertytype))
         assert propertytype == 'int' or propertytype == 'basestring' or propertytype == 'IntCounter', "Unexpected property type, actually got " + propertytype
@@ -19,7 +19,7 @@ class AddIntCounter(Edge):
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
         self.propertytype = propertytype
-        self.transaction_hash = transaction_hash
+        self.transaction_id = transaction_id
 
     def replay(self, doc):
         if self.inactive:
@@ -33,7 +33,7 @@ class AddIntCounter(Edge):
     def clone(self):
         return AddIntCounter(self._start_hashes, 
                 self.propertyownerid, self.propertyname, self.propertyvalue,
-                self.propertytype, self.documentid, self.documentclassname, self.nonce, self.transaction_hash)
+                self.propertytype, self.documentid, self.documentclassname, self.nonce, self.transaction_id)
 
     def get_conflict_winner(self, edge2):
         return 0 # Counter CRDT edges can never conflict

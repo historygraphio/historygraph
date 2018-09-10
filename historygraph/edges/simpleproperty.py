@@ -6,8 +6,8 @@ from . import Edge
 
 class SimpleProperty(Edge):
     def __init__(self, startnodes, propertyownerid,
-                 propertyname, propertyvalue, propertytype, documentid, documentclassname, nonce='', transaction_hash=''):
-        super(SimpleProperty, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_hash)
+                 propertyname, propertyvalue, propertytype, documentid, documentclassname, nonce='', transaction_id=''):
+        super(SimpleProperty, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_id)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
         assert propertytype == 'int' or propertytype == 'basestring' or propertytype == 'float'
@@ -15,7 +15,7 @@ class SimpleProperty(Edge):
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
         self.propertytype = propertytype
-        self.transaction_hash = transaction_hash
+        self.transaction_id = transaction_id
 
     def replay(self, doc):
         if self.inactive:
@@ -30,7 +30,7 @@ class SimpleProperty(Edge):
         return SimpleProperty(self._start_hashes, 
                 self.propertyownerid, self.propertyname, self.propertyvalue,
                 self.propertytype, self.documentid, self.documentclassname,
-                self.nonce, self.transaction_hash)
+                self.nonce, self.transaction_id)
 
     def get_conflict_winner(self, edge2):
         # For a numeric register the maximum value is the conflict winner

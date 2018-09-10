@@ -8,9 +8,9 @@ class EndTransaction(Edge):
     # An EndTransaction edge is added to a historygraph when a transaction end to act as a terminator for the transaction
     # it doesn't transform the data in any way
     def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue,
-                 propertytype, documentid, documentclassname, nonce='', transaction_hash=''):
+                 propertytype, documentid, documentclassname, nonce='', transaction_id=''):
         super(EndTransaction, self).__init__(startnodes, documentid, documentclassname,
-                                    nonce, transaction_hash)
+                                    nonce, transaction_id)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
         assert isinstance(propertyvalue, basestring)
@@ -20,12 +20,12 @@ class EndTransaction(Edge):
         # For the EndTransaction edge type the propertytype member will be used
         # for the transaction type
         self.propertytype = propertytype
-        self.transaction_hash = transaction_hash
+        self.transaction_id = transaction_id
 
     def clone(self):
         return EndTransaction(self._start_hashes, self.propertyownerid, self.propertyname,
                      self.propertyvalue, self.propertytype, self.documentid,
-                     self.documentclassname, self.nonce, self.transaction_hash)
+                     self.documentclassname, self.nonce, self.transaction_id)
 
     def replay(self, doc):
         pass

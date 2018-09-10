@@ -188,7 +188,7 @@ class TransactionHistoryGraph(HistoryGraph):
         super(TransactionHistoryGraph, self).add_edges(edgeclones)
         self.in_init = False
         self._added_edges = list()
-        self._transaction_hash = str(uuid.uuid4())
+        self._transaction_id = str(uuid.uuid4())
 
     def add_edges(self, edges_list):
         # When we add edges they also need to go into the source historygraph
@@ -197,7 +197,7 @@ class TransactionHistoryGraph(HistoryGraph):
 
         assert len(edges_list) == 1
         edge = edges_list[0]
-        edge.transaction_hash = self._transaction_hash
+        edge.transaction_id = self._transaction_id
         self._added_edges.append(edge)
 
     def is_in_transaction(self):
@@ -213,7 +213,7 @@ class TransactionHistoryGraph(HistoryGraph):
         cloned_edges_list.append(EndTransaction({last_edge.get_end_node()},
             '', '', '',
             '', last_edge.documentid, last_edge.documentclassname,
-            '', last_edge.transaction_hash))
+            '', last_edge.transaction_id))
         #print("end_transaction self._added_edges=", [edge.as_dict() for edge in self._added_edges])
         #print("end_transaction cloned_edges_list=", [edge.as_dict() for edge in cloned_edges_list])
         #print("end_transaction self.source_historygraph._edgesbyendnode.values()=", [edge.as_dict() for edge in self.source_historygraph._edgesbyendnode.values()])
