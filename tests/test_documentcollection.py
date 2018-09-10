@@ -2,6 +2,9 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 import unittest
 from .common import DocumentCollection, TestPropertyOwner1, TestPropertyOwner2
+from historygraph import Document
+from historygraph import fields
+from historygraph import DocumentObject
 import json
 
 
@@ -66,3 +69,59 @@ class StoreObjectsInJSONEdgeReceivedOutofOrderTestCase(unittest.TestCase):
             self.assertEqual(testitem3.cover, 3)
         self.assertEqual(test3.covers, 1)
 
+class StoreObjectsInJSONEdgeReceivedOutofOrderSpreadsheetTestCase(unittest.TestCase):
+    # This test replications specific problems with the in browser test case example
+    def test_spreadsheet(self):
+        class SpreadsheetCell(DocumentObject):
+            content = fields.CharRegister()
+
+        class SpreadsheetColumn(DocumentObject):
+            name = fields.CharRegister()
+            cells = fields.List(SpreadsheetCell)
+
+        class SpreadsheetShare(DocumentObject):
+            email = fields.CharRegister()
+
+        class Spreadsheet(Document):
+            name = fields.CharRegister()
+            columns = fields.List(SpreadsheetColumn)
+            shares = fields.Collection(SpreadsheetShare)
+
+        def CreateNewDocumentCollection(master=None):
+            dc = DocumentCollection(master=master)
+            dc.register(Spreadsheet)
+            dc.register(SpreadsheetColumn)
+            dc.register(SpreadsheetCell)
+            dc.register(SpreadsheetShare)
+            return dc
+
+        dc1 = CreateNewDocumentCollection()
+        spreadsheet1 = Spreadsheet()
+        dc1.add_document_object(spreadsheet1)
+        for i in range(5):
+            col = SpreadsheetColumn()
+            spreadsheet1.columns.append(col)
+            dc1.add_document_object(col)
+            for j in range(5):
+                cell = SpreadsheetCell()
+                col.cells.append(cell)
+                dc1.add_document_object(cell)
+                cell.content = '{}{}'.format('ABCDE'[i], j + 1)
+
+        assert spreadsheet1.columns[1].cells[2].content == 'B3'
+
+        edges = dc1.get_all_edges()[0]
+        #print('StoreObjectsInJSONEdgeReceivedOutofOrderTestCase edges=', edges)
+        first_edges = [edge for edge in edges if edge[4] == '' and edge[5] == '']
+        later_edges = [edge for edge in edges if edge[4] != '' or edge[5] != '']
+        dc2 = CreateNewDocumentCollection()
+
+        dc2.load_from_json(json.dumps({'history': later_edges, 'immutableobjects': []}))
+        dc2.load_from_json(json.dumps({'history': first_edges, 'immutableobjects': []}))
+
+        assert len(dc2.get_by_class(Spreadsheet)) == 1
+
+        spreadsheet2 = dc2.get_by_class(Spreadsheet)[0]
+        #column = spreadsheet2.columns[1]
+        #print('column.cells=', column.cells)
+        assert spreadsheet2.columns[1].cells[2].content == 'B3'
