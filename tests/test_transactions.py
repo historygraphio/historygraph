@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 import unittest
 from .common import DocumentCollection, Covers, TestPropertyOwner2, TestPropertyOwner1
+from historygraph.edges import EndTransaction
 
 
 class TransactionTestCase(unittest.TestCase):
@@ -39,21 +40,32 @@ class TransactionTestCase(unittest.TestCase):
         self.assertEqual(test1.covers,2)
         self.assertEqual(test1.table, 1)
 
-        #Test the last two edges in the remote copy of the graph have the same hash
+        #Test the last edge in the graph is an end transaction edge
         test1_edge1 = test1.history.get_edges_by_end_node(test1._clockhash)
+        self.assertTrue(isinstance(test1_edge1, EndTransaction))
+
+        #Test the last three edges in the local copy of the graph have the same hash
         test1_edge2 = test1.history.get_edges_by_end_node(list(test1_edge1._start_hashes)[0])
+        test1_edge3 = test1.history.get_edges_by_end_node(list(test1_edge2._start_hashes)[0])
         self.assertNotEqual(test1_edge1.transaction_hash, '')
         self.assertNotEqual(test1_edge2.transaction_hash, '')
+        self.assertNotEqual(test1_edge3.transaction_hash, '')
         self.assertEqual(test1_edge1.transaction_hash, test1_edge2.transaction_hash)
+        self.assertEqual(test1_edge2.transaction_hash, test1_edge3.transaction_hash)
 
-        #Test the last two edges in the remote copy of the graph have the same hash
+        #Test the last three edges in the remote copy of the graph have the same hash
         test2_edge1 = test2.history.get_edges_by_end_node(test2._clockhash)
+        self.assertTrue(isinstance(test2_edge1, EndTransaction))
         test2_edge2 = test2.history.get_edges_by_end_node(list(test2_edge1._start_hashes)[0])
+        test2_edge3 = test2.history.get_edges_by_end_node(list(test2_edge2._start_hashes)[0])
         self.assertNotEqual(test2_edge1.transaction_hash, '')
         self.assertNotEqual(test2_edge2.transaction_hash, '')
+        self.assertNotEqual(test2_edge3.transaction_hash, '')
         self.assertEqual(test2_edge1.transaction_hash, test2_edge2.transaction_hash)
+        self.assertEqual(test2_edge2.transaction_hash, test2_edge3.transaction_hash)
         self.assertEqual(test2.covers, 2)
         self.assertEqual(test2.table, 1)
 
         self.assertEqual(test2_edge1.transaction_hash, test1_edge1.transaction_hash)
         self.assertEqual(test2_edge2.transaction_hash, test1_edge2.transaction_hash)
+        self.assertEqual(test2_edge3.transaction_hash, test1_edge3.transaction_hash)

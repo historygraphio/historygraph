@@ -6,6 +6,7 @@ from collections import defaultdict
 import uuid
 from . import edges
 import hashlib
+from historygraph.edges import EndTransaction
 
 class HistoryGraph(object):
     def __init__(self):
@@ -187,6 +188,7 @@ class TransactionHistoryGraph(HistoryGraph):
         super(TransactionHistoryGraph, self).add_edges(edgeclones)
         self.in_init = False
         self._added_edges = list()
+        self._transaction_hash = str(uuid.uuid4())
 
     def add_edges(self, edges_list):
         # When we add edges they also need to go into the source historygraph
@@ -194,22 +196,24 @@ class TransactionHistoryGraph(HistoryGraph):
             return
 
         assert len(edges_list) == 1
-        self._added_edges.append(edges_list[0])
-        transaction_hash = hashlib.sha256(''.join([str(edge.get_end_node()) for edge in self._added_edges])).hexdigest()
-        #print('add_edges transaction_hash=', transaction_hash)
-        #print('add_edges type(transaction_hash)=', type(transaction_hash))
-        for i in range(len(self._added_edges)):
-            edge = self._added_edges[i]
-            edge.transaction_hash = transaction_hash
-            if i > 0:
-                edge._start_hashes = [self._added_edges[i - 1].get_end_node()]
+        edge = edges_list[0]
+        edge.transaction_hash = self._transaction_hash
+        self._added_edges.append(edge)
 
     def is_in_transaction(self):
-        return False
+        return True
+
+    def get_last_transaction_edge(self):
+        return self._added_edges[-1]
 
     def end_transaction(self):
         cloned_edges_list = [e.clone() for e in self._edgesbyendnode.values()] + \
             [e.clone() for e in self._added_edges]
+        last_edge = cloned_edges_list[-1]
+        cloned_edges_list.append(EndTransaction({last_edge.get_end_node()},
+            '', '', '',
+            '', last_edge.documentid, last_edge.documentclassname,
+            '', last_edge.transaction_hash))
         #print("end_transaction self._added_edges=", [edge.as_dict() for edge in self._added_edges])
         #print("end_transaction cloned_edges_list=", [edge.as_dict() for edge in cloned_edges_list])
         #print("end_transaction self.source_historygraph._edgesbyendnode.values()=", [edge.as_dict() for edge in self.source_historygraph._edgesbyendnode.values()])

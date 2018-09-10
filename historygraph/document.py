@@ -43,8 +43,12 @@ class Document(DocumentObject):
             edge = edges.RemoveListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         else:
             assert False
-        self._clockhash = edge.get_end_node()
         self.history.add_edges([edge])
+        if self.history.is_in_transaction():
+            # If we are in a transaction the historygraph has changed the edge for
+            # us use that edge instead
+            edge = self.history.get_last_transaction_edge()
+        self._clockhash = edge.get_end_node()
         for l in self.edgeslistener:
             # Signal the listener that there was a change
             l.edges_added([edge])
