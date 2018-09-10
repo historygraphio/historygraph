@@ -6,7 +6,6 @@ from collections import defaultdict
 import uuid
 from . import edges
 import hashlib
-from historygraph.edges import EndTransaction
 
 class HistoryGraph(object):
     def __init__(self):
@@ -204,11 +203,15 @@ class TransactionHistoryGraph(HistoryGraph):
             return
 
         assert len(edges_list) == 1
-        edge = edges_list[0]
-        if self._transaction_id == '':
-            self._transaction_id = edge.get_end_node()
-        edge.transaction_id = self._transaction_id
-        self._added_edges.append(edge)
+        self._added_edges.append(edges_list[0])
+        transaction_id = hashlib.sha256(''.join([str(edge.get_end_node()) for edge in self._added_edges])).hexdigest()
+        #print('add_edges transaction_id=', transaction_id)
+        #print('add_edges type(transaction_id)=', type(transaction_id))
+        for i in range(len(self._added_edges)):
+            edge = self._added_edges[i]
+            edge.transaction_id = transaction_id
+            if i > 0:
+                edge._start_hashes = [self._added_edges[i - 1].get_end_node()]
 
     def is_in_transaction(self):
         return True
@@ -219,16 +222,7 @@ class TransactionHistoryGraph(HistoryGraph):
     def end_transaction(self):
         cloned_edges_list = [e.clone() for e in self._edgesbyendnode.values()] + \
             [e.clone() for e in self._added_edges]
-        last_edge = cloned_edges_list[-1]
-        cloned_edges_list.append(EndTransaction({last_edge.get_end_node()},
-            '', '', '',
-            '', last_edge.documentid, last_edge.documentclassname,
-            '', last_edge.transaction_id))
-        #print("end_transaction self._added_edges=", [edge.as_dict() for edge in self._added_edges])
-        #print("end_transaction cloned_edges_list=", [edge.as_dict() for edge in cloned_edges_list])
-        #print("end_transaction self.source_historygraph._edgesbyendnode.values()=", [edge.as_dict() for edge in self.source_historygraph._edgesbyendnode.values()])
         self.source_historygraph.add_edges(cloned_edges_list)
-        #print("end_transaction self.source_historygraph.add_edges completed")
         self.source_historygraph.process_graph()
         self.source_historygraph.record_past_edges()
         self.source_historygraph.process_conflict_winners()
