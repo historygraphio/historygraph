@@ -17,6 +17,8 @@ class EndTransaction(Edge):
         self.propertyownerid = propertyownerid
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
+        # For the EndTransaction edge type the propertytype member will be used
+        # for the transaction type
         self.propertytype = propertytype
         self.transaction_hash = transaction_hash
 
