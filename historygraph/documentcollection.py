@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 #This module handles storing all documents in the database (and reloading)
 from collections import defaultdict
 from .documentobject import DocumentObject
-from . import fields, edges
+from . import fields, edges, validators
 from .historygraph import HistoryGraph
 from json import JSONEncoder, JSONDecoder
 from .document import Document
@@ -13,6 +13,9 @@ import hashlib
 import uuid
 
 class DocumentCollection(object):
+
+    standard_validators = [validators.int_counter_integer_value]
+
     def __init__(self, has_standard_validators=True):
         self.id = str(uuid.uuid4())
         self.objects = defaultdict(dict)
@@ -21,11 +24,13 @@ class DocumentCollection(object):
         for theclass in edges.Edge.__subclasses__():
             self.historyedgeclasses[theclass.__name__] = theclass
         self.listeners = list()
-        self._validators = list()
+        if has_standard_validators:
+            self._validators = self.standard_validators
+        else:
+            self._validators = list()
 
     def register(self, theclass):
         self.classes[theclass.__name__] = theclass
-
 
     def get_all_edges(self):
         # Retreive all the edges for all of the documents in this dc
