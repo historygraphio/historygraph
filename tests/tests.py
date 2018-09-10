@@ -703,11 +703,14 @@ class SimpleCoversUpdateTestCase(unittest.TestCase):
 
 class SimpleCounterTestCase(unittest.TestCase):
     def runTest(self):
+        dc1 = DocumentCollection()
+        dc1.register(CounterTestContainer)
         #Test merging together simple counter documents
         test = CounterTestContainer()
         #Test we default to zero
         self.assertEqual(test.testcounter.get(), 0)
         #Test adding and subtract gives reasonable values
+        test.dc = dc1
         test.testcounter.add(1)
         self.assertEqual(test.testcounter.get(), 1)
         test.testcounter.add(1)
@@ -744,6 +747,7 @@ class UncleanReplayCounterTestCase(unittest.TestCase):
     def runTest(self):
         #Test merge together two simple covers objects
         test = CounterTestContainer()
+        test.dc = self.dc
         test.testcounter.add(1)
         self.assertEqual(test.testcounter.get(), 1)
         history2 = test.history.clone()
@@ -877,6 +881,9 @@ class HistoryGraphDepthTestCase(unittest.TestCase):
 class FieldListFunctionsTestCase(unittest.TestCase):
     # Test each individual function in the fields.List and FieldListImpl classes
     def runTest(self):
+        dc1 = DocumentCollection()
+        dc1.register(TestPropertyOwner1)
+
         fl = fields.List(TestPropertyOwner1)
         self.assertEqual(fl.theclass, TestPropertyOwner1)
 
@@ -892,6 +899,7 @@ class FieldListFunctionsTestCase(unittest.TestCase):
             flImpl[0]
 
         parent = TestPropertyOwner1()
+        parent.dc = dc1
         name = "test"
         flImpl = fl.create_instance(parent, name)
         test1 = TestPropertyOwner1()

@@ -118,6 +118,7 @@ class DocumentCollection(object):
                                                           propertyvalue, propertytype, documentid,
                                                           documentclassname, nonce, transaction_id)
             history = historygraphdict[documentid]
+            history.dc = self
             history.add_edges([edge])
 
         for documentid in historygraphdict:
@@ -132,6 +133,7 @@ class DocumentCollection(object):
                         wasexisting = True
             if doc is None:
                 doc = self.classes[documentclassnamedict[documentid]](documentid)
+                doc.history.dc = self
                 doc.dc = self
 
             # Make a copy of self's history
@@ -209,3 +211,6 @@ class DocumentCollection(object):
         # Inform the listeners that edges were added
         for l in self.listeners:
             l.edges_added(self, edges)
+
+    def get_validators(self):
+        return []

@@ -43,6 +43,7 @@ class Document(DocumentObject):
             edge = edges.RemoveListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         else:
             assert False
+        self.history.dc = self.dc
         self.history.add_edges([edge])
         if self.history.is_in_transaction():
             # If we are in a transaction the historygraph has changed the edge for
