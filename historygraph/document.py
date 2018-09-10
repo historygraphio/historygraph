@@ -114,6 +114,8 @@ class Document(DocumentObject):
         # a partial replay for better performance
         edgesdict = dict([(list(edge._start_hashes)[0], edge) for edge in edges_list])
         while len(edgesdict) > 0:
+            #TODO: This functinoality is never tested and doesn't work
+            assert False
             #Get the next edge
             oldnode = self._clockhash
             edge = edgesdict[self._clockhash]

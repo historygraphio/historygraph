@@ -13,7 +13,7 @@ import hashlib
 import uuid
 
 class DocumentCollection(object):
-    def __init__(self):
+    def __init__(self, has_standard_validators=True):
         self.id = str(uuid.uuid4())
         self.objects = defaultdict(dict)
         self.classes = dict()
@@ -21,6 +21,7 @@ class DocumentCollection(object):
         for theclass in edges.Edge.__subclasses__():
             self.historyedgeclasses[theclass.__name__] = theclass
         self.listeners = list()
+        self._validators = list()
 
     def register(self, theclass):
         self.classes[theclass.__name__] = theclass
@@ -213,4 +214,7 @@ class DocumentCollection(object):
             l.edges_added(self, edges)
 
     def get_validators(self):
-        return []
+        return self._validators
+
+    def register_validator(self, validator):
+        self._validators.append(validator)

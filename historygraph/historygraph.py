@@ -29,7 +29,7 @@ class HistoryGraph(object):
 
     def filter_valid_edges(self, edges_list):
         validators = self.dc.get_validators()
-        return [edge for edge in edges_list if all([v.is_valid(edge, self) for v in validators])]
+        return [edge for edge in edges_list if all([v(edge, self) for v in validators])]
 
     def add_edges(self, edges_list):
         # Add edges to this graph. This only updates the dictionaries
