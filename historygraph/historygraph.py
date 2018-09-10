@@ -196,7 +196,7 @@ class TransactionHistoryGraph(HistoryGraph):
         super(TransactionHistoryGraph, self).add_edges(edgeclones)
         self.in_init = False
         self._added_edges = list()
-        self._transaction_id = str(uuid.uuid4())
+        self._transaction_id = ''
 
     def add_edges(self, edges_list):
         # When we add edges they also need to go into the source historygraph
@@ -205,6 +205,8 @@ class TransactionHistoryGraph(HistoryGraph):
 
         assert len(edges_list) == 1
         edge = edges_list[0]
+        if self._transaction_id == '':
+            self._transaction_id = edge.get_end_node()
         edge.transaction_id = self._transaction_id
         self._added_edges.append(edge)
 
