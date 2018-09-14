@@ -6,9 +6,10 @@ from . import Edge
 
 class RemoveChild(Edge):
     def __init__(self, startnodes, propertyownerid,
-                 propertyname, propertyvalue, propertytype, documentid, 
-                 documentclassname, nonce='', transaction_id=''):
-        super(RemoveChild, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_id)
+                 propertyname, propertyvalue, propertytype, documentid,
+                 documentclassname, nonce='', transaction_hash=''):
+        super(RemoveChild, self).__init__(startnodes, documentid,
+            documentclassname, nonce, transaction_hash)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
         assert isinstance(propertyvalue, basestring)
@@ -16,7 +17,6 @@ class RemoveChild(Edge):
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
         self.propertytype = propertytype
-        self.transaction_id = transaction_id
 
     def replay(self, doc):
         # Remove the item if it's parent exits
@@ -25,11 +25,10 @@ class RemoveChild(Edge):
             getattr(parent, self.propertyname).remove(self.propertyvalue)
 
     def clone(self):
-        return RemoveChild(self._start_hashes, 
-            self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype, self.documentid, self.documentclassname, self.nonce, self.transaction_id)
+        return RemoveChild(self._start_hashes,
+            self.propertyownerid, self.propertyname, self.propertyvalue,
+            self.propertytype, self.documentid, self.documentclassname,
+            self.nonce, self.transaction_hash)
 
     def get_conflict_winner(self, edge2):
         return 0
-
-    
-        

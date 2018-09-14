@@ -6,9 +6,9 @@ from . import Edge
 
 class Merge(Edge):
     def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue,
-                 propertytype, documentid, documentclassname, nonce='', transaction_id=''):
+                 propertytype, documentid, documentclassname, nonce='', transaction_hash=''):
         super(Merge, self).__init__(startnodes, documentid, documentclassname,
-                                    nonce, transaction_id)
+                                    nonce, transaction_hash)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
         assert isinstance(propertyvalue, basestring)
@@ -16,7 +16,6 @@ class Merge(Edge):
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
         self.propertytype = propertytype
-        self.transaction_id = transaction_id
 
     def clone(self):
         return Merge(self._start_hashes, self.propertyownerid, self.propertyname,

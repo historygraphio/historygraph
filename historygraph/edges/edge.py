@@ -66,7 +66,7 @@ class Edge(object):
             "documentid":self.documentid,
             "documentclassname":self.documentclassname,
             "nonce":self.nonce,
-            "transaction_id": self.transaction_id,
+            "transaction_hash": self.transaction_hash,
          }
 
     def __str__(self):
