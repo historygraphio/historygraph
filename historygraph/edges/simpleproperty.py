@@ -6,7 +6,8 @@ from . import Edge
 
 class SimpleProperty(Edge):
     def __init__(self, startnodes, propertyownerid,
-                 propertyname, propertyvalue, propertytype, documentid, documentclassname, nonce='', transaction_hash=''):
+                 propertyname, propertyvalue, propertytype, documentid,
+                 documentclassname, nonce='', transaction_hash=''):
         super(SimpleProperty, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_hash)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
@@ -15,7 +16,6 @@ class SimpleProperty(Edge):
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
         self.propertytype = propertytype
-        self.transaction_hash = transaction_hash
 
     def replay(self, doc):
         if self.inactive:
@@ -27,7 +27,7 @@ class SimpleProperty(Edge):
             setattr(edgeobject, self.propertyname, field.translate_from_string(self.propertyvalue))
 
     def clone(self):
-        return SimpleProperty(self._start_hashes, 
+        return SimpleProperty(self._start_hashes,
                 self.propertyownerid, self.propertyname, self.propertyvalue,
                 self.propertytype, self.documentid, self.documentclassname,
                 self.nonce, self.transaction_hash)
@@ -61,7 +61,3 @@ class SimpleProperty(Edge):
     #def get_edge_description(self):
     #    #Return a description of the edgeuseful for debugging purposes
     #    return "Edge type = " + self.__class__.__name__ + " edgeid = " + self.edgeid + " start nodes = " + str(self._start_hashes) + " end node = " + self.endnode + "  self.propertyname = " +  self.propertyname + " self.propertyvalue = " + self.propertyvalue + " self.propertytype = " + str(self.propertytype)
-    
-
-        
-        

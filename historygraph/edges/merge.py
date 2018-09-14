@@ -16,7 +16,6 @@ class Merge(Edge):
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
         self.propertytype = propertytype
-        self.transaction_hash = transaction_hash
 
     def clone(self):
         return Merge(self._start_hashes, self.propertyownerid, self.propertyname,
@@ -25,11 +24,10 @@ class Merge(Edge):
 
     def replay(self, doc):
         pass
-    
+
     #def get_edge_description(self):
     #    #Return a description of the edgeuseful for debugging purposes
     #    return "Edge type = " + self.__class__.__name__ + " edgeid = " + self.edgeid + " start nodes = " + str(self._start_hashes) + " end node = " + self.endnode
 
     def get_conflict_winner(self, edge2):
         return 0 #Merge edges can never conflict with anything
-

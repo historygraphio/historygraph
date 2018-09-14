@@ -7,7 +7,8 @@ from json import JSONEncoder, JSONDecoder
 from .. import fields
 
 class AddListItem(Edge):
-    def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue, propertytype, documentid, documentclassname, nonce='', transaction_hash=''):
+    def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue,
+                 propertytype, documentid, documentclassname, nonce='', transaction_hash=''):
         super(AddListItem, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_hash)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
@@ -16,7 +17,6 @@ class AddListItem(Edge):
         self.propertyvalue = propertyvalue
         self.propertyname = propertyname
         self.propertytype = propertytype
-        self.transaction_hash = transaction_hash
 
     def replay(self, doc):
         # List items are actually listnodes (or tombstone) they are then replayed via their own algorithm
@@ -43,18 +43,15 @@ class AddListItem(Edge):
                 if n.parent == added_node.parent and n.timestamp == added_node.timestamp and \
                    n.data == added_node.data and n.obj == added_node.obj:
                     return
-                
+
             if hasattr(flImpl, "_rendered_list"):
                 delattr(flImpl, "_rendered_list")
             flImpl._listnodes.append(added_node)
 
     def clone(self):
-        return AddListItem(self._start_hashes, 
+        return AddListItem(self._start_hashes,
             self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype,
             self.documentid, self.documentclassname, self.nonce, self.transaction_hash)
 
     def get_conflict_winner(self, edge2):
         return 0 #There can never be a conflict because all edges are new
-
-    
-        
