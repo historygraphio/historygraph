@@ -204,12 +204,12 @@ class TransactionHistoryGraph(HistoryGraph):
 
         assert len(edges_list) == 1
         self._added_edges.append(edges_list[0])
-        transaction_id = hashlib.sha256(''.join([str(edge.get_end_node()) for edge in self._added_edges])).hexdigest()
+        transaction_hash = hashlib.sha256(''.join([str(edge.get_end_node()) for edge in self._added_edges])).hexdigest()
         #print('add_edges transaction_id=', transaction_id)
         #print('add_edges type(transaction_id)=', type(transaction_id))
         for i in range(len(self._added_edges)):
             edge = self._added_edges[i]
-            edge.transaction_id = transaction_id
+            edge.transaction_hash = transaction_hash
             if i > 0:
                 edge._start_hashes = [self._added_edges[i - 1].get_end_node()]
 

@@ -51,7 +51,7 @@ class AddListItem(Edge):
     def clone(self):
         return AddListItem(self._start_hashes,
             self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype,
-            self.documentid, self.documentclassname, self.nonce, self.transaction_id)
+            self.documentid, self.documentclassname, self.nonce, self.transaction_hash)
 
     def get_conflict_winner(self, edge2):
         return 0 #There can never be a conflict because all edges are new

@@ -30,7 +30,7 @@ class SimpleProperty(Edge):
         return SimpleProperty(self._start_hashes,
                 self.propertyownerid, self.propertyname, self.propertyvalue,
                 self.propertytype, self.documentid, self.documentclassname,
-                self.nonce, self.transaction_id)
+                self.nonce, self.transaction_hash)
 
     def get_conflict_winner(self, edge2):
         # For a numeric register the maximum value is the conflict winner
