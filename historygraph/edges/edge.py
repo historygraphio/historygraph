@@ -136,7 +136,7 @@ class Edge(object):
         # assuming one start hash
         start_hashes= list(self._start_hashes)
         start_hash_1 = start_hashes[0]
-        assert len(start_hashes) == 1
+        #assert len(start_hashes) == 1
         s = ("classname",str(self.__class__.__name__),
             "start_hash_1",str(start_hash_1),
             "propertyownerid",str(self.propertyownerid),

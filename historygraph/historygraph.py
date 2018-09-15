@@ -29,6 +29,9 @@ class HistoryGraph(object):
 
     def get_valid_transaction_edges(self):
         def is_continuous(edges):
+            if any([len(edge._start_hashes) > 1 for edge in edges]):
+                # All edges must
+                return False
             # Return True iff the list of edges is a totally ordered set
             start_hashes = {item for edge in edges for item in edge._start_hashes}
             end_hashes = {edge.get_end_node() for edge in edges}
