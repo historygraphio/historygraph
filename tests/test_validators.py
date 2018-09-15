@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 import unittest
 from .common import DocumentCollection, Covers, CounterTestContainer
 from historygraph.edges import SimpleProperty, AddIntCounter
+import hashlib
 
 class SimpleValidationTestCase(unittest.TestCase):
     def setUp(self):
@@ -103,3 +104,41 @@ class StandardValidationTestCase(unittest.TestCase):
 
         self.assertEqual(test.testcounter.get(), 1)
         self.assertEqual(test._clockhash, last_edge.get_end_node())
+
+class StandardTransactionValidationTestCase(unittest.TestCase):
+    # The standard validators should only allow ints to be applied to
+    # intcounter fields
+    def setUp(self):
+        self.dc1 = DocumentCollection(has_standard_validators=True)
+        self.dc1.register(CounterTestContainer)
+
+    def test_success(self):
+        test = CounterTestContainer()
+        self.dc1.add_document_object(test)
+        test.testcounter.add(1)
+
+        last_edge = test.history.get_edges_by_end_node(test._clockhash)
+
+        edge1 = AddIntCounter({test._clockhash},
+                              last_edge.propertyownerid,
+                              last_edge.propertyname, 1,
+                              last_edge.propertytype, last_edge.documentid,
+                              last_edge.documentclassname, last_edge.nonce)
+        edge2 = AddIntCounter({test._clockhash},
+                              last_edge.propertyownerid,
+                              last_edge.propertyname, 1,
+                              last_edge.propertytype, last_edge.documentid,
+                              last_edge.documentclassname, last_edge.nonce)
+        edges = [ edge1, edge2 ]
+
+        transaction_hash = hashlib.sha256(''.join([str(edge.get_transaction_info_hash())
+            for edge in edges])).hexdigest()
+        for i in range(len(edges)):
+            edge = edges[i]
+            edge.transaction_hash = transaction_hash
+            if i > 0:
+                edge._start_hashes = [edges[i - 1].get_end_node()]
+
+        test.full_replay(edges)
+
+        self.assertEqual(test.testcounter.get(), 3)

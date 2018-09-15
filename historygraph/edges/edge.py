@@ -130,3 +130,22 @@ class Edge(object):
             return max(depth1, depth2)
         else:
             assert False
+
+    def get_transaction_info_hash(self):
+        # Get the same as end node but with transaction hash remove and
+        # assuming one start hash
+        start_hashes= list(self._start_hashes)
+        start_hash_1 = start_hashes[0]
+        assert len(start_hashes) == 1
+        s = ("classname",str(self.__class__.__name__),
+            "start_hash_1",str(start_hash_1),
+            "propertyownerid",str(self.propertyownerid),
+
+            "propertyvalue",str(self.propertyvalue),
+            "propertyname",str(self.propertyname),
+            "propertytype",str(self.propertytype),
+            "documentid",str(self.documentid),
+            "documentclassname",str(self.documentclassname),
+            "nonce",str(self.nonce),
+         )
+        return hashlib.sha256(str(s)).hexdigest()
