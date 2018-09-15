@@ -7,6 +7,28 @@ import uuid
 from . import edges
 import hashlib
 
+def get_transaction_hash(edges):
+    return hashlib.sha256(''.join([str(edge.get_transaction_info_hash())
+                          for edge in edges])).hexdigest()
+
+def order_edges(edges):
+    # Assuming edges is a totally ordered set return a list with the edges in the
+    # correct order
+    start_hashes = {item for edge in edges for item in edge._start_hashes}
+    end_hashes = {edge.get_end_node() for edge in edges}
+    start_hash = list(start_hashes - end_hashes)[0]
+    start_hashes = {edge._start_hashes[0]: edge for edge in edges}
+
+    def process_order_edges(start_hash, start_hashes):
+        if start_hash not in start_hashes:
+            return []
+        else:
+            edge = start_hashes[start_hash]
+            return [edge] + process_order_edges(edge.get_end_node(),
+                                                start_hashes)
+
+    return process_order_edges(start_hash, start_hashes)
+
 class HistoryGraph(object):
     def __init__(self):
         # We maintain dictionaries by the start and end nodes. The various functions
@@ -30,7 +52,8 @@ class HistoryGraph(object):
     def get_valid_transaction_edges(self):
         def is_continuous(edges):
             if any([len(edge._start_hashes) > 1 for edge in edges]):
-                # All edges must
+                # All edges must have only one start hashes for this to be
+                # a totally ordered set
                 return False
             # Return True iff the list of edges is a totally ordered set
             start_hashes = {item for edge in edges for item in edge._start_hashes}
@@ -47,8 +70,17 @@ class HistoryGraph(object):
         for k, d2 in self._transaction_edges.iteritems():
             edges = d2.values()
             if is_continuous(edges):
-                matching_edges = matching_edges + edges
-                self._transaction_edges[k] = dict()
+                edges = order_edges(edges)
+                transaction_hash = get_transaction_hash(edges)
+                #print('get_valid_transaction_edges transaction_hash=', transaction_hash)
+                #print('get_valid_transaction_edges edges.get_transaction_info_hash=', ','.join([edge.get_transaction_info_hash() for edge in edges]))
+                #print('get_valid_transaction_edges edges.transaction_hash=', ','.join([edge.transaction_hash for edge in edges]))
+                #print('get_valid_transaction_edges edges.start_hashes=', ','.join([edge._start_hashes[0] for edge in edges]))
+                #print('get_valid_transaction_edges edges.get_end_node=', ','.join([edge.get_end_node() for edge in edges]))
+                if all([edge.transaction_hash == transaction_hash for edge in edges]):
+                    # Verify the calculated transaction hash matches the provided transaction hash
+                    matching_edges = matching_edges + edges
+                    self._transaction_edges[k] = dict()
         #ret = [d2.values() for k, d2 in self._transaction_edges.iteritems()]
         #ret = []
         #self._transaction_edges = defaultdict(dict)
@@ -240,7 +272,8 @@ class TransactionHistoryGraph(HistoryGraph):
 
         assert len(edges_list) == 1
         self._added_edges.append(edges_list[0])
-        transaction_hash = hashlib.sha256(''.join([str(edge.get_end_node()) for edge in self._added_edges])).hexdigest()
+        transaction_hash = get_transaction_hash(self._added_edges)
+        #transaction_hash = hashlib.sha256(''.join([str(edge.get_end_node()) for edge in self._added_edges])).hexdigest()
         #print('add_edges transaction_id=', transaction_id)
         #print('add_edges type(transaction_id)=', type(transaction_id))
         for i in range(len(self._added_edges)):
