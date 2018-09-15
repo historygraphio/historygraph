@@ -28,6 +28,7 @@ class DocumentCollection(object):
             self._validators = self.standard_validators
         else:
             self._validators = list()
+        self._custom_validators = list()
 
     def register(self, theclass):
         self.classes[theclass.__name__] = theclass
@@ -223,3 +224,6 @@ class DocumentCollection(object):
 
     def register_validator(self, validator):
         self._validators.append(validator)
+
+    def register_custom_validator(self, custom_validator):
+        self._custom_validators.append(custom_validator)

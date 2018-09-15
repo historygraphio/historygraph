@@ -171,14 +171,18 @@ class Document(DocumentObject):
         ret._clockhash = self._clockhash
         return ret
 
-    def transaction(self):
+    def transaction(self, custom_transaction=None):
         # Return a deep copy of this object. This object all of it's children and
         # it's history is cloned. It's history is a frozen history so it writes back to the parent
         ret = self.__class__(self.id)
         ret.copy_document_object(self)
-        ret.history = TransactionHistoryGraph(self.history, self)
+        ret.history = TransactionHistoryGraph(self.history, self, custom_transaction)
         ret.dc = self.dc
-        ret._clockhash = self._clockhash
+        if custom_transaction  is None:
+            ret._clockhash = self._clockhash
+        else:
+            #print('transaction setting clockhash from auto created edge')
+            ret._clockhash = ret.history.get_last_transaction_edge().get_end_node()
         return ret
 
     def endtransaction(self):

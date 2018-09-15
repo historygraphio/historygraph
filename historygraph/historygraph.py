@@ -86,16 +86,23 @@ class HistoryGraph(object):
         #self._transaction_edges = defaultdict(dict)
         return matching_edges
 
+    def get_valid_custom_transaction_edges(self):
+        return []
+
     def filter_valid_edges(self, edges_list):
+        #print('filter_valid_edges edges_list=', edges_list)
         validators = self.dc.get_validators()
         # Seperate out edges in a transaction for others
         transaction_edges = [edge for edge in edges_list if edge.transaction_hash != '']
         edges_list = [edge for edge in edges_list if edge.transaction_hash == '']
+        #print('filter_valid_edges 2 edges_list=', edges_list)
+        #print('filter_valid_edges 2 transaction_edges=', transaction_edges)
         for edge in transaction_edges:
             self._transaction_edges[edge.transaction_hash][edge.get_end_node()] = edge
         transaction_edges = [edges for edges in self.get_valid_transaction_edges()]
+        custom_transaction_edges = [edges for edges in self.get_valid_custom_transaction_edges()]
         #transaction_edges = [item for sublist in transaction_edges for item in sublist]
-        edges_list = edges_list + transaction_edges
+        edges_list = edges_list + transaction_edges + custom_transaction_edges
         return [edge for edge in edges_list if all([v(edge, self) for v in validators])]
 
     def add_edges(self, edges_list):
@@ -253,17 +260,23 @@ class FrozenHistoryGraph(HistoryGraph):
 class TransactionHistoryGraph(HistoryGraph):
     # This subclass handles the case of a history graph that writes any new edges it receives
     # into the historygraph it was cloned from
-    def __init__(self, source_historygraph, source_doc):
+    def __init__(self, source_historygraph, source_doc, custom_transaction):
         super(TransactionHistoryGraph, self).__init__()
         self.source_historygraph = source_historygraph
         self.source_doc = source_doc
         self.in_init = True
+        self.custom_transaction = custom_transaction
         edgeclones = self.source_historygraph.get_edges_clones()
         self.dc = source_historygraph.dc
         super(TransactionHistoryGraph, self).add_edges(edgeclones)
         self.in_init = False
         self._added_edges = list()
         self._transaction_id = ''
+        if custom_transaction is not None:
+            #print('TransactionHistoryGraph adding custom transaction edge')
+            begin_custom_transaction_edge = edges.BeginCustomTransaction({self.source_doc._clockhash},
+                '', '', '', '', source_doc.id, source_doc.__class__.__name__)
+            self._added_edges.append(begin_custom_transaction_edge)
 
     def add_edges(self, edges_list):
         # When we add edges they also need to go into the source historygraph
@@ -291,10 +304,14 @@ class TransactionHistoryGraph(HistoryGraph):
     def end_transaction(self):
         cloned_edges_list = [e.clone() for e in self._edgesbyendnode.values()] + \
             [e.clone() for e in self._added_edges]
+        #print('end_transaction cloned_edges_list=', cloned_edges_list)
+        #print('end_transaction len(self.source_historygraph._edgesbyendnode)=', len(self.source_historygraph._edgesbyendnode))
         self.source_historygraph.add_edges(cloned_edges_list)
+        #print('end_transaction len(self.source_historygraph._edgesbyendnode)=', len(self.source_historygraph._edgesbyendnode))
         self.source_historygraph.process_graph()
         self.source_historygraph.record_past_edges()
         self.source_historygraph.process_conflict_winners()
         self.source_historygraph.replay(self.source_doc)
+        #print('end_transaction self.source_doc.covers=', self.source_doc.covers)
         for l in self.source_doc.edgeslistener:
             l.edges_added(cloned_edges_list)

@@ -8,6 +8,7 @@ import hashlib
 import uuid
 
 
+
 class SimpleValidationTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection(has_standard_validators=False)
