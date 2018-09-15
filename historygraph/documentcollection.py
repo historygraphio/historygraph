@@ -227,3 +227,6 @@ class DocumentCollection(object):
 
     def register_custom_validator(self, custom_validator):
         self._custom_validators.append(custom_validator)
+
+    def get_customer_validators(self):
+        return self._custom_validators

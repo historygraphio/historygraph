@@ -79,15 +79,26 @@ class HistoryGraph(object):
                 #print('get_valid_transaction_edges edges.get_end_node=', ','.join([edge.get_end_node() for edge in edges]))
                 if all([edge.transaction_hash == transaction_hash for edge in edges]):
                     # Verify the calculated transaction hash matches the provided transaction hash
-                    matching_edges = matching_edges + edges
-                    self._transaction_edges[k] = dict()
+                    if self.is_custom_transaction(edges) is False or self.is_valid_custom_transaction(edges):
+                        matching_edges = matching_edges + edges
+                        self._transaction_edges[k] = dict()
         #ret = [d2.values() for k, d2 in self._transaction_edges.iteritems()]
         #ret = []
         #self._transaction_edges = defaultdict(dict)
         return matching_edges
 
-    def get_valid_custom_transaction_edges(self):
-        return []
+    def is_valid_custom_transaction(self, edges_list):
+        begin_edge = edges_list[0]
+        validator = [v for v in self.dc.get_customer_validators() if v.__name__ == begin_edge.nonce][0]
+        return validator.is_valid(edges_list, self)
+
+    def is_custom_transaction(self, edges_list):
+        return len(edges_list) >= 1 and \
+            isinstance(edges_list[0], edges.BeginCustomTransaction)
+
+
+    #def get_valid_custom_transaction_edges(self):
+    #    return []
 
     def filter_valid_edges(self, edges_list):
         #print('filter_valid_edges edges_list=', edges_list)
@@ -100,9 +111,9 @@ class HistoryGraph(object):
         for edge in transaction_edges:
             self._transaction_edges[edge.transaction_hash][edge.get_end_node()] = edge
         transaction_edges = [edges for edges in self.get_valid_transaction_edges()]
-        custom_transaction_edges = [edges for edges in self.get_valid_custom_transaction_edges()]
+        #custom_transaction_edges = [edges for edges in self.get_valid_custom_transaction_edges()]
         #transaction_edges = [item for sublist in transaction_edges for item in sublist]
-        edges_list = edges_list + transaction_edges + custom_transaction_edges
+        edges_list = edges_list + transaction_edges# + custom_transaction_edges
         return [edge for edge in edges_list if all([v(edge, self) for v in validators])]
 
     def add_edges(self, edges_list):
@@ -275,7 +286,8 @@ class TransactionHistoryGraph(HistoryGraph):
         if custom_transaction is not None:
             #print('TransactionHistoryGraph adding custom transaction edge')
             begin_custom_transaction_edge = edges.BeginCustomTransaction({self.source_doc._clockhash},
-                '', '', '', '', source_doc.id, source_doc.__class__.__name__)
+                '', '', '', '', source_doc.id, source_doc.__class__.__name__,
+                custom_transaction.__name__)
             self._added_edges.append(begin_custom_transaction_edge)
 
     def add_edges(self, edges_list):
