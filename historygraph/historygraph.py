@@ -15,6 +15,7 @@ class HistoryGraph(object):
         self._edgesbyendnode = dict()
         self.isreplaying = False
         self.dc = None
+        self._transaction_edges = defaultdict(dict)
 
     def get_edges_by_end_node(self, clockhash):
         return self._edgesbyendnode[clockhash]
@@ -26,8 +27,21 @@ class HistoryGraph(object):
         # Return true iff we have this edge
         return clockhash in self._edgesbyendnode
 
+    def get_valid_transaction_edges(self):
+        ret = [d2.values() for k, d2 in self._transaction_edges.iteritems()]
+        self._transaction_edges = defaultdict(dict)
+        return ret
+
     def filter_valid_edges(self, edges_list):
         validators = self.dc.get_validators()
+        # Seperate out edges in a transaction for others
+        transaction_edges = [edge for edge in edges_list if edge.transaction_hash != '']
+        edges_list = [edge for edge in edges_list if edge.transaction_hash == '']
+        for edge in transaction_edges:
+            self._transaction_edges[edge.transaction_hash][edge.get_end_node()] = edge
+        transaction_edges = [edges for edges in self.get_valid_transaction_edges()]
+        transaction_edges = [item for sublist in transaction_edges for item in sublist]
+        edges_list = edges_list + transaction_edges
         return [edge for edge in edges_list if all([v(edge, self) for v in validators])]
 
     def add_edges(self, edges_list):

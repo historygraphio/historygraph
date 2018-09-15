@@ -142,3 +142,35 @@ class StandardTransactionValidationTestCase(unittest.TestCase):
         test.full_replay(edges)
 
         self.assertEqual(test.testcounter.get(), 3)
+
+    @unittest.expectedFailure
+    def test_incorrect_hash_transaction_is_rejected(self):
+        test = CounterTestContainer()
+        self.dc1.add_document_object(test)
+        test.testcounter.add(1)
+
+        last_edge = test.history.get_edges_by_end_node(test._clockhash)
+
+        edge1 = AddIntCounter({test._clockhash},
+                              last_edge.propertyownerid,
+                              last_edge.propertyname, 1,
+                              last_edge.propertytype, last_edge.documentid,
+                              last_edge.documentclassname, last_edge.nonce)
+        edge2 = AddIntCounter({test._clockhash},
+                              last_edge.propertyownerid,
+                              last_edge.propertyname, 1,
+                              last_edge.propertytype, last_edge.documentid,
+                              last_edge.documentclassname, last_edge.nonce)
+        edges = [ edge1, edge2 ]
+
+        transaction_hash = hashlib.sha256(','.join([str(edge.get_transaction_info_hash())
+            for edge in edges])).hexdigest()
+        for i in range(len(edges)):
+            edge = edges[i]
+            edge.transaction_hash = transaction_hash
+            if i > 0:
+                edge._start_hashes = [edges[i - 1].get_end_node()]
+
+        test.full_replay(edges)
+
+        self.assertEqual(test.testcounter.get(), 1)
