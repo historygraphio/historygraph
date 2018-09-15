@@ -283,6 +283,7 @@ class TransactionHistoryGraph(HistoryGraph):
         self.in_init = False
         self._added_edges = list()
         self._transaction_id = ''
+        self.custom_transaction = custom_transaction
         if custom_transaction is not None:
             #print('TransactionHistoryGraph adding custom transaction edge')
             begin_custom_transaction_edge = edges.BeginCustomTransaction({self.source_doc._clockhash},
@@ -314,6 +315,8 @@ class TransactionHistoryGraph(HistoryGraph):
         return self._added_edges[-1]
 
     def end_transaction(self):
+        if self.custom_transaction:
+            assert self.custom_transaction.is_valid(self._added_edges, self), "Transaction did not validate"
         cloned_edges_list = [e.clone() for e in self._edgesbyendnode.values()] + \
             [e.clone() for e in self._added_edges]
         #print('end_transaction cloned_edges_list=', cloned_edges_list)
