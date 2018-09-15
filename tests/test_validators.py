@@ -4,6 +4,8 @@ import unittest
 from .common import DocumentCollection, Covers, CounterTestContainer
 from historygraph.edges import SimpleProperty, AddIntCounter
 import hashlib
+import uuid
+
 
 class SimpleValidationTestCase(unittest.TestCase):
     def setUp(self):
@@ -124,7 +126,7 @@ class StandardTransactionValidationTestCase(unittest.TestCase):
                               last_edge.propertyname, 1,
                               last_edge.propertytype, last_edge.documentid,
                               last_edge.documentclassname, last_edge.nonce)
-        edge2 = AddIntCounter({test._clockhash},
+        edge2 = AddIntCounter({edge1.get_end_node()},
                               last_edge.propertyownerid,
                               last_edge.propertyname, 1,
                               last_edge.propertytype, last_edge.documentid,
@@ -155,12 +157,12 @@ class StandardTransactionValidationTestCase(unittest.TestCase):
                               last_edge.propertyownerid,
                               last_edge.propertyname, 1,
                               last_edge.propertytype, last_edge.documentid,
-                              last_edge.documentclassname, last_edge.nonce)
-        edge2 = AddIntCounter({test._clockhash},
+                              last_edge.documentclassname, str(uuid.uuid4()))
+        edge2 = AddIntCounter({edge1.get_end_node()},
                               last_edge.propertyownerid,
                               last_edge.propertyname, 1,
                               last_edge.propertytype, last_edge.documentid,
-                              last_edge.documentclassname, last_edge.nonce)
+                              last_edge.documentclassname, str(uuid.uuid4()))
         edges = [ edge1, edge2 ]
 
         transaction_hash = hashlib.sha256(','.join([str(edge.get_transaction_info_hash())
@@ -172,5 +174,42 @@ class StandardTransactionValidationTestCase(unittest.TestCase):
                 edge._start_hashes = [edges[i - 1].get_end_node()]
 
         test.full_replay(edges)
+
+        self.assertEqual(test.testcounter.get(), 1)
+
+    def test_missing_edge_is_rejected(self):
+        test = CounterTestContainer()
+        self.dc1.add_document_object(test)
+        test.testcounter.add(1)
+
+        last_edge = test.history.get_edges_by_end_node(test._clockhash)
+
+        edge1 = AddIntCounter({test._clockhash},
+                              last_edge.propertyownerid,
+                              last_edge.propertyname, 1,
+                              last_edge.propertytype, last_edge.documentid,
+                              last_edge.documentclassname, str(uuid.uuid4()))
+        edge2 = AddIntCounter({edge1.get_end_node()},
+                              last_edge.propertyownerid,
+                              last_edge.propertyname, 1,
+                              last_edge.propertytype, last_edge.documentid,
+                              last_edge.documentclassname, str(uuid.uuid4()))
+        edge3 = AddIntCounter({edge2.get_end_node()},
+                              last_edge.propertyownerid,
+                              last_edge.propertyname, 1,
+                              last_edge.propertytype, last_edge.documentid,
+                              last_edge.documentclassname, str(uuid.uuid4()))
+        edges = [ edge1, edge2, edge3 ]
+
+        transaction_hash = hashlib.sha256(','.join([str(edge.get_transaction_info_hash())
+            for edge in edges])).hexdigest()
+
+        for i in range(len(edges)):
+            edge = edges[i]
+            edge.transaction_hash = transaction_hash
+            if i > 0:
+                edge._start_hashes = [edges[i - 1].get_end_node()]
+
+        test.full_replay([ edge1, edge3 ])
 
         self.assertEqual(test.testcounter.get(), 1)

@@ -28,9 +28,28 @@ class HistoryGraph(object):
         return clockhash in self._edgesbyendnode
 
     def get_valid_transaction_edges(self):
-        ret = [d2.values() for k, d2 in self._transaction_edges.iteritems()]
-        self._transaction_edges = defaultdict(dict)
-        return ret
+        def is_continuous(edges):
+            # Return True iff the list of edges is a totally ordered set
+            start_hashes = {item for edge in edges for item in edge._start_hashes}
+            end_hashes = {edge.get_end_node() for edge in edges}
+            # For edges to be continous there must be one start hashes without an end hash
+            # and vice versa
+            if len(start_hashes - end_hashes) != 1:
+                return False
+            if len(end_hashes - start_hashes) != 1:
+                return False
+            return True
+
+        matching_edges = []
+        for k, d2 in self._transaction_edges.iteritems():
+            edges = d2.values()
+            if is_continuous(edges):
+                matching_edges = matching_edges + edges
+                self._transaction_edges[k] = dict()
+        #ret = [d2.values() for k, d2 in self._transaction_edges.iteritems()]
+        #ret = []
+        #self._transaction_edges = defaultdict(dict)
+        return matching_edges
 
     def filter_valid_edges(self, edges_list):
         validators = self.dc.get_validators()
@@ -40,7 +59,7 @@ class HistoryGraph(object):
         for edge in transaction_edges:
             self._transaction_edges[edge.transaction_hash][edge.get_end_node()] = edge
         transaction_edges = [edges for edges in self.get_valid_transaction_edges()]
-        transaction_edges = [item for sublist in transaction_edges for item in sublist]
+        #transaction_edges = [item for sublist in transaction_edges for item in sublist]
         edges_list = edges_list + transaction_edges
         return [edge for edge in edges_list if all([v(edge, self) for v in validators])]
 
