@@ -184,8 +184,9 @@ class HistoryGraph(object):
         l[0].record_past_edges(pastedges, self)
 
     def merge_graphs(self, graph):
-        for edge in graph.get_all_edges():
-            self.add_edges([edge])
+        #for edge in graph.get_all_edges():
+        #    self.add_edges([edge])
+        self.add_edges(graph.get_all_edges())
         self.process_graph()
 
     def process_graph(self):
