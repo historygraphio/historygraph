@@ -148,7 +148,7 @@ class HistoryGraph(object):
         # Return a copy of this HistoryGraph
         ret = HistoryGraph()
         ret.dc = self.dc
-        edgeclones = self.get_edges_clones()
+        edgeclones = self.get_all_edges()
         ret.add_edges(edgeclones)
         return ret
 
@@ -236,10 +236,6 @@ class HistoryGraph(object):
         else:
             return self.get_edges_by_end_node(_clockhash).depth(self)
 
-    def get_edges_clones(self):
-        # Return a list of clones of all of the edges
-        return [edge.clone() for edge in self.get_all_edges()]
-
     def is_in_transaction(self):
         return False
 
@@ -251,7 +247,7 @@ class FrozenHistoryGraph(HistoryGraph):
         self.source_historygraph = source_historygraph
         self.source_doc = source_doc
         self.in_init = True
-        edgeclones = self.get_edges_clones()
+        edgeclones = self.get_all_edges()
         self.add_edges(edgeclones)
         self.in_init = False
 
@@ -278,7 +274,7 @@ class TransactionHistoryGraph(HistoryGraph):
         self.source_doc = source_doc
         self.in_init = True
         self.custom_transaction = custom_transaction
-        edgeclones = self.source_historygraph.get_edges_clones()
+        edgeclones = self.source_historygraph.get_all_edges()
         self.dc = source_historygraph.dc
         super(TransactionHistoryGraph, self).add_edges(edgeclones)
         self.in_init = False
