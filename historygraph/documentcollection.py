@@ -11,6 +11,7 @@ from .document import Document
 from .immutableobject import ImmutableObject
 import hashlib
 import uuid
+import time
 
 class DocumentCollection(object):
     def __init__(self):
@@ -24,7 +25,7 @@ class DocumentCollection(object):
 
     def register(self, theclass):
         self.classes[theclass.__name__] = theclass
-        
+
 
     def get_all_edges(self):
         # Retreive all the edges for all of the documents in this dc
@@ -48,7 +49,7 @@ class DocumentCollection(object):
                             start_hash_2 = start_hashes[1]
                         else:
                             assert False
-                        
+
                         if edge.propertytype is None:
                             propertytypename = ""
                         else:
@@ -74,8 +75,12 @@ class DocumentCollection(object):
         historygraphdict = defaultdict(HistoryGraph)
         documentclassnamedict = dict()
 
+        print('load_from_json 1')
         rawdc = JSONDecoder().decode(jsontext)
         rows = rawdc["history"]
+
+        print('load_from_json 2 time=', time.time())
+
 
         for row in rows:
             # Loop over each record in the JSON array and build the appropriate edge
@@ -90,6 +95,7 @@ class DocumentCollection(object):
             propertyvaluestr = str(row[8])
             propertytypestr = str(row[9])
             nonce = str(row[10])
+            print('load_from_json 2.1 time=', time.time())
 
             if documentid in historygraphdict:
                 historygraph = historygraphdict[documentid]
@@ -108,6 +114,7 @@ class DocumentCollection(object):
                 propertyvalue = ""
             else:
                 propertyvalue = propertyvaluestr
+            print('load_from_json 2.2 time=', time.time())
             propertytype = propertytypestr
             documentclassnamedict[documentid] = documentclassname
             if start_hash_2 == "":
@@ -117,10 +124,16 @@ class DocumentCollection(object):
             edge = self.historyedgeclasses[edgeclassname](start_hashes, propertyownerid, propertyname,
                                                           propertyvalue, propertytype, documentid,
                                                           documentclassname, nonce)
+            print('load_from_json 2.3 time=', time.time())
             history = historygraphdict[documentid]
             history.add_edges([edge])
+            print('load_from_json 2.4 time=', time.time())
+
+        print('load_from_json 3 time=', time.time())
+
 
         for documentid in historygraphdict:
+            print('load_from_json 3 documentid=', documentid)
             # Merge the received historygraph edges in with the ones currently in the
             # database
             doc = None
@@ -130,6 +143,7 @@ class DocumentCollection(object):
                     if d2.id == documentid:
                         doc = d2
                         wasexisting = True
+            print('load_from_json 3.1 time=', time.time())
             if doc is None:
                 doc = self.classes[documentclassnamedict[documentid]](documentid)
                 doc.dc = self
@@ -138,21 +152,28 @@ class DocumentCollection(object):
             # Make a copy of self's history
             history = doc.history.clone()
             # Merge doc2's history
+            print('load_from_json 3.2 time=', time.time())
             history.merge_graphs(historygraphdict[documentid])
             has_start_edge = history.has_start_edge()
+            print('load_from_json 3.3 time=', time.time())
             if has_start_edge:
                 history.record_past_edges()
                 history.process_conflict_winners()
+            print('load_from_json 3.4 time=', time.time())
             # Create the target object and replay the history in to it
             doc.insetattr = True
             doc.history = history
             if has_start_edge:
                 history.replay(doc)
             doc.insetattr = False
+            print('load_from_json 3.5 time=', time.time())
 
             if not wasexisting:
                 self.add_document_object(doc)
-            
+            print('load_from_json 3.6 time=', time.time())
+
+        print('load_from_json 4 time=', time.time())
+
         rows = rawdc["immutableobjects"]
         for d in rows:
             # Loop over each immutable object and recreate it
@@ -169,8 +190,8 @@ class DocumentCollection(object):
                     wasexisting = True
             if wasexisting == False:
                 self.objects[classname][io.get_hash()] = io
-            
-       
+
+
     def get_by_class(self, theclass):
         return [obj for (objid, obj) in self.objects[theclass.__name__].iteritems()]
 
@@ -193,7 +214,7 @@ class DocumentCollection(object):
             l.document_object_added(self, obj)
 
     def add_immutable_object(self, obj):
-        # Add a newly created immutable object to the dc. 
+        # Add a newly created immutable object to the dc.
         assert isinstance(obj, ImmutableObject)
         assert obj.__class__.__name__  in self.classes
         self.objects[obj.__class__.__name__][obj.get_hash()] = obj
@@ -210,6 +231,3 @@ class DocumentCollection(object):
         # Inform the listeners that edges were added
         for l in self.listeners:
             l.edges_added(self, edges)
-        
-
-

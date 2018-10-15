@@ -47,9 +47,10 @@ class HistoryGraph(object):
         edgeclones = list()
         for k in self.edgesbyendnode:
             edge = self.edgesbyendnode[k]
-            edge2 = edge.clone()
-            edgeclones.append(edge2)
-            assert edge.get_end_node() == edge2.get_end_node(), 'Mismatch edge = ' + repr(edge.as_dict()) + ', edge2 = ' + repr(edge2.as_dict())
+            #edge2 = edge.clone()
+            #edgeclones.append(edge2)
+            edgeclones.append(edge)
+            #assert edge.get_end_node() == edge2.get_end_node(), 'Mismatch edge = ' + repr(edge.as_dict()) + ', edge2 = ' + repr(edge2.as_dict())
         ret.add_edges(edgeclones)
         return ret
 
@@ -86,9 +87,10 @@ class HistoryGraph(object):
         l[0].record_past_edges(pastedges, self)
 
     def merge_graphs(self, graph):
-        for k in graph.edgesbyendnode:
-            edge = graph.edgesbyendnode[k]
-            self.add_edges([edge])
+        #for k in graph.edgesbyendnode:
+        #    edge = graph.edgesbyendnode[k]
+        #    self.add_edges([edge])
+        self.add_edges(graph.edgesbyendnode.values())
         self.process_graph()
 
     def process_graph(self):
@@ -122,7 +124,7 @@ class HistoryGraph(object):
                 if k1 != k2:
                     if not edge2.has_past_edge(k1) and not edge1.has_past_edge(k2):
                         edge1.compare_for_conflicts(edge2)
-                        
+
     def has_dangling_edges(self):
         # A sanity check a graph has dangling edges if there is more than one endnode that does not have a start node
         # It means that a Merge needs to be run
@@ -132,13 +134,13 @@ class HistoryGraph(object):
 
     def get_all_edges(self):
         return [v for (k, v) in self.edgesbyendnode.iteritems()]
-        
+
     def depth(self, _clockhash):
         if _clockhash == '':
             return 0
         else:
             return self.edgesbyendnode[_clockhash].depth(self)
-        
+
 
 class FrozenHistoryGraph(HistoryGraph):
     # This subclass handles the case of a history graph that writes any new edges it receives
@@ -170,4 +172,3 @@ class FrozenHistoryGraph(HistoryGraph):
         self.source_historygraph.replay(self.source_doc)
         for l in self.source_doc.edgeslistener:
             l.edges_added(edges_list)
-
