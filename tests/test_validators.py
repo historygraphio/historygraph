@@ -140,6 +140,7 @@ class StandardTransactionValidationTestCase(unittest.TestCase):
         #print('test_success edges.get_transaction_info_hash=', ','.join([edge.get_transaction_info_hash() for edge in edges]))
         for i in range(len(edges)):
             edge = edges[i]
+            edge.clear_end_node_cache()
             edge.transaction_hash = transaction_hash
             if i > 0:
                 edge._start_hashes = [edges[i - 1].get_end_node()]

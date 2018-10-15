@@ -73,6 +73,8 @@ class Edge(object):
         return str(self.as_dict())
 
     def get_end_node(self):
+        if hasattr(self, '_end_node'):
+            return self._end_node
         # Get the end node value it is a SHA256 hash of our current contents
         start_hashes= list(self._start_hashes)
         start_hash_1 = start_hashes[0]
@@ -93,7 +95,8 @@ class Edge(object):
             "nonce",str(self.nonce),
             "transaction_hash", str(self.transaction_hash)
          )
-        return hashlib.sha256(str(s)).hexdigest()
+        self._end_node = hashlib.sha256(str(s)).hexdigest()
+        return self._end_node
 
     def as_tuple(self):
         # Return a tuple that represents the edge when it is turned in JSON
@@ -148,3 +151,8 @@ class Edge(object):
             "nonce",str(self.nonce),
          )
         return hashlib.sha256(str(s)).hexdigest()
+
+    def clear_end_node_cache(self):
+        #Todo remove this edges should be immutable
+        if hasattr(self, '_end_node'):
+            delattr(self, '_end_node')

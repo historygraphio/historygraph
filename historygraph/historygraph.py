@@ -304,6 +304,7 @@ class TransactionHistoryGraph(HistoryGraph):
         #print('add_edges type(transaction_id)=', type(transaction_id))
         for i in range(len(self._added_edges)):
             edge = self._added_edges[i]
+            edge.clear_end_node_cache()
             edge.transaction_hash = transaction_hash
             if i > 0:
                 edge._start_hashes = [self._added_edges[i - 1].get_end_node()]
