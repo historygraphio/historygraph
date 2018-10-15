@@ -12,12 +12,12 @@ class FrozenFunctionTestCase(unittest.TestCase):
         self.dc2.register(Covers)
 
     def test_frozen_function_basic(self):
-        test1 = Covers() 
+        test1 = Covers()
         self.dc1.add_document_object(test1)
         test1.covers = 1
         test2 = self.dc2.get_object_by_id(Covers.__name__, test1.id)
         self.dc2.freeze_dc_comms()
-        
+
         test1.covers = 2
         test2.covers = 3
         self.assertEqual(test1.covers, 2)
@@ -28,6 +28,24 @@ class FrozenFunctionTestCase(unittest.TestCase):
         self.assertEqual(frozen_test1.covers, 2)
         # The unfrozen version should be normal
         self.assertEqual(test1.covers, 3)
+
+    def test_frozen_function_basic_back_to_main(self):
+        test1 = Covers()
+        self.dc1.add_document_object(test1)
+        test1.covers = 1
+
+        test1.covers = 2
+        self.assertEqual(test1.covers, 2)
+        frozen_test1 = test1.frozen()
+        self.assertNotEqual(frozen_test1, test1)
+        self.assertNotEqual(frozen_test1, self.dc1.get_object_by_id(Covers.__name__, test1.id))
+        self.assertEqual(frozen_test1.covers, 2)
+        frozen_test1.covers = 3
+        # Test is pushed back into main
+        self.assertEqual(frozen_test1.covers, 3)
+        test1.covers = 4
+        # Test main cannot push into frozen
+        self.assertEqual(frozen_test1.covers, 3)
 
 
 class FrozenFunctionCollectionsTestCase(unittest.TestCase):
@@ -80,4 +98,3 @@ class FrozenFunctionCollectionsTestCase(unittest.TestCase):
         for po2 in frozen_test2.propertyowner2s:
             self.assertEqual(po2.__class__.__name__ , TestPropertyOwner2.__name__)
             self.assertEqual(po2.cover, 1)
-
