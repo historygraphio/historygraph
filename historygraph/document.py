@@ -41,6 +41,8 @@ class Document(DocumentObject):
             edge = edges.AddListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         elif changetype == ChangeType.REMOVE_LISTITEM:
             edge = edges.RemoveListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
+        elif changetype == ChangeType.DELETE_DOCUMENT_OBJECT:
+            edge = edges.DeleteDocumentObject(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         else:
             assert False
         self.history.dc = self.dc

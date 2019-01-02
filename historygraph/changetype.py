@@ -8,5 +8,6 @@ class ChangeType(object):
     ADD_CHILD = 1
     REMOVE_CHILD = 2
     ADD_INT_COUNTER = 3
-    ADD_LISTITEM = 4 
-    REMOVE_LISTITEM = 5 
+    ADD_LISTITEM = 4
+    REMOVE_LISTITEM = 5
+    DELETE_DOCUMENT_OBJECT = 6

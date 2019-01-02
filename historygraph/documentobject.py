@@ -18,7 +18,7 @@ class DocumentObject(object):
                 for obj in prop:
                     retlist.add(obj.clone())
         return ret
-    
+
     def __init__(self, id=None):
         self.insetattr = True
         self.dc = None
@@ -35,8 +35,9 @@ class DocumentObject(object):
             self._field[k] = var
             if isinstance(var, fields.Field):
                 setattr(self, k, var.create_instance(self, k))
+        self._is_deleted = False
         self.insetattr = False
-        
+
     def __setattr__(self, name, value):
         # Handle setting an attribute and building the HistoryGraph edge that represents it
         super(DocumentObject, self).__setattr__(name, value)
@@ -50,7 +51,7 @@ class DocumentObject(object):
         self.insetattr = False
         for h in self.change_handlers:
             h(self)
-         
+
     def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
         # If we are just a document object cascade the changes up to the parent
         if self.parent is not None:
@@ -79,3 +80,6 @@ class DocumentObject(object):
     def remove_handler(self, h):
         self.change_handlers.remove(h)
 
+    def delete(self):
+        self._is_deleted = True
+        self.was_changed(ChangeType.DELETE_DOCUMENT_OBJECT, '', '', self.id, '')

@@ -72,7 +72,8 @@ class DocumentCollection(object):
     def as_json(self):
         # Encode the entire dc in a form suitable to send over the internet
         (historyedges, immutableobjects) = self.get_all_edges()
-        return JSONEncoder().encode({"history":historyedges,"immutableobjects":immutableobjects})
+        return JSONEncoder().encode({"history":historyedges,
+                                     "immutableobjects":immutableobjects})
 
     def load_from_json(self, jsontext):
         # Load the sent edges as JSON. This will handle full or partial
@@ -180,7 +181,9 @@ class DocumentCollection(object):
 
 
     def get_by_class(self, theclass):
-        return [obj for (objid, obj) in self.objects[theclass.__name__].iteritems()]
+        return [obj for (objid, obj) in
+                self.objects[theclass.__name__].iteritems()
+                if obj._is_deleted is False]
 
     def add_document_object(self, obj):
         # Add a newly created document object to the dc. This function needs to be called
@@ -213,6 +216,9 @@ class DocumentCollection(object):
 
     def get_object_by_id(self, classname, id):
         return self.objects[classname][id]
+
+    def has_object_by_id(self, classname, id):
+        return id in self.objects[classname]
 
     def edges_added(self, edges):
         # Inform the listeners that edges were added
