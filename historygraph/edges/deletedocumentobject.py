@@ -17,9 +17,8 @@ class DeleteDocumentObject(Edge):
         self.propertytype = propertytype
 
     def replay(self, doc):
-        #assert False
         # Create the document object if it does not already exist
-        objid = self.propertyvalue
+        objid = self.propertyownerid
         if doc.dc.has_object_by_id(self.documentclassname, objid):
             obj = doc.dc.get_object_by_id(self.documentclassname, objid)
             obj._is_deleted = True

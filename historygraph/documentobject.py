@@ -82,4 +82,4 @@ class DocumentObject(object):
 
     def delete(self):
         self._is_deleted = True
-        self.was_changed(ChangeType.DELETE_DOCUMENT_OBJECT, '', '', self.id, '')
+        self.was_changed(ChangeType.DELETE_DOCUMENT_OBJECT, self.id, '', '', '')
