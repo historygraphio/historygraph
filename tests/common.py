@@ -84,3 +84,12 @@ class TestPropertyOwner1(Document):
     def was_changed(self, changetype, propertyowner, propertyname, propertyvalue, propertytype):
         super(TestPropertyOwner1, self).was_changed(changetype, propertyowner, propertyname, propertyvalue, propertytype)
         self.bWasChanged = True
+
+
+class TestFieldListOwner2(DocumentObject):
+    cover = fields.IntRegister()
+    quantity = fields.IntRegister()
+
+class TestFieldListOwner1(Document):
+    covers = fields.IntRegister()
+    propertyowner2s = fields.List(TestFieldListOwner2)

@@ -46,7 +46,7 @@ class List(Field):
                 self._listnodes.append(added_node)
             if hasattr(self, "_rendered_list"):
                 delattr(self, "_rendered_list")
-                
+
             self.was_changed(ChangeType.ADD_LISTITEM, self.parent.id, self.name, JSONEncoder().encode((obj.id, added_node.id,
                              added_node.parent, added_node.timestamp, added_node.data)), obj.__class__.__name__)
 
@@ -67,6 +67,14 @@ class List(Field):
                     return
             assert False
 
+        def remove_by_objid(self, objid):
+            # We have an id remove the object. Usually from replaying an edge
+            for node in self._listnodes:
+                if node.obj.id == objid:
+                    self.remove_by_node(node)
+                    return
+            assert False
+
         def remove_by_node(self, node):
             # Find the given node and remove it
             obj = node.obj
@@ -76,7 +84,7 @@ class List(Field):
 
             obj = self.parent.get_document().documentobjects[obj.id]
             del self.parent.get_document().documentobjects[obj.id]
-            self.was_changed(ChangeType.REMOVE_LISTITEM, self.parent.id, self.name, node.id, obj.__class__.__name__)            
+            self.was_changed(ChangeType.REMOVE_LISTITEM, self.parent.id, self.name, node.id, obj.__class__.__name__)
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             # TODO: Possible balloonian function
@@ -129,7 +137,7 @@ class List(Field):
         def get_document(self):
             #Return the document
             return self.parent.get_document()
-            
+
 
 
     def __init__(self, theclass):

@@ -1,7 +1,9 @@
 from __future__ import absolute_import, unicode_literals, print_function
 
 import unittest
-from .common import DocumentCollection, CounterTestContainer, Covers, TestPropertyOwner2, TestPropertyOwner1
+from .common import (DocumentCollection, CounterTestContainer, Covers,
+                     TestPropertyOwner2, TestPropertyOwner1,
+                     TestFieldListOwner2, TestFieldListOwner1)
 from historygraph import DocumentObject
 from historygraph import Document
 from historygraph import fields
@@ -944,15 +946,6 @@ class FieldListFunctionsTestCase(unittest.TestCase):
         self.assertEqual(len(flImpl._listnodes), 0)
         self.assertEqual(len(flImpl._tombstones), 0)
         self.assertFalse(hasattr(flImpl, "_rendered_list"))
-
-
-class TestFieldListOwner2(DocumentObject):
-    cover = fields.IntRegister()
-    quantity = fields.IntRegister()
-
-class TestFieldListOwner1(Document):
-    covers = fields.IntRegister()
-    propertyowner2s = fields.List(TestFieldListOwner2)
 
 
 class FieldListMergeTestCase(unittest.TestCase):
