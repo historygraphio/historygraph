@@ -17,6 +17,7 @@ class DocumentObject(object):
                 retlist.empty()
                 for obj in prop:
                     retlist.add(obj.clone())
+        ret._is_deleted = self._is_deleted
         return ret
 
     def __init__(self, id=None):
@@ -83,3 +84,6 @@ class DocumentObject(object):
     def delete(self):
         self._is_deleted = True
         self.was_changed(ChangeType.DELETE_DOCUMENT_OBJECT, self.id, '', '', '')
+
+    def get_is_deleted(self):
+        return self._is_deleted

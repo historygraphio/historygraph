@@ -17,6 +17,8 @@ class DeleteDocumentObject(Edge):
         self.propertytype = propertytype
 
     def replay(self, doc):
+        if self.inactive:
+            return
         # Create the document object if it does not already exist
         objid = self.propertyownerid
         if doc.dc.has_object_by_id(self.documentclassname, objid):
@@ -32,4 +34,8 @@ class DeleteDocumentObject(Edge):
     def get_conflict_winner(self, edge2):
         # Deleting a document object always loses a conflict with anything
         # other than another deletion (which is a draw)
-        return 0 # Not correctly implemented correctly
+        if self.propertyownerid != edge2.propertyownerid:
+            return 0
+        if isinstance(edge2, DeleteDocumentObject):
+            return 0 # Deletion edges never conflict
+        return 1 # The other edge always wins

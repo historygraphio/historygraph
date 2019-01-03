@@ -43,12 +43,16 @@ class Edge(object):
         return past_edge_id in self.pastedges
 
     def compare_for_conflicts(self, edge2):
-	    if (self.__class__ != edge2.__class__):
-		    return; #Different edge types can never conflict
+	    from .deletedocumentobject import DeleteDocumentObject
 	    if (self.inactive or edge2.inactive):
 		    return; #Inactive edges can never conflict with active edges
+	    if self.__class__ != DeleteDocumentObject and edge2.__class__ != DeleteDocumentObject and self.__class__ != edge2.__class__:
+		    return #Different edge types can never conflict except for deletion edges
         # Determine the conflict loser and mark it as inactive
-	    conflictwinner = self.get_conflict_winner(edge2)
+	    if edge2.__class__ == DeleteDocumentObject:
+	        conflictwinner = -1 * edge2.get_conflict_winner(self)
+	    else:
+	        conflictwinner = self.get_conflict_winner(edge2)
 	    assert conflictwinner == -1 or conflictwinner == 0 or conflictwinner == 1
 	    if conflictwinner == 1:
 	        self.inactive = True

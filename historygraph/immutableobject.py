@@ -10,7 +10,7 @@ import hashlib
 
 
 class ImmutableObject(object):
-    
+
     def __init__(self, **kwargs):
         # Initialise the immutable object from the kwargs. It can never be changed once initialise
         self.insetup = True
@@ -25,9 +25,9 @@ class ImmutableObject(object):
                 if k in kwargs:
                     setattr(self, k, kwargs[k])
         self._prevhash = kwargs['_prevhash'] if '_prevhash' in kwargs else ''
-            
+
         self.insetup = False
-        
+
     def __setattr__(self, name, value):
         if name == "insetup":
             super(ImmutableObject, self).__setattr__(name, value)
@@ -42,7 +42,7 @@ class ImmutableObject(object):
         s = sorted([(k,str(getattr(self, k))) for (k,v) in self._field.iteritems()], key=itemgetter(0)) + [('_prevhash', str(self._prevhash))]
 
         return hashlib.sha256(str(s)).hexdigest()
-        
+
     def as_dict(self):
         #Return a dict suitable for transport
         ret = dict()
@@ -52,3 +52,7 @@ class ImmutableObject(object):
         ret["classname"] = self.__class__.__name__
         ret["hash"] = self.get_hash()
         return ret
+
+    def get_is_deleted(self):
+        return False
+        

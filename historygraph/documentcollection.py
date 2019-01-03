@@ -183,7 +183,7 @@ class DocumentCollection(object):
     def get_by_class(self, theclass):
         return [obj for (objid, obj) in
                 self.objects[theclass.__name__].iteritems()
-                if obj._is_deleted is False]
+                if obj.get_is_deleted() is False]
 
     def add_document_object(self, obj):
         # Add a newly created document object to the dc. This function needs to be called

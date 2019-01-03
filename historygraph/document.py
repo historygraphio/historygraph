@@ -70,6 +70,7 @@ class Document(DocumentObject):
         return self
 
     def add_edges(self, edges_list):
+        print('add_edges called')
         # Add the passed in edges to the historygraph for this documentt
         #TODO: This appear to be obsolete code left left from the old freeze function
         #if self.isfrozen:
@@ -157,6 +158,7 @@ class Document(DocumentObject):
     def clean(self):
         for (propname, prop) in self._field.items():
             prop.clean(self, propname)
+        self._is_deleted = False
 
     def depth(self):
         # Calculate the depth of the graph (number of steps back to the start)
