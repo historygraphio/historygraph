@@ -4,7 +4,9 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 
 class Field(object):
-    pass
+    def cascade_delete(self, owner, name):
+        # The owning object is being deleted cascade onto it's children
+        pass
 
 
 from .intregister import IntRegister
@@ -13,5 +15,3 @@ from .charregister import CharRegister
 from .intcounter import IntCounter
 from .list import List
 from .floatregister import FloatRegister
-
-

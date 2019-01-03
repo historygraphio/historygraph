@@ -12,6 +12,7 @@ class DocumentObject(object):
         ret = self.__class__(self.id)
         ret.copy_document_object(self)
         for prop in self._field:
+            #TODO: There should be a similar test for field.List members
             if isinstance(prop, fields.Collection):
                 retlist = ret.getattr(prop.name)
                 retlist.empty()
@@ -83,10 +84,16 @@ class DocumentObject(object):
         self.change_handlers.remove(h)
 
     def delete(self):
+        # Mark as deleted
         self._is_deleted = True
         self.was_changed(ChangeType.DELETE_DOCUMENT_OBJECT, self.id, '', '', '')
+        # If we have a parent remove ourselves from any collections or lists
         if self.parent:
             self.parent.remove_by_objid(self.id)
+        # If we have any children cascade this deletion to them
+        for k, v in self._field.iteritems():
+            v.cascade_delete(self, k)
+
 
     def get_is_deleted(self):
         return self._is_deleted
