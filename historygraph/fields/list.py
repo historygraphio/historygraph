@@ -138,6 +138,10 @@ class List(Field):
             #Return the document
             return self.parent.get_document()
 
+        def _cascade_delete(self):
+            doc = self.parent.get_document()
+            for item in self:
+                item.delete()
 
 
     def __init__(self, theclass):
@@ -151,3 +155,6 @@ class List(Field):
 
     def clean(self, owner, name):
         return getattr(owner, name).clean()
+
+    def cascade_delete(self, owner, name):
+        getattr(owner, name)._cascade_delete()
