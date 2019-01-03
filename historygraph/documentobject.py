@@ -73,7 +73,8 @@ class DocumentObject(object):
 
     def __str__(self):
         # Return a string representation which is useful for debugging
-        return '\n'.join([str(k) + ':' + str(getattr(self, k)) for k in self._field])
+        return '\n'.join([str(k) + ':' + str(getattr(self, k)) for k in
+                          self._field])
 
     def add_handler(self, h):
         self.change_handlers.append(h)
@@ -84,6 +85,8 @@ class DocumentObject(object):
     def delete(self):
         self._is_deleted = True
         self.was_changed(ChangeType.DELETE_DOCUMENT_OBJECT, self.id, '', '', '')
+        if self.parent:
+            self.parent.remove_by_objid(self.id)
 
     def get_is_deleted(self):
         return self._is_deleted

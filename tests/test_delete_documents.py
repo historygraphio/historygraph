@@ -10,8 +10,10 @@ class TestDeletion(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()
         self.dc1.register(TestPropertyOwner1)
+        self.dc1.register(TestPropertyOwner2)
         self.dc2 = DocumentCollection(master=self.dc1)
         self.dc2.register(TestPropertyOwner1)
+        self.dc2.register(TestPropertyOwner2)
 
     def test_simple_deletion(self):
         test = TestPropertyOwner1()
@@ -100,3 +102,32 @@ class TestDeletion(unittest.TestCase):
         test1s = self.dc1.get_by_class(TestPropertyOwner1)
         self.assertEqual(len(test1s), 1)
         self.assertEqual(test1s[0].covers, 18)
+
+    def test_simple_deletion_child_in_collection(self):
+        test = TestPropertyOwner1()
+        self.dc1.add_document_object(test)
+        test.covers = 17
+        testitem = TestPropertyOwner2()
+        test.propertyowner2s.add(testitem)
+        self.dc1.add_document_object(testitem)
+        testitem.cover = 1
+        self.assertEqual(testitem._is_deleted, False)
+        test1s2 = self.dc1.get_by_class(TestPropertyOwner2)
+        self.assertEqual(len(test1s2), 1)
+        self.assertEqual(testitem.cover, test1s2[0].cover)
+
+        self.dc2.freeze_dc_comms()
+        test1s = self.dc2.get_by_class(TestPropertyOwner1)
+        self.assertEqual(len(test1s), 1)
+        self.assertEqual(len(test1s[0].propertyowner2s), 1)
+        for testitem2 in test1s[0].propertyowner2s:
+            self.assertEqual(testitem.cover, testitem2.cover)
+
+        testitem.delete()
+        self.assertEqual(testitem._is_deleted, True)
+        test1 = self.dc1.get_by_class(TestPropertyOwner1)[0]
+        self.assertEqual(len(test1.propertyowner2s), 0)
+
+        self.dc2.unfreeze_dc_comms()
+        test2 = self.dc2.get_by_class(TestPropertyOwner1)[0]
+        self.assertEqual(len(test2.propertyowner2s), 0)

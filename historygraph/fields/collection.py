@@ -29,7 +29,10 @@ class Collection(Field):
             self.l.remove(objid)
             obj = self.parent.get_document().documentobjects[objid]
             del self.parent.get_document().documentobjects[objid]
-            self.was_changed(ChangeType.REMOVE_CHILD, self.parent.id, self.name, objid, obj.__class__.__name__)            
+            self.was_changed(ChangeType.REMOVE_CHILD, self.parent.id, self.name, objid, obj.__class__.__name__)
+
+        def remove_by_objid(self, objid):
+            self.remove(objid)
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             # TODO: Possible balloonian function

@@ -24,6 +24,8 @@ class DeleteDocumentObject(Edge):
         if doc.dc.has_object_by_id(self.documentclassname, objid):
             obj = doc.dc.get_object_by_id(self.documentclassname, objid)
             obj._is_deleted = True
+            if obj.parent:
+                obj.parent.remove_by_objid(objid)
 
     def clone(self):
         return DeleteDocumentObject(self._start_hashes,
