@@ -67,15 +67,15 @@ class List(Field):
                     return
             assert False
 
-        def remove_by_objid(self, objid):
+        def remove_by_objid(self, objid, create_edge=True):
             # We have an id remove the object. Usually from replaying an edge
             for node in self._listnodes:
                 if node.obj.id == objid:
-                    self.remove_by_node(node)
+                    self.remove_by_node(node, create_edge=create_edge)
                     return
             assert False
 
-        def remove_by_node(self, node):
+        def remove_by_node(self, node, create_edge=True):
             # Find the given node and remove it
             obj = node.obj
             self._tombstones.add(node.id)
@@ -84,7 +84,9 @@ class List(Field):
 
             obj = self.parent.get_document().documentobjects[obj.id]
             del self.parent.get_document().documentobjects[obj.id]
-            self.was_changed(ChangeType.REMOVE_LISTITEM, self.parent.id, self.name, node.id, obj.__class__.__name__)
+            if create_edge:
+                self.was_changed(ChangeType.REMOVE_LISTITEM, self.parent.id,
+                    self.name, node.id, obj.__class__.__name__)
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             # TODO: Possible balloonian function

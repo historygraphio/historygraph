@@ -229,3 +229,48 @@ class TestDeletion(unittest.TestCase):
         self.dc2.unfreeze_dc_comms()
         test2s = self.dc2.get_by_class(TestFieldListOwner1)
         self.assertEqual(len(test2s), 0)
+
+    def test_deletion_ancestor_conflict(self):
+        # deletion should lose every conflict where an operation is performed
+        # on one of it descendents
+        test = TestPropertyOwner1()
+        self.dc1.add_document_object(test)
+        test.covers = 17
+        self.assertEqual(test._is_deleted, False)
+        testitem = TestPropertyOwner2()
+        test.propertyowner2s.add(testitem)
+        self.dc1.add_document_object(testitem)
+        testitem.cover = 1
+        test1s = self.dc1.get_by_class(TestPropertyOwner1)
+        self.assertEqual(len(test1s), 1)
+        self.assertEqual(test.covers, test1s[0].covers)
+
+        self.dc2.freeze_dc_comms()
+        test1s = self.dc2.get_by_class(TestPropertyOwner1)
+        self.assertEqual(len(test1s), 1)
+        self.assertEqual(test.covers, test1s[0].covers)
+        self.assertEqual(len(test1s[0].propertyowner2s), 1)
+
+        for testitem in test1s[0].propertyowner2s:
+            testitem.cover = 6
+        #self.assertNotEqual(test.propertyowner2s[0].cover,
+        #                    test1s[0].propertyowner2s[0].cover)
+
+        test.delete()
+        self.assertEqual(test._is_deleted, True)
+        test1s = self.dc1.get_by_class(TestPropertyOwner1)
+        self.assertEqual(len(test1s), 0)
+
+        self.dc2.unfreeze_dc_comms()
+        test1s = self.dc2.get_by_class(TestPropertyOwner1)
+        self.assertEqual(len(test1s), 1)
+        self.assertEqual(len(test1s[0].propertyowner2s), 1)
+        for testitem in test1s[0].propertyowner2s:
+            self.assertEqual(testitem.cover, 6)
+
+        test1s = self.dc1.get_by_class(TestPropertyOwner1)
+        self.assertEqual(len(test1s), 1)
+        self.assertEqual(len(test1s[0].propertyowner2s), 1)
+        #self.assertEqual(test1s[0].propertyowner2s[0].cover, 6)
+        for testitem in test1s[0].propertyowner2s:
+            self.assertEqual(testitem.cover, 6)

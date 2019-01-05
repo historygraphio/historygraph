@@ -29,5 +29,5 @@ class BeginCustomTransaction(Edge):
     #    #Return a description of the edgeuseful for debugging purposes
     #    return "Edge type = " + self.__class__.__name__ + " edgeid = " + self.edgeid + " start nodes = " + str(self._start_hashes) + " end node = " + self.endnode
 
-    def get_conflict_winner(self, edge2):
+    def get_conflict_winner(self, edge2, doc_obj_heirachy):
         return 0 #Merge edges can never conflict with anything

@@ -32,7 +32,7 @@ class SimpleProperty(Edge):
                 self.propertytype, self.documentid, self.documentclassname,
                 self.nonce, self.transaction_hash)
 
-    def get_conflict_winner(self, edge2):
+    def get_conflict_winner(self, edge2, doc_obj_heirachy):
         # For a numeric register the maximum value is the conflict winner
         # For a character register the minimum value is the conflict winner
         if self.propertyownerid != edge2.propertyownerid:

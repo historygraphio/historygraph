@@ -24,15 +24,16 @@ class Collection(Field):
             self.parent.get_document().documentobjects[obj.id] = obj
             self.was_changed(ChangeType.ADD_CHILD, self.parent.id, self.name, obj.id, obj.__class__.__name__)
 
-        def remove(self, objid):
+        def remove(self, objid, create_edge=True):
             assert isinstance(objid, basestring)
             self.l.remove(objid)
             obj = self.parent.get_document().documentobjects[objid]
             del self.parent.get_document().documentobjects[objid]
-            self.was_changed(ChangeType.REMOVE_CHILD, self.parent.id, self.name, objid, obj.__class__.__name__)
+            if create_edge:
+                self.was_changed(ChangeType.REMOVE_CHILD, self.parent.id, self.name, objid, obj.__class__.__name__)
 
-        def remove_by_objid(self, objid):
-            self.remove(objid)
+        def remove_by_objid(self, objid, create_edge=True):
+            self.remove(objid, create_edge)
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             # TODO: Possible balloonian function
@@ -67,7 +68,7 @@ class Collection(Field):
         def _cascade_delete(self):
             doc = self.parent.get_document()
             for item in set(self.l):
-                doc.documentobjects[item].delete()
+                doc.documentobjects[item].delete(create_edge=False)
 
     def __init__(self, theclass):
         self.theclass = theclass

@@ -25,7 +25,8 @@ class AddChild(Edge):
             doc.documentobjects[newobj.id] = newobj
         else:
             newobj = doc.documentobjects[objid]
-        if isinstance(self, AddChild) and self.propertyownerid == "" and self.propertyname == "":
+        if isinstance(self, AddChild) and self.propertyownerid == "" and \
+           self.propertyname == "":
             pass #There is no parent object and this edge is creating a stand alone object
         else:
             if doc.has_document_object(self.propertyownerid):
@@ -39,5 +40,11 @@ class AddChild(Edge):
             self.propertytype, self.documentid, self.documentclassname,
             self.nonce, self.transaction_hash)
 
-    def get_conflict_winner(self, edge2):
+    def get_conflict_winner(self, edge2, doc_obj_heirachy):
         return 0 #There can never be a conflict because all edges are new
+
+    def get_heirachy_update(self):
+        # Return a dict of the heirachy change made by this edge
+        # key = the id of this object
+        # value = the id of the parent
+        return {self.propertyvalue: self.propertyownerid}

@@ -35,7 +35,7 @@ class AddIntCounter(Edge):
                 self.propertyownerid, self.propertyname, self.propertyvalue,
                 self.propertytype, self.documentid, self.documentclassname, self.nonce, self.transaction_hash)
 
-    def get_conflict_winner(self, edge2):
+    def get_conflict_winner(self, edge2, doc_obj_heirachy):
         return 0 # Counter CRDT edges can never conflict
 
     #def get_edge_description(self):

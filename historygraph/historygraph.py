@@ -207,6 +207,14 @@ class HistoryGraph(object):
                 self.process_graph()
 
     def process_conflict_winners(self):
+        # Iterate over the graph every time a child is added record the
+        # parent the DeleteDocumentObject edge need to navigate the structure
+        # of the document
+        doc_obj_heirachy = dict()
+        for edge in self.get_all_edges():
+            hu = edge.get_heirachy_update()
+            doc_obj_heirachy.update(hu)
+        doc_obj_heirachy.update({edge.documentid: ''})
         # Iterate over the graph and look for conflict and determine the winners
         for edge in self.get_all_edges():
             edge.inactive = False
@@ -217,7 +225,7 @@ class HistoryGraph(object):
 
                 if k1 != k2:
                     if not edge2.has_past_edge(k1) and not edge1.has_past_edge(k2):
-                        edge1.compare_for_conflicts(edge2)
+                        edge1.compare_for_conflicts(edge2, doc_obj_heirachy)
 
     def has_dangling_edges(self):
         # A sanity check a graph has dangling edges if there is more than one endnode that does not have a start node

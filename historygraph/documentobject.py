@@ -83,13 +83,14 @@ class DocumentObject(object):
     def remove_handler(self, h):
         self.change_handlers.remove(h)
 
-    def delete(self):
+    def delete(self, create_edge=True):
         # Mark as deleted
         self._is_deleted = True
-        self.was_changed(ChangeType.DELETE_DOCUMENT_OBJECT, self.id, '', '', '')
+        if create_edge:
+            self.was_changed(ChangeType.DELETE_DOCUMENT_OBJECT, self.id, '', '', '')
         # If we have a parent remove ourselves from any collections or lists
-        if self.parent:
-            self.parent.remove_by_objid(self.id)
+        if self.parent is not None and hasattr(self.parent, 'remove_by_objid'):
+            self.parent.remove_by_objid(self.id, create_edge=False)
         # If we have any children cascade this deletion to them
         for k, v in self._field.iteritems():
             v.cascade_delete(self, k)
