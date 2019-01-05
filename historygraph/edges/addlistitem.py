@@ -60,4 +60,6 @@ class AddListItem(Edge):
         # Return a dict of the heirachy change made by this edge
         # key = the id of this object
         # value = the id of the parent
-        return {self.propertyvalue: self.propertyownerid}
+        (objid, added_node_id, added_node_parent, added_node_timestamp,
+            added_node_data) = JSONDecoder().decode(self.propertyvalue)
+        return {objid: self.propertyownerid}
