@@ -111,6 +111,9 @@ class DocumentCollection(object):
             elif propertytypestr == "basestring":
                 propertytype = basestring
                 propertyvalue = str(propertyvaluestr)
+            elif propertytypestr == "boolean":
+                propertytype = bool
+                propertyvalue = propertyvaluestr == "True"
             elif propertytypestr == "" and edgeclassname == "Merge":
                 propertytype = None
                 propertyvalue = ""

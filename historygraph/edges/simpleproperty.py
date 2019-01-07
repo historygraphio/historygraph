@@ -11,7 +11,8 @@ class SimpleProperty(Edge):
         super(SimpleProperty, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_hash)
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
-        assert propertytype == 'int' or propertytype == 'basestring' or propertytype == 'float'
+        assert propertytype == 'int' or propertytype == 'basestring' or \
+            propertytype == 'float' or propertytype == 'boolean'
         self.propertyownerid = propertyownerid
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
@@ -24,7 +25,8 @@ class SimpleProperty(Edge):
             # Is needed if the document object has been deleted somewhere else
             edgeobject = doc.get_document_object(self.propertyownerid)
             field = edgeobject._field[self.propertyname]
-            setattr(edgeobject, self.propertyname, field.translate_from_string(self.propertyvalue))
+            setattr(edgeobject, self.propertyname,
+                field.translate_from_string(self.propertyvalue))
 
     def clone(self):
         return SimpleProperty(self._start_hashes,
@@ -33,8 +35,10 @@ class SimpleProperty(Edge):
                 self.nonce, self.transaction_hash)
 
     def get_conflict_winner(self, edge2, doc_obj_heirachy):
+        # TODO: Do these comparisions in a more OOP way
         # For a numeric register the maximum value is the conflict winner
         # For a character register the minimum value is the conflict winner
+        # For a boolean a True value is the winner
         if self.propertyownerid != edge2.propertyownerid:
             return 0
         if self.propertyname != edge2.propertyname:
@@ -51,6 +55,11 @@ class SimpleProperty(Edge):
                 return 1
         elif self.propertytype == "float":
             if float(self.propertyvalue) > float(edge2.propertyvalue):
+                return -1
+            else:
+                return 1
+        elif self.propertytype == "boolean":
+            if self.propertyvalue == True:
                 return -1
             else:
                 return 1
