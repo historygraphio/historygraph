@@ -93,3 +93,6 @@ class TestFieldListOwner2(DocumentObject):
 class TestFieldListOwner1(Document):
     covers = fields.IntRegister()
     propertyowner2s = fields.List(TestFieldListOwner2)
+
+class FloatCounterTestContainer(Document):
+    testcounter = fields.FloatCounter()

@@ -16,3 +16,4 @@ from .intcounter import IntCounter
 from .list import List
 from .floatregister import FloatRegister
 from .booleanregister import BooleanRegister
+from .floatcounter import FloatCounter

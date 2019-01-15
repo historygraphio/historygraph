@@ -5,8 +5,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 from . import Field
 from ..changetype import ChangeType
 
-class IntCounter(Field):
-    class _FieldIntCounterImpl(object):
+class FloatCounter(Field):
+    class _FieldFloatCounterImpl(object):
         # This implementation class is what actually get attacted to the document object to implement the required
         # behaviour
         def __init__(self, owner, name):
@@ -16,11 +16,11 @@ class IntCounter(Field):
 
         def add(self, change):
             self.value += change
-            self.was_changed(ChangeType.ADD_INT_COUNTER, self.parent.id, self.name, change, "IntCounter")
+            self.was_changed(ChangeType.ADD_FLOAT_COUNTER, self.parent.id, self.name, change, "FloatCounter")
 
         def subtract(self, change):
             self.value -= change
-            self.was_changed(ChangeType.ADD_INT_COUNTER, self.parent.id, self.name, -change, "IntCounter")
+            self.was_changed(ChangeType.ADD_FLOAT_COUNTER, self.parent.id, self.name, -change, "FloatCounter")
 
         def get(self):
             return self.value
@@ -32,7 +32,7 @@ class IntCounter(Field):
                 self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
         def clone(self, owner, name):
-            ret = IntCounter._FieldIntCounterImpl(self.parent, self.name)
+            ret = FloatCounter._FieldFloatCounterImpl(self.parent, self.name)
             ret.value = self.value
             return ret
 
@@ -41,13 +41,13 @@ class IntCounter(Field):
 
 
     def create_instance(self, owner, name):
-        return IntCounter._FieldIntCounterImpl(owner, name)
+        return FloatCounter._FieldFloatCounterImpl(owner, name)
 
     def clone(self, name, src, owner):
         return getattr(src, name).clone(owner, name)
 
     def translate_from_string(self, s):
-        return int(s)
+        return float(s)
 
     def clean(self, owner, name):
         return getattr(owner, name).clean()
