@@ -52,8 +52,15 @@ class DocumentObject(object):
         self.insetattr = True
         if name in self._field:
             assert self.get_document().dc is not None
-            if type(self._field[name]) != fields.Collection and type(self._field[name]) != fields.IntCounter and type(self._field[name]) != fields.List:
-                self.was_changed(ChangeType.SET_PROPERTY_VALUE, self.id, name, value, self._field[name].get_type_name())
+            if type(self._field[name]) == fields.ForeignKey:
+                self.was_changed(ChangeType.SET_PROPERTY_VALUE, self.id, name,
+                                 '' if value is None else value.id,
+                                 self._field[name].get_type_name())
+            elif type(self._field[name]) != fields.Collection and \
+               type(self._field[name]) != fields.IntCounter and \
+               type(self._field[name]) != fields.List:
+                self.was_changed(ChangeType.SET_PROPERTY_VALUE, self.id, name,
+                                 value, self._field[name].get_type_name())
         self.insetattr = False
         for h in self.change_handlers:
             h(self)

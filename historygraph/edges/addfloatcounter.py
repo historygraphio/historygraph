@@ -28,7 +28,8 @@ class AddFloatCounter(Edge):
             # Find the relevant field on the relavant document object and increment/decrement it's value
             edgeobject = doc.get_document_object(self.propertyownerid)
             field = edgeobject._field[self.propertyname]
-            getattr(edgeobject, self.propertyname).add(field.translate_from_string(self.propertyvalue))
+            getattr(edgeobject, self.propertyname).add(
+                field.translate_from_string(self.propertyvalue, doc.dc))
 
     def clone(self):
         return AddFloatCounter(self._start_hashes,

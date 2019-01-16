@@ -10,7 +10,7 @@ class DecimalRegister(Field):
     def create_instance(self, owner, name):
         return Decimal('0.0')
 
-    def translate_from_string(self, s):
+    def translate_from_string(self, s, dc):
         return Decimal(s)
 
     def clone(self, propertyname, src, owner):

@@ -8,7 +8,7 @@ class IntRegister(Field):
     def create_instance(self, owner, name):
         return 0
 
-    def translate_from_string(self, s):
+    def translate_from_string(self, s, dc):
         return int(s)
 
     def clone(self, propertyname, src, owner):

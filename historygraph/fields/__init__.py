@@ -19,3 +19,4 @@ from .booleanregister import BooleanRegister
 from .floatcounter import FloatCounter
 from .decimalregister import DecimalRegister
 from .decimalcounter import DecimalCounter
+from .foreignkey import ForeignKey

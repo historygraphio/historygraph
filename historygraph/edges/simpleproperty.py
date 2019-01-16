@@ -15,7 +15,7 @@ class SimpleProperty(Edge):
         assert isinstance(propertytype, basestring)
         assert propertytype == 'int' or propertytype == 'basestring' or \
             propertytype == 'float' or propertytype == 'boolean' \
-            or propertytype == 'decimal'
+            or propertytype == 'decimal' or propertytype == 'foreignkey'
         self.propertyownerid = propertyownerid
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
@@ -29,7 +29,7 @@ class SimpleProperty(Edge):
             edgeobject = doc.get_document_object(self.propertyownerid)
             field = edgeobject._field[self.propertyname]
             setattr(edgeobject, self.propertyname,
-                field.translate_from_string(self.propertyvalue))
+                field.translate_from_string(self.propertyvalue, doc.dc))
 
     def clone(self):
         return SimpleProperty(self._start_hashes,
@@ -68,6 +68,11 @@ class SimpleProperty(Edge):
                 return 1
         elif self.propertytype == "decimal":
             if Decimal(self.propertyvalue) > Decimal(edge2.propertyvalue):
+                return -1
+            else:
+                return 1
+        elif self.propertytype == "foreignkey":
+            if self.propertyvalue > edge2.propertyvalue:
                 return -1
             else:
                 return 1

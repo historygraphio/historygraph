@@ -8,7 +8,7 @@ class BooleanRegister(Field):
     def create_instance(self, owner, name):
         return False
 
-    def translate_from_string(self, s):
+    def translate_from_string(self, s, dc):
         if isinstance(s, basestring):
             return s == "True"
         else:

@@ -46,7 +46,7 @@ class IntCounter(Field):
     def clone(self, name, src, owner):
         return getattr(src, name).clone(owner, name)
 
-    def translate_from_string(self, s):
+    def translate_from_string(self, s, dc):
         return int(s)
 
     def clean(self, owner, name):

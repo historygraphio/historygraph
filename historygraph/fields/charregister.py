@@ -8,7 +8,7 @@ class CharRegister(Field):
     def create_instance(self, owner, name):
         return ""
 
-    def translate_from_string(self, s):
+    def translate_from_string(self, s, dc):
         return s
 
     def clone(self, propertyname, src, owner):
@@ -19,4 +19,3 @@ class CharRegister(Field):
 
     def clean(self, owner, name):
         pass
-    
