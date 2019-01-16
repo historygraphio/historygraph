@@ -3,6 +3,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 #An edge that changes a value in a document
 from . import Edge
+from decimal import Decimal
+
 
 class SimpleProperty(Edge):
     def __init__(self, startnodes, propertyownerid,
@@ -12,7 +14,8 @@ class SimpleProperty(Edge):
         assert isinstance(propertyownerid, basestring)
         assert isinstance(propertytype, basestring)
         assert propertytype == 'int' or propertytype == 'basestring' or \
-            propertytype == 'float' or propertytype == 'boolean'
+            propertytype == 'float' or propertytype == 'boolean' \
+            or propertytype == 'decimal'
         self.propertyownerid = propertyownerid
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue
@@ -60,6 +63,11 @@ class SimpleProperty(Edge):
                 return 1
         elif self.propertytype == "boolean":
             if self.propertyvalue == True:
+                return -1
+            else:
+                return 1
+        elif self.propertytype == "decimal":
+            if Decimal(self.propertyvalue) > Decimal(edge2.propertyvalue):
                 return -1
             else:
                 return 1
