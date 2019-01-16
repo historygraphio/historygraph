@@ -129,7 +129,11 @@ class HistoryGraph(object):
             #    self.edgesbystartnode[node].append(edge)
             self._edgesbyendnode[edge.get_end_node()] = edge
 
-    def replay(self, doc):
+    def replay(self, doc, to=None):
+        if to is not None:
+            history2 = self.past_or_equal(to)
+            history2.replay(doc)
+            return
         # Replay the entrie HistoryGraph. This marks every edge as not played and the starts
         # playing them recursively from the start edge
         self.isreplaying = True
