@@ -12,3 +12,5 @@ class ChangeType(object):
     REMOVE_LISTITEM = 5
     DELETE_DOCUMENT_OBJECT = 6
     ADD_FLOAT_COUNTER = 7
+    ADD_DECIMAL_COUNTER = 8
+    

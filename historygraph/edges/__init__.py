@@ -12,3 +12,4 @@ from .removelistitem import RemoveListItem
 from .begincustomtransaction import BeginCustomTransaction
 from .deletedocumentobject import DeleteDocumentObject
 from .addfloatcounter import AddFloatCounter
+from .adddecimalcounter import AddDecimalCounter

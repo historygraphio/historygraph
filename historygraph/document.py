@@ -45,6 +45,8 @@ class Document(DocumentObject):
             edge = edges.DeleteDocumentObject(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         elif changetype == ChangeType.ADD_FLOAT_COUNTER:
             edge = edges.AddFloatCounter(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
+        elif changetype == ChangeType.ADD_DECIMAL_COUNTER:
+            edge = edges.AddDecimalCounter(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         else:
             assert False
         self.history.dc = self.dc
