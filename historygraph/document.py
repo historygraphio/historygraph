@@ -8,9 +8,14 @@ from .historygraph import HistoryGraph, FrozenHistoryGraph, TransactionHistoryGr
 from .changetype import ChangeType
 from . import edges
 
+NAMESPACE_HISTORYGRAPH = uuid.UUID('a8c5024c-1967-11e9-ab14-d663bd873d93')
 
 class Document(DocumentObject):
     def __init__(self, id=None):
+        if self.is_singleton:
+            newid = uuid.uuid5(NAMESPACE_HISTORYGRAPH, self.__class__.__name__)
+            assert id is None or newid == id, 'You cannot set the id on a singleton object'
+            id = newid
         super(Document, self).__init__(id)
         self.insetattr = True
         self.parent = None

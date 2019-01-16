@@ -32,6 +32,8 @@ class DocumentCollection(object):
 
     def register(self, theclass):
         self.classes[theclass.__name__] = theclass
+        if theclass.is_singleton:
+            self.add_document_object(theclass())
 
     def get_all_edges(self):
         # Retreive all the edges for all of the documents in this dc
@@ -184,6 +186,7 @@ class DocumentCollection(object):
 
 
     def get_by_class(self, theclass):
+        #TODO: change to get by class name to retain consistency with get_object_by_id
         return [obj for (objid, obj) in
                 self.objects[theclass.__name__].iteritems()
                 if obj.get_is_deleted() is False]

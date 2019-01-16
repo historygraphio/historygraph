@@ -7,6 +7,8 @@ from .changetype import *
 from . import fields
 
 class DocumentObject(object):
+    is_singleton = False
+
     def clone(self):
         # Make a copy of this object and return it
         ret = self.__class__(self.id)
@@ -31,7 +33,9 @@ class DocumentObject(object):
             id = str(uuid.uuid4())
         self.id = id
         # Get the fields from the class and create an instance of each one for this instance
-        variables = [a for a in dir(self.__class__) if not a.startswith('__') and not callable(getattr(self.__class__,a))]
+        variables = [a for a in dir(self.__class__) if not a.startswith('__')
+                     and not callable(getattr(self.__class__,a))
+                     and a != 'is_singleton']
         for k in variables:
             var = getattr(self.__class__, k)
             self._field[k] = var

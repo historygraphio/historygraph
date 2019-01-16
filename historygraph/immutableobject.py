@@ -10,6 +10,8 @@ import hashlib
 
 
 class ImmutableObject(object):
+    is_singleton = False
+
 
     def __init__(self, **kwargs):
         # Initialise the immutable object from the kwargs. It can never be changed once initialise
@@ -55,4 +57,3 @@ class ImmutableObject(object):
 
     def get_is_deleted(self):
         return False
-        
