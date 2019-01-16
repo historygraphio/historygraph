@@ -247,6 +247,15 @@ class HistoryGraph(object):
     def is_in_transaction(self):
         return False
 
+    def past_or_equal(self, edgeid):
+        ret = HistoryGraph()
+        ret.dc = self.dc
+        self.record_past_edges()
+        edge = self.get_edges_by_end_node(edgeid)
+        edge_set = {edgeid} | set(edge.pastedges)
+        ret.add_edges([self.get_edges_by_end_node(edgeid2) for edgeid2 in edge_set])
+        return ret
+
 class FrozenHistoryGraph(HistoryGraph):
     # This subclass handles the case of a history graph that writes any new edges it receives
     # into the historygraph it was cloned from
