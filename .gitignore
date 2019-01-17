@@ -29,9 +29,9 @@ core
 
 # Virtual env guff
 venv/
+venv3/
 pip-selfcheck.json
 *.pyc
 
 .tox
 historygraph.egg-info/
-

@@ -23,8 +23,8 @@ python -B -m unittest discover
 
 Set up a virtualenv for Python 3 and install the necessary stuff
 ```
-virtualenv venv -p python3
-source venv/bin/activate
+virtualenv venv3 -p python3
+source venv3/bin/activate
 pip install pip --upgrade
 pip install urllib3[secure]
 pip install -r requirements.txt
