@@ -6,6 +6,8 @@ from collections import defaultdict
 import uuid
 from . import edges
 import hashlib
+import six
+
 
 def get_transaction_hash(edges):
     return hashlib.sha256(''.join([str(edge.get_transaction_info_hash())
@@ -67,7 +69,7 @@ class HistoryGraph(object):
             return True
 
         matching_edges = []
-        for k, d2 in self._transaction_edges.iteritems():
+        for k, d2 in six.iteritems(self._transaction_edges):
             edges = d2.values()
             if is_continuous(edges):
                 edges = order_edges(edges)

@@ -7,7 +7,7 @@ from .changetype import *
 from . import fields
 from operator import itemgetter
 import hashlib
-
+import six
 
 class ImmutableObject(object):
     is_singleton = False
@@ -41,7 +41,7 @@ class ImmutableObject(object):
 
     def get_hash(self):
         #Immutable objects don't have UUIDs they have SHA256 hashes of their content
-        s = sorted([(k,str(getattr(self, k))) for (k,v) in self._field.iteritems()], key=itemgetter(0)) + [('_prevhash', str(self._prevhash))]
+        s = sorted([(k,str(getattr(self, k))) for (k,v) in six.iteritems(self._field)], key=itemgetter(0)) + [('_prevhash', str(self._prevhash))]
 
         return hashlib.sha256(str(s)).hexdigest()
 

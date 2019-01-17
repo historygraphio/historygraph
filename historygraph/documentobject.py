@@ -105,7 +105,7 @@ class DocumentObject(object):
         if self.parent is not None and hasattr(self.parent, 'remove_by_objid'):
             self.parent.remove_by_objid(self.id, create_edge=False)
         # If we have any children cascade this deletion to them
-        for k, v in self._field.iteritems():
+        for k, v in six.iteritems(self._field):
             v.cascade_delete(self, k)
 
 

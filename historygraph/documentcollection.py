@@ -11,6 +11,8 @@ from .document import Document
 from .immutableobject import ImmutableObject
 import hashlib
 import uuid
+import six
+
 
 class DocumentCollection(object):
 
@@ -43,7 +45,7 @@ class DocumentCollection(object):
         for classname in self.objects:
             documentdict = self.objects[classname]
             if issubclass(self.classes[classname], Document):
-                for (documentid, document) in documentdict.iteritems():
+                for (documentid, document) in six.iteritems(documentdict):
                     history = document.history
                     for edge in history.get_all_edges():
                         start_hashes = list(edge._start_hashes)
@@ -63,7 +65,7 @@ class DocumentCollection(object):
                             propertytypename = edge.propertytype
                         historyedges.append(edge.as_tuple())
             elif issubclass(self.classes[classname], ImmutableObject):
-                for (objid, obj) in documentdict.iteritems():
+                for (objid, obj) in six.iteritems(documentdict):
                     immutableobjects.append(obj.as_dict())
             elif issubclass(self.classes[classname], DocumentObject):
                 pass
@@ -140,7 +142,7 @@ class DocumentCollection(object):
             doc = None
             wasexisting = False
             if documentclassnamedict[documentid] in self.objects:
-                for (d2id, d2) in self.objects[documentclassnamedict[documentid]].iteritems():
+                for (d2id, d2) in six.iteritems(self.objects[documentclassnamedict[documentid]]):
                     if d2.id == documentid:
                         doc = d2
                         wasexisting = True
@@ -178,7 +180,7 @@ class DocumentCollection(object):
             del d["hash"]
             io = theclass(**d)
             wasexisting = False
-            for (io2id, io2) in self.objects[classname].iteritems():
+            for (io2id, io2) in six.iteritems(self.objects[classname]):
                 if io2.get_hash() == io.get_hash():
                     wasexisting = True
             if wasexisting == False:
@@ -188,7 +190,7 @@ class DocumentCollection(object):
     def get_by_class(self, theclass):
         #TODO: change to get by class name to retain consistency with get_object_by_id
         return [obj for (objid, obj) in
-                self.objects[theclass.__name__].iteritems()
+                six.iteritems(self.objects[theclass.__name__])
                 if obj.get_is_deleted() is False]
 
     def add_document_object(self, obj):
