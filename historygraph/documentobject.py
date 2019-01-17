@@ -5,6 +5,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 import uuid
 from .changetype import *
 from . import fields
+import six
+
 
 class DocumentObject(object):
     is_singleton = False
@@ -68,7 +70,7 @@ class DocumentObject(object):
     def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
         # If we are just a document object cascade the changes up to the parent
         if self.parent is not None:
-            assert isinstance(propertyownerid, basestring)
+            assert isinstance(propertyownerid, six.string_types)
             self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
     def copy_document_object(self, src):

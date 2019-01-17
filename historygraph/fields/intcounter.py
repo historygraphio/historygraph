@@ -4,6 +4,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 #An integer register field in HistoryGraph
 from . import Field
 from ..changetype import ChangeType
+import six
+
 
 class IntCounter(Field):
     class _FieldIntCounterImpl(object):
@@ -27,7 +29,7 @@ class IntCounter(Field):
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             # TODO: Possible balloonian function
-            assert isinstance(propertyownerid, basestring)
+            assert isinstance(propertyownerid, six.string_types)
             if not self.parent.insetattr:
                 self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 

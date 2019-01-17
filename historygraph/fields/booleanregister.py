@@ -3,13 +3,15 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 #A boolean register field in HistoryGraph
 from . import Field
+import six
+
 
 class BooleanRegister(Field):
     def create_instance(self, owner, name):
         return False
 
     def translate_from_string(self, s, dc):
-        if isinstance(s, basestring):
+        if isinstance(s, six.string_types):
             return s == "True"
         else:
             return s

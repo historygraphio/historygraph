@@ -4,6 +4,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 #A list of sub objects in HistoryGraph
 from . import Field
 from ..changetype import ChangeType
+import six
+
 
 class Collection(Field):
     class _FieldCollectionImpl(object):
@@ -25,7 +27,7 @@ class Collection(Field):
             self.was_changed(ChangeType.ADD_CHILD, self.parent.id, self.name, obj.id, obj.__class__.__name__)
 
         def remove(self, objid, create_edge=True):
-            assert isinstance(objid, basestring)
+            assert isinstance(objid, six.string_types)
             self.l.remove(objid)
             obj = self.parent.get_document().documentobjects[objid]
             del self.parent.get_document().documentobjects[objid]
@@ -37,7 +39,7 @@ class Collection(Field):
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             # TODO: Possible balloonian function
-            assert isinstance(propertyownerid, basestring)
+            assert isinstance(propertyownerid, six.string_types)
             if not self.parent.insetattr:
                 self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 

@@ -3,6 +3,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 #A HistoryGraph edge that removes a child
 from . import Edge
+import six
+
 
 class RemoveChild(Edge):
     def __init__(self, startnodes, propertyownerid,
@@ -10,9 +12,9 @@ class RemoveChild(Edge):
                  documentclassname, nonce='', transaction_hash=''):
         super(RemoveChild, self).__init__(startnodes, documentid,
             documentclassname, nonce, transaction_hash)
-        assert isinstance(propertyownerid, basestring)
-        assert isinstance(propertytype, basestring)
-        assert isinstance(propertyvalue, basestring)
+        assert isinstance(propertyownerid, six.string_types)
+        assert isinstance(propertytype, six.string_types)
+        assert isinstance(propertyvalue, six.string_types)
         self.propertyownerid = propertyownerid
         self.propertyname = propertyname
         self.propertyvalue = propertyvalue

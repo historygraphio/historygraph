@@ -4,6 +4,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 #An edge that changes a value in a document
 from . import Edge
 import uuid
+import six
+
 
 class AddDecimalCounter(Edge):
     def __init__(self, startnodes, propertyownerid,
@@ -13,8 +15,8 @@ class AddDecimalCounter(Edge):
             # If the nonce isn't set it
             nonce = str(uuid.uuid4())
         super(AddDecimalCounter, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_hash)
-        assert isinstance(propertyownerid, basestring)
-        assert isinstance(propertytype, basestring), "propertytype should be basestring but it actually is " + str(type(propertytype))
+        assert isinstance(propertyownerid, six.string_types)
+        assert isinstance(propertytype, six.string_types), "propertytype should be a string but it actually is " + str(type(propertytype))
         assert propertytype == 'DecimalCounter', "Unexpected property type, actually got " + propertytype
         self.propertyownerid = propertyownerid
         self.propertyname = propertyname

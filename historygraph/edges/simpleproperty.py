@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 #An edge that changes a value in a document
 from . import Edge
 from decimal import Decimal
+import six
 
 
 class SimpleProperty(Edge):
@@ -11,8 +12,8 @@ class SimpleProperty(Edge):
                  propertyname, propertyvalue, propertytype, documentid,
                  documentclassname, nonce='', transaction_hash=''):
         super(SimpleProperty, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_hash)
-        assert isinstance(propertyownerid, basestring)
-        assert isinstance(propertytype, basestring)
+        assert isinstance(propertyownerid, six.string_types)
+        assert isinstance(propertytype, six.string_types)
         assert propertytype == 'int' or propertytype == 'basestring' or \
             propertytype == 'float' or propertytype == 'boolean' \
             or propertytype == 'decimal' or propertytype == 'foreignkey'

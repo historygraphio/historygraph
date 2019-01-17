@@ -7,12 +7,13 @@ from . import Field
 from ..changetype import ChangeType
 import uuid
 from json import JSONEncoder, JSONDecoder
+import six
 
 class List(Field):
     class _ListNode(object):
         def __init__(self, parent, timestamp, data, obj):
             self.id = str(uuid.uuid4())
-            assert isinstance(parent, basestring)
+            assert isinstance(parent, six.string_types)
             self.parent = parent
             self.timestamp = timestamp
             self.data = data
@@ -90,7 +91,7 @@ class List(Field):
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             # TODO: Possible balloonian function
-            assert isinstance(propertyownerid, basestring)
+            assert isinstance(propertyownerid, six.string_types)
             self.parent.was_changed(changetype, propertyownerid, propertyname, propertyvalue, propertytype)
 
         def __len__(self):

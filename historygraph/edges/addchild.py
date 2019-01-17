@@ -3,14 +3,16 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 #The edge representing adding a child object in HistoryGraph
 from . import Edge
+import six
+
 
 class AddChild(Edge):
     def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue,
                  propertytype, documentid, documentclassname, nonce='', transaction_hash=''):
         super(AddChild, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_hash)
-        assert isinstance(propertyownerid, basestring)
-        assert isinstance(propertytype, basestring)
-        assert isinstance(propertyvalue, basestring)
+        assert isinstance(propertyownerid, six.string_types)
+        assert isinstance(propertytype, six.string_types)
+        assert isinstance(propertyvalue, six.string_types)
         self.propertyownerid = propertyownerid
         self.propertyvalue = propertyvalue
         self.propertyname = propertyname

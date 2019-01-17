@@ -108,16 +108,16 @@ class DocumentCollection(object):
                 historygraphdict[documentid] = historygraph
                 documentclassnamedict[documentid] = documentclassname
             if propertytypestr == "int" or propertytypestr == "FieldIntCounter":
-                propertytype = int
+                #propertytype = int
                 propertyvalue = int(propertyvaluestr)
             elif propertytypestr == "basestring":
-                propertytype = basestring
+                #propertytype = basestring
                 propertyvalue = str(propertyvaluestr)
             elif propertytypestr == "boolean":
-                propertytype = bool
+                #propertytype = bool
                 propertyvalue = propertyvaluestr == "True"
             elif propertytypestr == "" and edgeclassname == "Merge":
-                propertytype = None
+                #propertytype = None
                 propertyvalue = ""
             else:
                 propertyvalue = propertyvaluestr
