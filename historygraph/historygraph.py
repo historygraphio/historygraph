@@ -155,7 +155,11 @@ class HistoryGraph(object):
         ret = HistoryGraph()
         ret.dc = self.dc
         edgeclones = self.get_all_edges()
-        ret.add_edges(edgeclones)
+        for edge in edgeclones:
+            #nodes = edge._start_hashes
+            #for node in nodes:
+            #    self.edgesbystartnode[node].append(edge)
+            ret._edgesbyendnode[edge.get_end_node()] = edge
         return ret
 
     def replay_edges(self, doc, edge):

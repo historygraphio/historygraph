@@ -120,3 +120,51 @@ class SimpleCustomValidationTestCase(unittest.TestCase):
         test1.full_replay(edges)
 
         self.assertEqual(test1.covers, 1)
+
+
+class ValueDependentValidationTestCase(unittest.TestCase):
+    # Test that we can
+    class MustAlwaysIncrease(object):
+        @classmethod
+        def is_valid(cls, edges_list, historygraph):
+            if len(edges_list) > 2:
+                # Only set a single edge in this transacrtion
+                return False
+            edge = edges_list[1]
+            if not isinstance(edge, SimpleProperty) or \
+               not edge.documentclassname == Covers.__name__ or \
+               not edge.propertyname == 'covers':
+                # Check the edge type, document type and the property it attachs to
+                return False
+            try:
+                int_value = int(edge.propertyvalue)
+            except ValueError as ex:
+                # Return false if we can't convert to an int
+                return False
+            # Get the previous value
+            doc = Covers(id=edge.documentid)
+            doc.dc = historygraph.dc
+            #if edges_list[0]._start_hashes[0] not in historygraph._edgesbyendnode:
+            #    return False
+            historygraph.replay(doc, to=edges_list[0]._start_hashes[0])
+            # Return true iff between 1 and 5 (inclusive)
+            return int_value > doc.covers
+
+    def setUp(self):
+        self.dc1 = DocumentCollection(has_standard_validators=False)
+        self.dc1.register(Covers)
+
+    def test_success_on_real_validation_test(self):
+        self.dc1.register_custom_validator(ValueDependentValidationTestCase.MustAlwaysIncrease)
+        test1 = Covers()
+        self.dc1.add_document_object(test1)
+        test1.covers = 1
+        self.assertEqual(len(test1.history._edgesbyendnode), 1)
+        transaction_test1 = test1.transaction(custom_transaction=ValueDependentValidationTestCase.MustAlwaysIncrease)
+        self.assertEqual(len(transaction_test1.history._edgesbyendnode) + len(transaction_test1.history._added_edges), 2)
+        self.assertEqual(len(transaction_test1.history._added_edges), 1)
+        transaction_test1.covers = 2
+        self.assertEqual(len(transaction_test1.history._added_edges), 2)
+        transaction_test1.endtransaction()
+        self.assertEqual(len(test1.history._edgesbyendnode), 3)
+        self.assertEqual(test1.covers,2)
