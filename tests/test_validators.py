@@ -169,7 +169,7 @@ class StandardTransactionValidationTestCase(unittest.TestCase):
         edges = [ edge1, edge2 ]
 
         transaction_hash = hashlib.sha256(','.join([str(edge.get_transaction_info_hash())
-            for edge in edges])).hexdigest()
+            for edge in edges]).encode('utf-8')).hexdigest()
         for i in range(len(edges)):
             edge = edges[i]
             edge.transaction_hash = transaction_hash
@@ -205,7 +205,7 @@ class StandardTransactionValidationTestCase(unittest.TestCase):
         edges = [ edge1, edge2, edge3 ]
 
         transaction_hash = hashlib.sha256(','.join([str(edge.get_transaction_info_hash())
-            for edge in edges])).hexdigest()
+            for edge in edges]).encode('utf-8')).hexdigest()
 
         for i in range(len(edges)):
             edge = edges[i]
@@ -242,7 +242,7 @@ class StandardTransactionValidationTestCase(unittest.TestCase):
         edges = [ edge1, edge2, edge3 ]
 
         transaction_hash = hashlib.sha256(','.join([str(edge.get_transaction_info_hash())
-            for edge in edges])).hexdigest()
+            for edge in edges]).encode('utf-8')).hexdigest()
         for i in range(len(edges)):
             edge = edges[i]
             edge.transaction_hash = transaction_hash
@@ -280,7 +280,7 @@ class StandardTransactionValidationTestCase(unittest.TestCase):
         edges = [ edge1, edge2, edge3 ]
 
         transaction_hash = hashlib.sha256(','.join([str(edge.get_transaction_info_hash())
-            for edge in edges])).hexdigest()
+            for edge in edges]).encode('utf-8')).hexdigest()
 
         for i in range(len(edges)):
             edge = edges[i]

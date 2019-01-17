@@ -11,7 +11,7 @@ import six
 
 def get_transaction_hash(edges):
     return hashlib.sha256(''.join([str(edge.get_transaction_info_hash())
-                          for edge in edges])).hexdigest()
+                          for edge in edges]).encode('utf-8')).hexdigest()
 
 def order_edges(edges):
     # Assuming edges is a totally ordered set return a list with the edges in the

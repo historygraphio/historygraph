@@ -99,7 +99,7 @@ class Edge(object):
             "nonce",str(self.nonce),
             "transaction_hash", str(self.transaction_hash)
          )
-        self._end_node = hashlib.sha256(str(s)).hexdigest()
+        self._end_node = hashlib.sha256(str(s).encode('utf-8')).hexdigest()
         return self._end_node
 
     def as_tuple(self):
@@ -154,7 +154,7 @@ class Edge(object):
             "documentclassname",str(self.documentclassname),
             "nonce",str(self.nonce),
          )
-        return hashlib.sha256(str(s)).hexdigest()
+        return hashlib.sha256(str(s).encode('utf-8')).hexdigest()
 
     def clear_end_node_cache(self):
         #Todo remove this edges should be immutable

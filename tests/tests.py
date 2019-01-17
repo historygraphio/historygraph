@@ -16,6 +16,7 @@ import hashlib
 from json import JSONEncoder, JSONDecoder
 from collections import defaultdict
 
+
 class SimpleCoversTestCase(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection()
@@ -132,7 +133,7 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
         self.assertEqual(self.test.covers, 4)
 
     def test_sending_merge_edge_with_one_invalid_start_hash(self):
-        dummysha = hashlib.sha256('Invalid node').hexdigest()
+        dummysha = hashlib.sha256('Invalid node'.encode('utf-8')).hexdigest()
         old_clockhash = self.test._clockhash
         edgenull = edges.Merge({self.test._clockhash, dummysha}, "", "", "", "", self.test.id, self.test.__class__.__name__)
         self.dc2.slave_listener.send_edges([edgenull.as_tuple()])
@@ -556,8 +557,8 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
 
         oldnode = test2._clockhash
 
-        dummysha1 = hashlib.sha256('Invalid node 1').hexdigest()
-        dummysha2 = hashlib.sha256('Invalid node 2').hexdigest()
+        dummysha1 = hashlib.sha256('Invalid node 1'.encode('utf-8')).hexdigest()
+        dummysha2 = hashlib.sha256('Invalid node 2'.encode('utf-8')).hexdigest()
         edgenull1 = edges.Merge({dummysha1, dummysha2}, "", "", "", "", test2.id, test2.__class__.__name__)
         edgenull2 = edges.Merge({test2._clockhash, edgenull1.get_end_node()}, "", "", "", "", test2.id, test2.__class__.__name__)
 

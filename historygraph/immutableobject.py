@@ -43,7 +43,7 @@ class ImmutableObject(object):
         #Immutable objects don't have UUIDs they have SHA256 hashes of their content
         s = sorted([(k,str(getattr(self, k))) for (k,v) in six.iteritems(self._field)], key=itemgetter(0)) + [('_prevhash', str(self._prevhash))]
 
-        return hashlib.sha256(str(s)).hexdigest()
+        return hashlib.sha256(str(s).encode('utf-8')).hexdigest()
 
     def as_dict(self):
         #Return a dict suitable for transport
