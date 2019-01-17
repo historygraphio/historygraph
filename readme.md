@@ -45,5 +45,5 @@ pip install pip --upgrade
 pip install urllib3[secure]
 pip install -r requirements.txt
 
-tox
+tox --recreate
 ```
