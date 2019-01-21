@@ -168,3 +168,51 @@ class ValueDependentValidationTestCase(unittest.TestCase):
         transaction_test1.endtransaction()
         self.assertEqual(len(test1.history._edgesbyendnode), 3)
         self.assertEqual(test1.covers,2)
+
+    def test_fails_on_value_decreases(self):
+        self.dc1.register_custom_validator(ValueDependentValidationTestCase.MustAlwaysIncrease)
+        test1 = Covers()
+        self.dc1.add_document_object(test1)
+        test1.covers = 2
+        self.assertEqual(len(test1.history._edgesbyendnode), 1)
+        transaction_test1 = test1.transaction(custom_transaction=ValueDependentValidationTestCase.MustAlwaysIncrease)
+        self.assertEqual(len(transaction_test1.history._edgesbyendnode) + len(transaction_test1.history._added_edges), 2)
+        self.assertEqual(len(transaction_test1.history._added_edges), 1)
+        transaction_test1.covers = 1
+        self.assertEqual(len(transaction_test1.history._added_edges), 2)
+        with self.assertRaises(AssertionError):
+            transaction_test1.endtransaction()
+        self.assertEqual(len(test1.history._edgesbyendnode), 1)
+        self.assertEqual(test1.covers,2)
+
+    def test_fails_on_value_decrease_manually_created_transaction(self):
+        self.dc1.register_custom_validator(ValueDependentValidationTestCase.MustAlwaysIncrease)
+        test1 = Covers()
+        self.dc1.add_document_object(test1)
+        test1.covers = 2
+        self.assertEqual(len(test1.history._edgesbyendnode), 1)
+        transaction_test1 = test1.transaction(custom_transaction=ValueDependentValidationTestCase.MustAlwaysIncrease)
+        self.assertEqual(len(transaction_test1.history._edgesbyendnode) + len(transaction_test1.history._added_edges), 2)
+        self.assertEqual(len(transaction_test1.history._added_edges), 1)
+        last_edge = transaction_test1.history.get_last_transaction_edge()
+
+        edge = SimpleProperty({transaction_test1._clockhash},
+                              test1.id,
+                              'covers', 1,
+                              'int', last_edge.documentid,
+                              last_edge.documentclassname, last_edge.nonce,
+                              last_edge.transaction_hash)
+
+        edges = [last_edge, edge]
+        transaction_hash = get_transaction_hash(edges)
+        #print('test_success transaction_hash=', transaction_hash)
+        #print('test_success edges.get_transaction_info_hash=', ','.join([edge.get_transaction_info_hash() for edge in edges]))
+        for i in range(len(edges)):
+            edge = edges[i]
+            edge.transaction_hash = transaction_hash
+            if i > 0:
+                edge._start_hashes = [edges[i - 1].get_end_node()]
+
+        test1.full_replay(edges)
+
+        self.assertEqual(test1.covers, 2)
