@@ -20,3 +20,4 @@ from .floatcounter import FloatCounter
 from .decimalregister import DecimalRegister
 from .decimalcounter import DecimalCounter
 from .foreignkey import ForeignKey
+from .textedit import TextEdit

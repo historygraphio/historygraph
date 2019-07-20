@@ -1,6 +1,9 @@
 from __future__ import absolute_import, unicode_literals, print_function
 
 import unittest
+from historygraph import Document
+from historygraph import fields
+from .common import DocumentCollection
 
 # A TextEdit is a new CRDT similar to a list in some ways but designed for
 # storing collaboratively edited text files. The problem it solves is -
@@ -38,3 +41,16 @@ import unittest
 # Stage two add support for markers (as per atom teletype)
 # Stage three a new related datatype for rich text editing
 #
+class TextEditTest(unittest.TestCase):
+    def test_create_text_with_single_fragment(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+
+        textowner.text.insert(0, "abcdef")
+
+        self.assertEqual(textowner.text.gettext(), "abcdef")

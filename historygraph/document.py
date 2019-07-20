@@ -52,6 +52,8 @@ class Document(DocumentObject):
             edge = edges.AddFloatCounter(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         elif changetype == ChangeType.ADD_DECIMAL_COUNTER:
             edge = edges.AddDecimalCounter(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
+        elif changetype == ChangeType.ADD_TEXTEDIT_FRAGMENT:
+            edge = edges.AddTextEditFragment(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__)
         else:
             assert False
         self.history.dc = self.dc
