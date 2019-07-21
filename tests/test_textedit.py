@@ -174,3 +174,47 @@ class TextEditTest(unittest.TestCase):
                          textowner.text._rendered_list[2].get_original_id())
         self.assertNotEqual(old_fragment.id,
                             textowner.text._rendered_list[2].get_original_id())
+
+    def test_create_text_with_three_consecutative_fragments(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "ghi")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+        self.assertEqual(len(textowner.text._rendered_list), 3)
+        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(textowner.text._rendered_list[0].data, "abc")
+        self.assertEqual(textowner.text._rendered_list[1].starts_at, 3)
+        self.assertEqual(textowner.text._rendered_list[1].data, "def")
+        self.assertEqual(textowner.text._rendered_list[2].starts_at, 6)
+        self.assertEqual(textowner.text._rendered_list[2].data, "ghi")
+
+        self.assertEqual(textowner.text._rendered_list[0],
+                         textowner.text.get_fragment_by_index(0)[0])
+        self.assertEqual(textowner.text._rendered_list[0],
+                         textowner.text.get_fragment_by_index(2)[0])
+        self.assertEqual(textowner.text._rendered_list[1],
+                         textowner.text.get_fragment_by_index(3)[0])
+        self.assertEqual(textowner.text._rendered_list[1],
+                         textowner.text.get_fragment_by_index(5)[0])
+        self.assertEqual(textowner.text._rendered_list[2],
+                         textowner.text.get_fragment_by_index(6)[0])
+        self.assertEqual(textowner.text._rendered_list[2],
+                         textowner.text.get_fragment_by_index(8)[0])
+        self.assertEqual(0, textowner.text.get_fragment_by_index(0)[1])
+        self.assertEqual(0, textowner.text.get_fragment_by_index(2)[1])
+        self.assertEqual(1, textowner.text.get_fragment_by_index(3)[1])
+        self.assertEqual(1, textowner.text.get_fragment_by_index(5)[1])
+        self.assertEqual(2, textowner.text.get_fragment_by_index(6)[1])
+        self.assertEqual(2, textowner.text.get_fragment_by_index(8)[1])
+
+        self.assertEqual(textowner.text.get_text(), "abcdefghi")
