@@ -39,6 +39,7 @@ from .common import DocumentCollection
 #
 # Future evolution:
 # Stage one is to get this to work as outlined for simple text editing
+# Stage one point five get it to generate a list of lines. Ie a list of strings
 # Stage two add support for markers (as per atom teletype)
 # Stage three a new related datatype for rich text editing
 #
@@ -218,3 +219,34 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(2, textowner.text.get_fragment_by_index(8)[1])
 
         self.assertEqual(textowner.text.get_text(), "abcdefghi")
+
+    def test_delete_text_whole_fragment(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "ghi")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+
+        old_first_node = textowner.text._rendered_list[0]
+        old_last_node = textowner.text._rendered_list[2]
+
+        textowner.text.removerange(3, 6)
+
+        textowner.text.render()
+
+        self.assertEqual(len(textowner.text._rendered_list), 2)
+        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(textowner.text._rendered_list[0].data, "abc")
+        self.assertEqual(textowner.text._rendered_list[0].id, old_first_node.id)
+        self.assertEqual(textowner.text._rendered_list[1].starts_at, 3)
+        self.assertEqual(textowner.text._rendered_list[1].data, "ghi")
+        self.assertEqual(textowner.text._rendered_list[1].id, old_last_node.id)

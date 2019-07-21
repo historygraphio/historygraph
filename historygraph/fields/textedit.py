@@ -96,6 +96,33 @@ class TextEdit(Field):
                     self.parent.id,
                     self.name, node.id, "string")
 
+        def removerange(self, start, end):
+            frag_start, frag_start_index = self.get_fragment_by_index(start)
+            if frag_start.starts_at != start:
+                # If the start position is in the middle of a fragment. Split that
+                # fragment
+                self._split_fragment(frag_start_index, start - frag_start.starts_at)
+                self.render()
+            frag_end, frag_end_index = self.get_fragment_by_index(end)
+            if frag_end.starts_at != end:
+                # If the start position is in the middle of a fragment. Split that
+                # fragment
+                self._split_fragment(frag_end_index, end - frag_end.starts_at)
+                self.render()
+            # Now we should only be deleting whole fragments
+            frag_start, frag_start_index = self.get_fragment_by_index(start)
+            frag_end, frag_end_index = self.get_fragment_by_index(end)
+            node_ids = [self._rendered_list[i].id for i in
+                        range(frag_start_index, frag_end_index)]
+            for nodeid in node_ids:
+                self.remove_by_nodeid(nodeid)
+            self.render()
+            for i in range(frag_start_index, len(self._rendered_list)):
+                prev_fragment = self._rendered_list[i - 1]
+                self._rendered_list[i].starts_at = prev_fragment.starts_at + \
+                    len(prev_fragment.data)
+
+
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             # TODO: Possible balloonian function
             assert isinstance(propertyownerid, six.string_types)
