@@ -11,7 +11,7 @@ import six
 
 class TextEdit(Field):
     class _Fragment(object):
-        def __init__(self, parent, timestamp, data, starts_at):
+        def __init__(self, parent, timestamp, data, starts_at, original_id):
             self.id = str(uuid.uuid4())
             assert isinstance(parent, six.string_types)
             self.parent = parent
@@ -19,6 +19,10 @@ class TextEdit(Field):
             assert isinstance(parent, six.string_types)
             self.data = data
             self.starts_at = starts_at
+            self.original_id = original_id
+
+        def get_original_id(self):
+            return self.original_id if self.original_id != "" else self.id
 
     class _TextEditImpl(object):
         # This implementation class is what actually get attacted to the document object to implement the required
@@ -30,14 +34,14 @@ class TextEdit(Field):
             self._listnodes = list()
             self._tombstones = set()
 
-        def _insert(self, index, fragmenttext):
+        def _insert(self, index, fragmenttext, original_id=""):
             # Insert a fragment in the conflict free list
             assert isinstance(fragmenttext, six.string_types)
             index = index - 1
             if index == -1:
                 # Add as the first fragment in the list
                 added_node = TextEdit._Fragment('', self.parent.get_document().depth(),
-                                                fragmenttext, 0)
+                                                fragmenttext, 0, original_id)
                 self._listnodes.append(added_node)
             else:
                 # Add at an artbitrary location in the list
@@ -46,7 +50,8 @@ class TextEdit(Field):
                 prev_fragment = self._rendered_list[index]
                 added_node = TextEdit._Fragment(self._rendered_list[index].id,
                     self.parent.get_document().depth(), fragmenttext,
-                    prev_fragment.starts_at + len(prev_fragment.data))
+                    prev_fragment.starts_at + len(prev_fragment.data),
+                    original_id)
                 self._listnodes.append(added_node)
             if hasattr(self, "_rendered_list"):
                 delattr(self, "_rendered_list")
@@ -82,7 +87,6 @@ class TextEdit(Field):
 
         def remove_by_node(self, node, create_edge=True):
             # Find the given node and remove it
-            obj = node.obj
             self._tombstones.add(node.id)
             if hasattr(self, "_rendered_list"):
                 delattr(self, "_rendered_list")
@@ -90,7 +94,7 @@ class TextEdit(Field):
             if create_edge:
                 self.was_changed(ChangeType.REMOVE_TEXTEDITFRAGMENT,
                     self.parent.id,
-                    self.name, node.id, obj.__class__.__name__)
+                    self.name, node.id, "string")
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             # TODO: Possible balloonian function
@@ -192,6 +196,17 @@ class TextEdit(Field):
                 return self._get_fragment_by_index(index, mid_frag_index, end_frag_index)
             else:
                 return self._get_fragment_by_index(index, mid_frag_index, end_frag_index)
+
+        def _split_fragment(self, frag_index, split_position):
+            # Split a fragment ie remove and old one and replace it with a new one
+            # frag_index is the fragment to replace, split_position is the position
+            # in the string to split at
+            self.render()
+            old_fragment = self._rendered_list[frag_index] # The fragment being replaced
+            self._remove(frag_index)
+            self._insert(frag_index, old_fragment.data[:split_position],
+                         original_id=old_fragment.id)
+            self._insert(frag_index + 1, old_fragment.data[split_position:])
 
     def __init__(self):
         pass

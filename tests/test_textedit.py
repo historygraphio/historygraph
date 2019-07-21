@@ -133,3 +133,44 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(1, textowner.text.get_fragment_by_index(5)[1])
 
         self.assertEqual(textowner.text.get_text(), "defabc")
+
+    def test_split_fragments(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+        self.assertEqual(len(textowner.text._rendered_list), 2)
+
+        old_fragment = textowner.text._rendered_list[0] # The fragment being split
+
+        textowner.text._split_fragment(0, 2)
+        textowner.text.render()
+        self.assertEqual(len(textowner.text._rendered_list), 3)
+
+        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(textowner.text._rendered_list[0].data, "ab")
+        # Test the first new fragments original id matches the id of the original node
+        # this ensure the sort order does not change it is dedenpendt on node id's
+        self.assertEqual(old_fragment.id,
+                         textowner.text._rendered_list[0].get_original_id())
+        self.assertEqual(textowner.text._rendered_list[1].starts_at, 2)
+        self.assertEqual(textowner.text._rendered_list[1].id,
+                         textowner.text._rendered_list[1].get_original_id())
+        self.assertNotEqual(old_fragment.id,
+                            textowner.text._rendered_list[1].get_original_id())
+        self.assertEqual(textowner.text._rendered_list[1].data, "c")
+        self.assertEqual(textowner.text._rendered_list[2].starts_at, 3)
+        self.assertEqual(textowner.text._rendered_list[2].data, "def")
+        self.assertEqual(textowner.text._rendered_list[2].id,
+                         textowner.text._rendered_list[2].get_original_id())
+        self.assertNotEqual(old_fragment.id,
+                            textowner.text._rendered_list[2].get_original_id())

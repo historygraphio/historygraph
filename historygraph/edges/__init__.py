@@ -14,3 +14,4 @@ from .deletedocumentobject import DeleteDocumentObject
 from .addfloatcounter import AddFloatCounter
 from .adddecimalcounter import AddDecimalCounter
 from .addtexteditfragment import AddTextEditFragment
+from .removetexteditfragment import RemoveTextEditFragment
