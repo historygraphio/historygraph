@@ -50,7 +50,8 @@ class TextEditTest(unittest.TestCase):
 
         dc1 = DocumentCollection()
         dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
 
         textowner.text.insert(0, "abcdef")
 
-        self.assertEqual(textowner.text.gettext(), "abcdef")
+        self.assertEqual(textowner.text.get_text(), "abcdef")

@@ -121,7 +121,7 @@ class TextEdit(Field):
             ret = list()
             for node in matching:
                 ret.append(node)
-                ret.append(self._render(node.id))
+                ret.extend(self._render(node.id))
             return ret
 
         def get_matching_list_nodes(self, nodeid):
@@ -136,6 +136,10 @@ class TextEdit(Field):
 
         def insert(self, index, fragmenttext):
             self._insert(index, fragmenttext)
+
+        def get_text(self):
+            self.render()
+            return ''.join([node.data for node in self._rendered_list])
 
 
     def __init__(self):
