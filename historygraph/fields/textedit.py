@@ -169,7 +169,7 @@ class TextEdit(Field):
             # Get a list of nodes with matching ids
             l = [n for n in self._listnodes if n.parent == nodeid]
             # Sort the nodes in timestamp then id order
-            return sorted(l, key=lambda n: (-n.timestamp, n.id))
+            return sorted(l, key=lambda n: (-n.timestamp, n.get_original_id()))
 
         def get_document(self):
             #Return the document
