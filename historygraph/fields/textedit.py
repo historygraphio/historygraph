@@ -11,13 +11,14 @@ import six
 
 class TextEdit(Field):
     class _Fragment(object):
-        def __init__(self, parent, timestamp, data):
+        def __init__(self, parent, timestamp, data, starts_at):
             self.id = str(uuid.uuid4())
             assert isinstance(parent, six.string_types)
             self.parent = parent
             self.timestamp = timestamp
             assert isinstance(parent, six.string_types)
             self.data = data
+            self.starts_at = starts_at
 
     class _TextEditImpl(object):
         # This implementation class is what actually get attacted to the document object to implement the required
@@ -36,13 +37,16 @@ class TextEdit(Field):
             if index == -1:
                 # Add as the first fragment in the list
                 added_node = TextEdit._Fragment('', self.parent.get_document().depth(),
-                                                fragmenttext)
+                                                fragmenttext, 0)
                 self._listnodes.append(added_node)
             else:
                 # Add at an artbitrary location in the list
                 self.render()
+                # The previous fragment in the list
+                prev_fragment = self._rendered_list[index]
                 added_node = TextEdit._Fragment(self._rendered_list[index].id,
-                    self.parent.get_document().depth(), fragmenttext)
+                    self.parent.get_document().depth(), fragmenttext,
+                    prev_fragment.starts_at + len(prev_fragment.data))
                 self._listnodes.append(added_node)
             if hasattr(self, "_rendered_list"):
                 delattr(self, "_rendered_list")
@@ -135,12 +139,34 @@ class TextEdit(Field):
             return self.parent.get_document()
 
         def insert(self, index, fragmenttext):
-            self._insert(index, fragmenttext)
+            # Get the fragment index points at
+            target_fragment, fragment_index = self.get_fragment_by_index(index)
+            if target_fragment is None:
+                # If the fragment list is empty proceed with the insertion
+                pass
+            elif index == target_fragment.starts_at + len(target_fragment.data):
+                # Usually if target_fragment is the last fragment the insert
+                # point should be one past it
+                fragment_index += 1
+            else:
+                assert False
+            self._insert(fragment_index, fragmenttext)
 
         def get_text(self):
             self.render()
             return ''.join([node.data for node in self._rendered_list])
 
+        def get_fragment_by_index(self, index):
+            # If the index is equal or after the last fragments start it points
+            # at the last fragment
+            self.render()
+            if len(self._rendered_list) == 0:
+                # If the list is empty return None as position 0
+                return None, 0
+            last_fragment = self._rendered_list[-1]
+            if index >= last_fragment.starts_at:
+                return last_fragment, len(self._rendered_list) - 1
+            assert False
 
     def __init__(self):
         pass

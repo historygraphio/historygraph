@@ -17,7 +17,8 @@ from .common import DocumentCollection
 # Text is an array of fragments.
 #
 # Each fragment is a string of text. Once a fragment is produced it can never
-# be changed (but it can be replaced)
+# be changed (but it can be replaced by two new fragments with the same
+# content as the old one)
 #
 # The text fragment also caches it's current index into the output. When a new
 # fragment is inserted every fragment after it must be moved along.
@@ -54,4 +55,28 @@ class TextEditTest(unittest.TestCase):
 
         textowner.text.insert(0, "abcdef")
 
+        self.assertEqual(textowner.text.get_text(), "abcdef")
+        self.assertEqual(len(textowner.text._rendered_list), 1)
+        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
+        fragment = textowner.text._rendered_list[0]
+        self.assertEqual(fragment, textowner.text.get_fragment_by_index(0)[0])
+        self.assertEqual(fragment, textowner.text.get_fragment_by_index(2)[0])
+        self.assertEqual(fragment, textowner.text.get_fragment_by_index(5)[0])
+        self.assertEqual(0, textowner.text.get_fragment_by_index(0)[1])
+
+    def test_create_text_with_two_consecutative_fragments(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+        self.assertEqual(len(textowner.text._rendered_list), 2)
         self.assertEqual(textowner.text.get_text(), "abcdef")
