@@ -51,6 +51,12 @@ class TextEdit(Field):
             if hasattr(self, "_rendered_list"):
                 delattr(self, "_rendered_list")
 
+            self.render()
+            for i in range(index + 2, len(self._rendered_list)):
+                prev_fragment = self._rendered_list[i - 1]
+                self._rendered_list[i].starts_at = prev_fragment.starts_at + \
+                    len(prev_fragment.data)
+
             self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                              self.name, JSONEncoder().encode((added_node.id,
                                 added_node.parent, added_node.timestamp, added_node.data)),
@@ -148,6 +154,10 @@ class TextEdit(Field):
                 # Usually if target_fragment is the last fragment the insert
                 # point should be one past it
                 fragment_index += 1
+            elif index == target_fragment.starts_at:
+                # If it points to the start of a fragment insert before the
+                # fragment
+                pass
             else:
                 assert False
             self._insert(fragment_index, fragmenttext)
@@ -166,7 +176,22 @@ class TextEdit(Field):
             last_fragment = self._rendered_list[-1]
             if index >= last_fragment.starts_at:
                 return last_fragment, len(self._rendered_list) - 1
-            assert False
+            return self._get_fragment_by_index(index, 0, len(self._rendered_list)-1)
+
+        def _get_fragment_by_index(self, index, start_frag_index, end_frag_index):
+            # Perform a binary search to find the matching fragment
+            start_frag = self._rendered_list[start_frag_index]
+            if index >= start_frag.starts_at and index < start_frag.starts_at + len(start_frag.data):
+                return start_frag, start_frag_index
+            end_frag = self._rendered_list[end_frag_index]
+            if index >= end_frag.starts_at and index < end_frag.starts_at + len(end_frag.data):
+                return end_frag, end_frag_index
+            mid_frag_index = (start_frag_index + end_frag_index) // 2
+            mid_frag = self._rendered_list[mid_frag_index]
+            if index >= mid_frag.starts_at:
+                return self._get_fragment_by_index(index, mid_frag_index, end_frag_index)
+            else:
+                return self._get_fragment_by_index(index, mid_frag_index, end_frag_index)
 
     def __init__(self):
         pass

@@ -79,4 +79,57 @@ class TextEditTest(unittest.TestCase):
 
         textowner.text.render()
         self.assertEqual(len(textowner.text._rendered_list), 2)
+        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(textowner.text._rendered_list[0].data, "abc")
+        self.assertEqual(textowner.text._rendered_list[1].starts_at, 3)
+        self.assertEqual(textowner.text._rendered_list[1].data, "def")
+
+        self.assertEqual(textowner.text._rendered_list[0],
+                         textowner.text.get_fragment_by_index(0)[0])
+        self.assertEqual(textowner.text._rendered_list[0],
+                         textowner.text.get_fragment_by_index(2)[0])
+        self.assertEqual(textowner.text._rendered_list[1],
+                         textowner.text.get_fragment_by_index(3)[0])
+        self.assertEqual(textowner.text._rendered_list[1],
+                         textowner.text.get_fragment_by_index(5)[0])
+        self.assertEqual(0, textowner.text.get_fragment_by_index(0)[1])
+        self.assertEqual(0, textowner.text.get_fragment_by_index(2)[1])
+        self.assertEqual(1, textowner.text.get_fragment_by_index(3)[1])
+        self.assertEqual(1, textowner.text.get_fragment_by_index(5)[1])
+
         self.assertEqual(textowner.text.get_text(), "abcdef")
+
+    def test_create_text_with_two_reversed_fragments(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(0, "def")
+
+        textowner.text.render()
+        self.assertEqual(len(textowner.text._rendered_list), 2)
+        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(textowner.text._rendered_list[0].data, "def")
+        self.assertEqual(textowner.text._rendered_list[1].starts_at, 3)
+        self.assertEqual(textowner.text._rendered_list[1].data, "abc")
+
+        self.assertEqual(textowner.text._rendered_list[0],
+                         textowner.text.get_fragment_by_index(0)[0])
+        self.assertEqual(textowner.text._rendered_list[0],
+                         textowner.text.get_fragment_by_index(2)[0])
+        self.assertEqual(textowner.text._rendered_list[1],
+                         textowner.text.get_fragment_by_index(3)[0])
+        self.assertEqual(textowner.text._rendered_list[1],
+                         textowner.text.get_fragment_by_index(5)[0])
+        self.assertEqual(0, textowner.text.get_fragment_by_index(0)[1])
+        self.assertEqual(0, textowner.text.get_fragment_by_index(2)[1])
+        self.assertEqual(1, textowner.text.get_fragment_by_index(3)[1])
+        self.assertEqual(1, textowner.text.get_fragment_by_index(5)[1])
+
+        self.assertEqual(textowner.text.get_text(), "defabc")
