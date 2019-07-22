@@ -176,6 +176,98 @@ class TextEditTest(unittest.TestCase):
         self.assertNotEqual(old_fragment.id,
                             textowner.text._rendered_list[2].get_original_id())
 
+    def test_split_second_fragment(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+        self.assertEqual(len(textowner.text._rendered_list), 2)
+
+        old_fragment = textowner.text._rendered_list[1] # The fragment being split
+
+        textowner.text._split_fragment(1, 1)
+        textowner.text.render()
+        self.assertEqual(len(textowner.text._rendered_list), 3)
+
+        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(textowner.text._rendered_list[0].data, "abc")
+        self.assertEqual(textowner.text._rendered_list[0].id,
+                         textowner.text._rendered_list[0].get_original_id())
+
+        self.assertEqual(textowner.text._rendered_list[1].starts_at, 3)
+        self.assertEqual(textowner.text._rendered_list[1].data, "d")
+
+        self.assertEqual(old_fragment.id,
+                         textowner.text._rendered_list[1].get_original_id())
+        self.assertNotEqual(textowner.text._rendered_list[1].id,
+                            textowner.text._rendered_list[1].get_original_id())
+
+        self.assertEqual(textowner.text._rendered_list[2].starts_at, 4)
+        self.assertEqual(textowner.text._rendered_list[2].data, "ef")
+        self.assertEqual(textowner.text._rendered_list[2].id,
+                         textowner.text._rendered_list[2].get_original_id())
+        self.assertNotEqual(old_fragment.id,
+                            textowner.text._rendered_list[2].get_original_id())
+
+    def test_split_middle_fragment(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "def")
+        textowner.text.insert(6, "def")
+
+        textowner.text.render()
+        self.assertEqual(len(textowner.text._rendered_list), 3)
+
+        old_fragment = textowner.text._rendered_list[1] # The fragment being split
+
+        textowner.text._split_fragment(1, 1)
+        textowner.text.render()
+        self.assertEqual(len(textowner.text._rendered_list), 4)
+
+        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(textowner.text._rendered_list[0].data, "abc")
+        self.assertEqual(textowner.text._rendered_list[0].id,
+                         textowner.text._rendered_list[0].get_original_id())
+
+        self.assertEqual(textowner.text._rendered_list[1].starts_at, 3)
+        self.assertEqual(textowner.text._rendered_list[1].data, "d")
+
+        self.assertEqual(old_fragment.id,
+                         textowner.text._rendered_list[1].get_original_id())
+        self.assertNotEqual(textowner.text._rendered_list[1].id,
+                            textowner.text._rendered_list[1].get_original_id())
+
+        self.assertEqual(textowner.text._rendered_list[2].starts_at, 4)
+        self.assertEqual(textowner.text._rendered_list[2].data, "ef")
+        self.assertEqual(textowner.text._rendered_list[2].id,
+                         textowner.text._rendered_list[2].get_original_id())
+        self.assertNotEqual(old_fragment.id,
+                            textowner.text._rendered_list[2].get_original_id())
+
+        self.assertEqual(textowner.text._rendered_list[3].starts_at, 6)
+        self.assertEqual(textowner.text._rendered_list[3].data, "ghi")
+        self.assertEqual(textowner.text._rendered_list[3].id,
+                         textowner.text._rendered_list[3].get_original_id())
+        self.assertNotEqual(old_fragment.id,
+                            textowner.text._rendered_list[3].get_original_id())
+
     def test_create_text_with_three_consecutative_fragments(self):
         class TestFieldTextEditOwner1(Document):
             text = fields.TextEdit()
@@ -250,3 +342,35 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(textowner.text._rendered_list[1].starts_at, 3)
         self.assertEqual(textowner.text._rendered_list[1].data, "ghi")
         self.assertEqual(textowner.text._rendered_list[1].id, old_last_node.id)
+
+    def test_delete_across_fragments(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "ghi")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+
+        old_first_node = textowner.text._rendered_list[0]
+        old_last_node = textowner.text._rendered_list[2]
+
+        textowner.text.removerange(2, 7)
+
+        textowner.text.render()
+
+        self.assertEqual(len(textowner.text._rendered_list), 2)
+        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(textowner.text._rendered_list[0].data, "ab")
+        self.assertNotEqual(textowner.text._rendered_list[0].id, old_first_node.id)
+        self.assertEqual(textowner.text._rendered_list[0].get_original_id(), old_first_node.id)
+        self.assertEqual(textowner.text._rendered_list[1].starts_at, 2)
+        self.assertEqual(textowner.text._rendered_list[1].data, "hi")
+        self.assertNotEqual(textowner.text._rendered_list[1].id, old_last_node.id)
