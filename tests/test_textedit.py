@@ -230,15 +230,17 @@ class TextEditTest(unittest.TestCase):
 
         textowner.text.insert(0, "abc")
         textowner.text.insert(3, "def")
-        textowner.text.insert(6, "def")
+        textowner.text.insert(6, "ghi")
 
         textowner.text.render()
+
         self.assertEqual(len(textowner.text._rendered_list), 3)
 
         old_fragment = textowner.text._rendered_list[1] # The fragment being split
 
         textowner.text._split_fragment(1, 1)
         textowner.text.render()
+
         self.assertEqual(len(textowner.text._rendered_list), 4)
 
         self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
