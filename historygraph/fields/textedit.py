@@ -97,6 +97,7 @@ class TextEdit(Field):
                     self.name, node.id, "string")
 
         def removerange(self, start, end):
+            assert start >= 0
             frag_start, frag_start_index = self.get_fragment_by_index(start)
             if frag_start.starts_at != start:
                 # If the start position is in the middle of a fragment. Split that
@@ -111,6 +112,7 @@ class TextEdit(Field):
                 self.render()
 
             self.render()
+            self._rendered_list[0].starts_at = 0
             for i in range(max(frag_start_index, 1), len(self._rendered_list)):
                 prev_fragment = self._rendered_list[i - 1]
                 self._rendered_list[i].starts_at = prev_fragment.starts_at + \
@@ -119,11 +121,15 @@ class TextEdit(Field):
             # Now we should only be deleting whole fragments
             frag_start, frag_start_index = self.get_fragment_by_index(start)
             frag_end, frag_end_index = self.get_fragment_by_index(end)
+            if end >= frag_end.starts_at + len(frag_end.data) and frag_end_index == len(self._rendered_list) - 1:
+                # If past the end of the last fragment bump up by one
+                frag_end_index += 1
             node_ids = [self._rendered_list[i].id for i in
                         range(frag_start_index, frag_end_index)]
             for nodeid in node_ids:
                 self.remove_by_nodeid(nodeid)
             self.render()
+            self._rendered_list[0].starts_at = 0
             for i in range(max(frag_start_index, 1), len(self._rendered_list)):
                 prev_fragment = self._rendered_list[i - 1]
                 self._rendered_list[i].starts_at = prev_fragment.starts_at + \
@@ -242,8 +248,9 @@ class TextEdit(Field):
             self.render()
             self._insert(frag_index, old_fragment.data[:split_position],
                          original_id=old_fragment.id)
-            self.render()
-            self._insert(frag_index + 1, old_fragment.data[split_position:])
+            if split_position < len(old_fragment.data):
+                self.render()
+                self._insert(frag_index + 1, old_fragment.data[split_position:])
 
     def __init__(self):
         pass

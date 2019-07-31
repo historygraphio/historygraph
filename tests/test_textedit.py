@@ -376,3 +376,123 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(textowner.text._rendered_list[1].starts_at, 2)
         self.assertEqual(textowner.text._rendered_list[1].data, "hi")
         self.assertNotEqual(textowner.text._rendered_list[1].id, old_last_node.id)
+
+    def test_delete_partial_fragment_at_start(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "ghi")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+
+        old_first_node = textowner.text._rendered_list[0]
+
+        textowner.text.removerange(0, 2)
+
+        textowner.text.render()
+
+        self.assertEqual(len(textowner.text._rendered_list), 3)
+        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(textowner.text._rendered_list[0].data, "c")
+        self.assertNotEqual(textowner.text._rendered_list[0].id, old_first_node.id)
+        self.assertNotEqual(textowner.text._rendered_list[0].get_original_id(), old_first_node.id)
+        self.assertEqual(textowner.text._rendered_list[1].starts_at, 1)
+        self.assertEqual(textowner.text._rendered_list[1].data, "def")
+        self.assertEqual(textowner.text._rendered_list[2].starts_at, 4)
+        self.assertEqual(textowner.text._rendered_list[2].data, "ghi")
+
+    def test_delete_multi_partial_fragment_at_start(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "ghi")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+
+        textowner.text.removerange(0, 4)
+
+        textowner.text.render()
+
+        self.assertEqual(len(textowner.text._rendered_list), 2)
+        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(textowner.text._rendered_list[0].data, "ef")
+        self.assertEqual(textowner.text._rendered_list[1].starts_at, 2)
+        self.assertEqual(textowner.text._rendered_list[1].data, "ghi")
+
+    def test_delete_partial_fragment_at_end(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "ghi")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+
+        old_first_node = textowner.text._rendered_list[0]
+
+        textowner.text.removerange(7, 9)
+
+        textowner.text.render()
+
+        self.assertEqual(len(textowner.text._rendered_list), 3)
+        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(textowner.text._rendered_list[0].data, "abc")
+        self.assertEqual(textowner.text._rendered_list[0].id, old_first_node.id)
+        self.assertEqual(textowner.text._rendered_list[0].get_original_id(), old_first_node.id)
+        self.assertEqual(textowner.text._rendered_list[1].starts_at, 3)
+        self.assertEqual(textowner.text._rendered_list[1].data, "def")
+        self.assertEqual(textowner.text._rendered_list[2].starts_at, 6)
+        self.assertEqual(textowner.text._rendered_list[2].data, "g")
+
+    def test_delete_multi_partial_fragment_at_end(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "ghi")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+
+        old_first_node = textowner.text._rendered_list[0]
+
+        textowner.text.removerange(5, 9)
+
+        textowner.text.render()
+
+        self.assertEqual(len(textowner.text._rendered_list), 2)
+        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(textowner.text._rendered_list[0].data, "abc")
+        self.assertEqual(textowner.text._rendered_list[0].id, old_first_node.id)
+        self.assertEqual(textowner.text._rendered_list[0].get_original_id(), old_first_node.id)
+        self.assertEqual(textowner.text._rendered_list[1].starts_at, 3)
+        self.assertEqual(textowner.text._rendered_list[1].data, "de")
