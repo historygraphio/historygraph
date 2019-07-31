@@ -111,7 +111,7 @@ class TextEdit(Field):
                 self.render()
 
             self.render()
-            for i in range(frag_start_index, len(self._rendered_list)):
+            for i in range(max(frag_start_index, 1), len(self._rendered_list)):
                 prev_fragment = self._rendered_list[i - 1]
                 self._rendered_list[i].starts_at = prev_fragment.starts_at + \
                     len(prev_fragment.data)
@@ -124,7 +124,7 @@ class TextEdit(Field):
             for nodeid in node_ids:
                 self.remove_by_nodeid(nodeid)
             self.render()
-            for i in range(frag_start_index, len(self._rendered_list)):
+            for i in range(max(frag_start_index, 1), len(self._rendered_list)):
                 prev_fragment = self._rendered_list[i - 1]
                 self._rendered_list[i].starts_at = prev_fragment.starts_at + \
                     len(prev_fragment.data)
@@ -218,21 +218,19 @@ class TextEdit(Field):
 
         def _get_fragment_by_index(self, index, start_frag_index, end_frag_index):
             # Perform a binary search to find the matching fragment
-            print("_get_fragment_by_index index=", index, " start_frag_index=", start_frag_index, " end_frag_index=", end_frag_index)
             start_frag = self._rendered_list[start_frag_index]
-            print("_get_fragment_by_index start_frag.starts_at=", start_frag.starts_at, " len(start_frag.data)=", len(start_frag.data))
             if index >= start_frag.starts_at and index < start_frag.starts_at + len(start_frag.data):
                 return start_frag, start_frag_index
             end_frag = self._rendered_list[end_frag_index]
-            print("_get_fragment_by_index end_frag.starts_at=", end_frag.starts_at, " len(end_frag.data)=", len(end_frag.data))
             if index >= end_frag.starts_at and index < end_frag.starts_at + len(end_frag.data):
                 return end_frag, end_frag_index
             mid_frag_index = (start_frag_index + end_frag_index) // 2
             mid_frag = self._rendered_list[mid_frag_index]
+
             if index >= mid_frag.starts_at:
                 return self._get_fragment_by_index(index, mid_frag_index, end_frag_index)
             else:
-                return self._get_fragment_by_index(index, mid_frag_index, end_frag_index)
+                return self._get_fragment_by_index(index, start_frag_index, mid_frag_index)
 
         def _split_fragment(self, frag_index, split_position):
             # Split a fragment ie remove and old one and replace it with a new one
