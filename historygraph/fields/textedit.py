@@ -294,6 +294,7 @@ class TextEdit(Field):
                     if lastsearch == -1:
                         break
                     else:
+                        lastsearch += thispos
                         thispos = lastsearch + 1
                         rawlines.append(lastlineinfo)
                         lastlineinfo = LineInfo(index,thispos,self._rendered_list)
