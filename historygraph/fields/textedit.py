@@ -203,7 +203,10 @@ class TextEdit(Field):
                 # fragment
                 pass
             else:
-                assert False
+                self._split_fragment(fragment_index, index - target_fragment.starts_at)
+                self.render()
+                self.insert(index, fragmenttext)
+                return
             self._insert(fragment_index, fragmenttext)
 
         def get_text(self):
@@ -251,6 +254,51 @@ class TextEdit(Field):
             if split_position < len(old_fragment.data):
                 self.render()
                 self._insert(frag_index + 1, old_fragment.data[split_position:])
+
+        def get_lines(self):
+            # Return an array of lines of text from this document
+            # Each line consists of the start point (fragment + offset)
+            # The start of the line is the character after the previous \n
+            # except the frst line always starts at position 0. The end of the
+            # line is the next \n. Except the last line which is the last
+            # character in the textedit
+            class LineInfo(object):
+                def __init__(self, start_fragment, start_offset, rendered_list):
+                    self.start_fragment = start_fragment
+                    self.start_offset = start_offset
+                    self.rendered_list = rendered_list
+
+                def get_content(self):
+                    def _get_content(fragment, start_offset):
+                        if fragment >= len(self.rendered_list):
+                            return ""
+                        data = self.rendered_list[fragment].data
+                        data = data[start_offset:]
+                        pos = data.find('\n')
+                        if pos == -1:
+                            return data + _get_content(fragment + 1, 0)
+                        else:
+                            return data[:pos]
+
+                    return _get_content(self.start_fragment, self.start_offset)
+
+            lastlineinfo = None
+            rawlines = list()
+            for index in range(0, len(self._rendered_list)):
+                if lastlineinfo == None:
+                    lastlineinfo = LineInfo(index,0,self._rendered_list)
+                fragment = self._rendered_list[index]
+                thispos = 0
+                while True:
+                    lastsearch = fragment.data[thispos:].find('\n')
+                    if lastsearch == -1:
+                        break
+                    else:
+                        thispos = lastsearch + 1
+                        rawlines.append(lastlineinfo)
+                        lastlineinfo = LineInfo(index,thispos,self._rendered_list)
+            rawlines.append(lastlineinfo)
+            return rawlines
 
     def __init__(self):
         pass
