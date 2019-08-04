@@ -89,6 +89,30 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(line.start_fragment, 0)
         self.assertEqual(line.get_content(), "def")
 
+    def test_simple_document_is_two_lines_new_line_at_end(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef\n")
+
+        lines = textowner.text.get_lines()
+        self.assertEqual(len(lines), 2)
+        line = lines[0]
+        self.assertEqual(line.start_offset, 0)
+        self.assertEqual(line.start_fragment, 0)
+        self.assertEqual(line.get_content(), "abcdef")
+
+        line = lines[1]
+        self.assertEqual(line.start_offset, 0)
+        self.assertEqual(line.start_fragment, 1)
+        self.assertEqual(line.get_content(), "")
+
     def test_split_fragment_document_is_two_lines(self):
         class TestFieldTextEditOwner1(Document):
             text = fields.TextEdit()
@@ -113,6 +137,31 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(line.start_offset, 1)
         self.assertEqual(line.start_fragment, 1)
         self.assertEqual(line.get_content(), "def")
+
+    def test_split_fragment_document_is_two_lines_new_line_at_end(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+        textowner.text.insert(6, "\n")
+
+        lines = textowner.text.get_lines()
+        self.assertEqual(len(lines), 2)
+        line = lines[0]
+        self.assertEqual(line.start_offset, 0)
+        self.assertEqual(line.start_fragment, 0)
+        self.assertEqual(line.get_content(), "abcdef")
+
+        line = lines[1]
+        self.assertEqual(line.start_offset, 0)
+        self.assertEqual(line.start_fragment, 2)
+        self.assertEqual(line.get_content(), "")
 
     def test_simple_document_two_lines_is_one_after_deletion(self):
         class TestFieldTextEditOwner1(Document):
