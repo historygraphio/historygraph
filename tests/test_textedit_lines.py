@@ -223,3 +223,48 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(line.start_offset, 4)
         self.assertEqual(line.start_fragment, 1)
         self.assertEqual(line.get_content(), "ghi")
+
+    def test_multi_fragment_document_three_lines_is_two_after_deletion(self):
+        class TestFieldTextEditOwner1(Document):
+            text = fields.TextEdit()
+
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection()
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc\n")
+        textowner.text.insert(4, "def\n")
+        textowner.text.insert(8, "ghi")
+
+        lines = textowner.text.get_lines()
+        self.assertEqual(len(lines), 3)
+        line = lines[0]
+        self.assertEqual(line.start_offset, 0)
+        self.assertEqual(line.start_fragment, 0)
+        self.assertEqual(line.get_content(), "abc")
+
+        line = lines[1]
+        self.assertEqual(line.start_fragment, 1)
+        self.assertEqual(line.start_offset, 0)
+        self.assertEqual(line.get_content(), "def")
+
+        line = lines[2]
+        self.assertEqual(line.start_offset, 0)
+        self.assertEqual(line.start_fragment, 2)
+        self.assertEqual(line.get_content(), "ghi")
+
+        textowner.text.removerange(3, 4)
+
+        lines = textowner.text.get_lines()
+        self.assertEqual(len(lines), 2)
+        line = lines[0]
+        self.assertEqual(line.start_offset, 0)
+        self.assertEqual(line.start_fragment, 0)
+        self.assertEqual(line.get_content(), "abcdef")
+
+        line = lines[1]
+        self.assertEqual(line.start_offset, 0)
+        self.assertEqual(line.start_fragment, 2)
+        self.assertEqual(line.get_content(), "ghi")
