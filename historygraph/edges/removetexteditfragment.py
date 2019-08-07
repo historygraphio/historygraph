@@ -23,7 +23,7 @@ class RemoveTextEditFragment(Edge):
     def replay(self, doc):
         # Remove the item if it's parent exits
         #if doc.has_document_object(self.propertyownerid):
-        #parent = doc.get_document_object(self.propertyownerid)
+        parent = doc.get_document_object(self.propertyownerid)
         getattr(parent, self.propertyname).remove_by_nodeid(self.propertyvalue)
 
     def clone(self):

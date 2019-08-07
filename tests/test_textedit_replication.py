@@ -132,3 +132,33 @@ class TextEditTestReplication(unittest.TestCase):
         self.assertEqual(1, test2.text.get_fragment_by_index(5)[1])
         self.assertEqual(2, test2.text.get_fragment_by_index(6)[1])
         self.assertEqual(2, test2.text.get_fragment_by_index(8)[1])
+
+    def test_delete_text_whole_fragment(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "ghi")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+
+        old_first_node = textowner.text._rendered_list[0]
+        old_last_node = textowner.text._rendered_list[2]
+
+        textowner.text.removerange(3, 6)
+
+        test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__, textowner.id)
+        test2.text.render()
+        test2.text.recalc_starts_at(0)
+
+        self.assertEqual(test2.text.get_text(), "abcghi")
+
+        self.assertEqual(len(test2.text._rendered_list), 2)
+        self.assertEqual(test2.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(test2.text._rendered_list[0].data, "abc")
+        self.assertEqual(test2.text._rendered_list[0].id, old_first_node.id)
+        self.assertEqual(test2.text._rendered_list[1].starts_at, 3)
+        self.assertEqual(test2.text._rendered_list[1].data, "ghi")
+        self.assertEqual(test2.text._rendered_list[1].id, old_last_node.id)
