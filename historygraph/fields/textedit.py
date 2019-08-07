@@ -113,11 +113,7 @@ class TextEdit(Field):
                 self.render()
 
             self.render()
-            self._rendered_list[0].starts_at = 0
-            for i in range(max(frag_start_index, 1), len(self._rendered_list)):
-                prev_fragment = self._rendered_list[i - 1]
-                self._rendered_list[i].starts_at = prev_fragment.starts_at + \
-                    len(prev_fragment.data)
+            self.recalc_starts_at(frag_start_index)
 
             # Now we should only be deleting whole fragments
             frag_start, frag_start_index = self.get_fragment_by_index(start)
@@ -129,6 +125,11 @@ class TextEdit(Field):
                         range(frag_start_index, frag_end_index)]
             for nodeid in node_ids:
                 self.remove_by_nodeid(nodeid)
+            self.render()
+            self.recalc_starts_at(frag_start_index)
+
+        def recalc_starts_at(self, frag_start_index):
+            # Recalculation of the starts at information for all frags after and including frag_start_index
             self.render()
             self._rendered_list[0].starts_at = 0
             for i in range(max(frag_start_index, 1), len(self._rendered_list)):

@@ -42,6 +42,7 @@ class AddTextEditFragment(Edge):
             if hasattr(flImpl, "_rendered_list"):
                 delattr(flImpl, "_rendered_list")
             flImpl._listnodes.append(added_node)
+            flImpl.recalc_starts_at(0)
 
     def clone(self):
         return AddTextEditFragment(self._start_hashes,
