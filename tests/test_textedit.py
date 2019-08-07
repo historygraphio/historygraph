@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 import unittest
 from historygraph import Document
 from historygraph import fields
-from .common import DocumentCollection
+from .common import DocumentCollection, TestFieldTextEditOwner1
 
 # A TextEdit is a new CRDT similar to a list in some ways but designed for
 # storing collaboratively edited text files. The problem it solves is -
@@ -45,9 +45,6 @@ from .common import DocumentCollection
 #
 class TextEditTest(unittest.TestCase):
     def test_create_text_with_single_fragment(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -66,9 +63,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(0, textowner.text.get_fragment_by_index(0)[1])
 
     def test_create_text_with_two_consecutative_fragments(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -101,9 +95,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(textowner.text.get_text(), "abcdef")
 
     def test_create_text_with_two_reversed_fragments(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -136,9 +127,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(textowner.text.get_text(), "defabc")
 
     def test_split_fragments(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -177,9 +165,6 @@ class TextEditTest(unittest.TestCase):
                             textowner.text._rendered_list[2].get_original_id())
 
     def test_split_second_fragment(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -219,9 +204,6 @@ class TextEditTest(unittest.TestCase):
                             textowner.text._rendered_list[2].get_original_id())
 
     def test_split_middle_fragment(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -271,9 +253,6 @@ class TextEditTest(unittest.TestCase):
                             textowner.text._rendered_list[3].get_original_id())
 
     def test_create_text_with_three_consecutative_fragments(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -315,9 +294,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(textowner.text.get_text(), "abcdefghi")
 
     def test_delete_text_whole_fragment(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -346,9 +322,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(textowner.text._rendered_list[1].id, old_last_node.id)
 
     def test_delete_across_fragments(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -378,9 +351,6 @@ class TextEditTest(unittest.TestCase):
         self.assertNotEqual(textowner.text._rendered_list[1].id, old_last_node.id)
 
     def test_delete_partial_fragment_at_start(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -410,9 +380,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(textowner.text._rendered_list[2].data, "ghi")
 
     def test_delete_multi_partial_fragment_at_start(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -436,9 +403,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(textowner.text._rendered_list[1].data, "ghi")
 
     def test_delete_partial_fragment_at_end(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -468,9 +432,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(textowner.text._rendered_list[2].data, "g")
 
     def test_delete_multi_partial_fragment_at_end(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()

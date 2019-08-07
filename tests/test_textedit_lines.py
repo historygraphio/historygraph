@@ -3,13 +3,10 @@ from __future__ import absolute_import, unicode_literals, print_function
 import unittest
 from historygraph import Document
 from historygraph import fields
-from .common import DocumentCollection
+from .common import DocumentCollection, TestFieldTextEditOwner1
 
 class TextEditTest(unittest.TestCase):
     def test_simple_document_has_one_line(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -26,9 +23,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(line.get_content(), "abcdef")
 
     def test_two_fragment_document_is_one_line(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -46,9 +40,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(line.get_content(), "abcdef")
 
     def test_split_fragment_document_is_one_line(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -66,9 +57,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(line.get_content(), "adefbc")
 
     def test_simple_document_is_two_lines(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -90,9 +78,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(line.get_content(), "def")
 
     def test_simple_document_is_two_lines_new_line_at_end(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -114,9 +99,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(line.get_content(), "")
 
     def test_split_fragment_document_is_two_lines(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -139,9 +121,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(line.get_content(), "def")
 
     def test_split_fragment_document_is_two_lines_new_line_at_end(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -164,9 +143,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(line.get_content(), "")
 
     def test_simple_document_two_lines_is_one_after_deletion(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -197,9 +173,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(line.get_content(), "abcdef")
 
     def test_split_fragment_document_two_lines_is_one_after_deletion(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -231,9 +204,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(line.get_content(), "abcdef")
 
     def test_simple_document_three_lines_is_two_after_deletion(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()
@@ -274,9 +244,6 @@ class TextEditTest(unittest.TestCase):
         self.assertEqual(line.get_content(), "ghi")
 
     def test_multi_fragment_document_three_lines_is_two_after_deletion(self):
-        class TestFieldTextEditOwner1(Document):
-            text = fields.TextEdit()
-
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection()

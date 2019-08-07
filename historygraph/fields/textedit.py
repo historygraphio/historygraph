@@ -64,7 +64,8 @@ class TextEdit(Field):
 
             self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                              self.name, JSONEncoder().encode((added_node.id,
-                                added_node.parent, added_node.timestamp, added_node.data)),
+                                added_node.parent, added_node.timestamp, added_node.data,
+                                added_node.original_id)),
                              "string")
 
         def _append(self, fragmenttext):

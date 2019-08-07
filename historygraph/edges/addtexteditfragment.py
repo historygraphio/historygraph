@@ -21,10 +21,10 @@ class AddTextEditFragment(Edge):
 
     def replay(self, doc):
         # List items are actually listnodes (or tombstone) they are then replayed via their own algorithm
-        (added_node_id, added_node_parent, added_node_timestamp, added_node_data) = \
+        (added_node_id, added_node_parent, added_node_timestamp, added_node_data, added_node_original_id) = \
             JSONDecoder().decode(self.propertyvalue)
         # Create the document object if it doesn't already exist
-        added_node = fields.TestEdit._Fragment(added_node_parent, added_node_timestamp, added_node_data)
+        added_node = fields.TextEdit._Fragment(added_node_parent, added_node_timestamp, added_node_data, 0, added_node_original_id)
         added_node.id = added_node_id
         if self.propertyownerid == "" and self.propertyname == "":
             assert False # We can never create stand alone object this way

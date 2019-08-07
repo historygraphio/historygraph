@@ -96,3 +96,6 @@ class TestFieldListOwner1(Document):
 
 class FloatCounterTestContainer(Document):
     testcounter = fields.FloatCounter()
+
+class TestFieldTextEditOwner1(Document):
+    text = fields.TextEdit()
