@@ -162,3 +162,140 @@ class TextEditTestReplication(unittest.TestCase):
         self.assertEqual(test2.text._rendered_list[1].starts_at, 3)
         self.assertEqual(test2.text._rendered_list[1].data, "ghi")
         self.assertEqual(test2.text._rendered_list[1].id, old_last_node.id)
+
+    def test_delete_across_fragments(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "ghi")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+
+        old_first_node = textowner.text._rendered_list[0]
+        old_last_node = textowner.text._rendered_list[2]
+
+        textowner.text.removerange(2, 7)
+
+        test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__, textowner.id)
+        test2.text.render()
+        test2.text.recalc_starts_at(0)
+
+        self.assertEqual(len(test2.text._rendered_list), 2)
+        self.assertEqual(test2.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(test2.text._rendered_list[0].data, "ab")
+        self.assertNotEqual(test2.text._rendered_list[0].id, old_first_node.id)
+        self.assertEqual(test2.text._rendered_list[0].get_original_id(), old_first_node.id)
+        self.assertEqual(test2.text._rendered_list[1].starts_at, 2)
+        self.assertEqual(test2.text._rendered_list[1].data, "hi")
+        self.assertNotEqual(test2.text._rendered_list[1].id, old_last_node.id)
+
+    def test_delete_partial_fragment_at_start(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "ghi")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+
+        old_first_node = textowner.text._rendered_list[0]
+
+        textowner.text.removerange(0, 2)
+
+        test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__, textowner.id)
+        test2.text.render()
+        test2.text.recalc_starts_at(0)
+
+        self.assertEqual(len(test2.text._rendered_list), 3)
+        self.assertEqual(test2.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(test2.text._rendered_list[0].data, "c")
+        self.assertNotEqual(test2.text._rendered_list[0].id, old_first_node.id)
+        self.assertNotEqual(test2.text._rendered_list[0].get_original_id(), old_first_node.id)
+        self.assertEqual(test2.text._rendered_list[1].starts_at, 1)
+        self.assertEqual(test2.text._rendered_list[1].data, "def")
+        self.assertEqual(test2.text._rendered_list[2].starts_at, 4)
+        self.assertEqual(test2.text._rendered_list[2].data, "ghi")
+
+    def test_delete_multi_partial_fragment_at_start(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "ghi")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+
+        textowner.text.removerange(0, 4)
+
+        test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__, textowner.id)
+        test2.text.render()
+        test2.text.recalc_starts_at(0)
+
+        self.assertEqual(len(test2.text._rendered_list), 2)
+        self.assertEqual(test2.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(test2.text._rendered_list[0].data, "ef")
+        self.assertEqual(test2.text._rendered_list[1].starts_at, 2)
+        self.assertEqual(test2.text._rendered_list[1].data, "ghi")
+
+    def test_delete_partial_fragment_at_end(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "ghi")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+
+        old_first_node = textowner.text._rendered_list[0]
+
+        textowner.text.removerange(7, 9)
+
+        test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__, textowner.id)
+        test2.text.render()
+        test2.text.recalc_starts_at(0)
+
+        self.assertEqual(len(test2.text._rendered_list), 3)
+        self.assertEqual(test2.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(test2.text._rendered_list[0].data, "abc")
+        self.assertEqual(test2.text._rendered_list[0].id, old_first_node.id)
+        self.assertEqual(test2.text._rendered_list[0].get_original_id(), old_first_node.id)
+        self.assertEqual(test2.text._rendered_list[1].starts_at, 3)
+        self.assertEqual(test2.text._rendered_list[1].data, "def")
+        self.assertEqual(test2.text._rendered_list[2].starts_at, 6)
+        self.assertEqual(test2.text._rendered_list[2].data, "g")
+
+    def test_delete_multi_partial_fragment_at_end(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abc")
+        textowner.text.insert(3, "ghi")
+        textowner.text.insert(3, "def")
+
+        textowner.text.render()
+
+        old_first_node = textowner.text._rendered_list[0]
+
+        textowner.text.removerange(5, 9)
+
+        test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__, textowner.id)
+        test2.text.render()
+        test2.text.recalc_starts_at(0)
+
+        self.assertEqual(len(test2.text._rendered_list), 2)
+        self.assertEqual(test2.text._rendered_list[0].starts_at, 0)
+        self.assertEqual(test2.text._rendered_list[0].data, "abc")
+        self.assertEqual(test2.text._rendered_list[0].id, old_first_node.id)
+        self.assertEqual(test2.text._rendered_list[0].get_original_id(), old_first_node.id)
+        self.assertEqual(test2.text._rendered_list[1].starts_at, 3)
+        self.assertEqual(test2.text._rendered_list[1].data, "de")
