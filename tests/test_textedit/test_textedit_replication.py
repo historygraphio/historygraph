@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 import unittest
 from historygraph import Document
 from historygraph import fields
-from .common import DocumentCollection, TestFieldTextEditOwner1
+from ..common import DocumentCollection, TestFieldTextEditOwner1
 
 
 class TextEditTestReplication(unittest.TestCase):
