@@ -7,6 +7,7 @@ from ..common import DocumentCollection, TestFieldTextEditOwner1
 
 
 class TextEditTestReplication(unittest.TestCase):
+    # Test that the textedit works when replicated in simple scenarios
     def setUp(self):
         self.dc1 = DocumentCollection()
         self.dc1.register(TestFieldTextEditOwner1)

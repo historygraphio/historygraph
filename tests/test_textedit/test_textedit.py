@@ -44,6 +44,7 @@ from ..common import DocumentCollection, TestFieldTextEditOwner1
 # Stage three a new related datatype for rich text editing
 #
 class TextEditTest(unittest.TestCase):
+    # Test the basic stand alone functionality of the text edit
     def test_create_text_with_single_fragment(self):
         textowner = TestFieldTextEditOwner1()
 

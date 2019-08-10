@@ -6,6 +6,7 @@ from historygraph import fields
 from ..common import DocumentCollection, TestFieldTextEditOwner1
 
 class TextEditTest(unittest.TestCase):
+    # Test the lines algorithm works correctly in standalone scenarios
     def test_simple_document_has_one_line(self):
         textowner = TestFieldTextEditOwner1()
 
