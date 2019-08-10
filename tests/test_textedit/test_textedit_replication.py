@@ -320,11 +320,22 @@ class TextEditTestReplication(unittest.TestCase):
         self.assertTrue(test2.text.get_text() == "abcdefghi" or test2.text.get_text() == "abcghidef")
         self.assertEqual(test2.text.get_text(), textowner.text.get_text())
 
-        """self.assertEqual(len(test2.text._rendered_list), 2)
-        self.assertEqual(test2.text._rendered_list[0].starts_at, 0)
-        self.assertEqual(test2.text._rendered_list[0].data, "abc")
-        self.assertEqual(test2.text._rendered_list[1].starts_at, 3)
-        self.assertEqual(test2.text._rendered_list[1].data, "def")
+        if test2.text.get_text() == "abcdefghi":
+            self.assertEqual(len(test2.text._rendered_list), 3)
+            self.assertEqual(test2.text._rendered_list[0].starts_at, 0)
+            self.assertEqual(test2.text._rendered_list[0].data, "abc")
+            self.assertEqual(test2.text._rendered_list[1].starts_at, 3)
+            self.assertEqual(test2.text._rendered_list[1].data, "def")
+            self.assertEqual(test2.text._rendered_list[2].starts_at, 6)
+            self.assertEqual(test2.text._rendered_list[2].data, "ghi")
+        if test2.text.get_text() == "abcghidef":
+            self.assertEqual(len(test2.text._rendered_list), 3)
+            self.assertEqual(test2.text._rendered_list[0].starts_at, 0)
+            self.assertEqual(test2.text._rendered_list[0].data, "abc")
+            self.assertEqual(test2.text._rendered_list[1].starts_at, 3)
+            self.assertEqual(test2.text._rendered_list[1].data, "ghi")
+            self.assertEqual(test2.text._rendered_list[2].starts_at, 6)
+            self.assertEqual(test2.text._rendered_list[2].data, "def")
 
         self.assertEqual(test2.text._rendered_list[0],
                          test2.text.get_fragment_by_index(0)[0])
@@ -334,31 +345,13 @@ class TextEditTestReplication(unittest.TestCase):
                          test2.text.get_fragment_by_index(3)[0])
         self.assertEqual(test2.text._rendered_list[1],
                          test2.text.get_fragment_by_index(5)[0])
+        self.assertEqual(test2.text._rendered_list[2],
+                         test2.text.get_fragment_by_index(6)[0])
+        self.assertEqual(test2.text._rendered_list[2],
+                         test2.text.get_fragment_by_index(8)[0])
         self.assertEqual(0, test2.text.get_fragment_by_index(0)[1])
         self.assertEqual(0, test2.text.get_fragment_by_index(2)[1])
         self.assertEqual(1, test2.text.get_fragment_by_index(3)[1])
         self.assertEqual(1, test2.text.get_fragment_by_index(5)[1])
-
-        textowner.text.render()
-
-        self.assertEqual(textowner.text.get_text(), "abcdef")
-        self.assertEqual(len(textowner.text._rendered_list), 2)
-        self.assertEqual(textowner.text._rendered_list[0].starts_at, 0)
-        self.assertEqual(textowner.text._rendered_list[0].data, "abc")
-        self.assertEqual(textowner.text._rendered_list[1].starts_at, 3)
-        self.assertEqual(textowner.text._rendered_list[1].data, "def")
-
-        self.assertEqual(textowner.text._rendered_list[0],
-                         textowner.text.get_fragment_by_index(0)[0])
-        self.assertEqual(textowner.text._rendered_list[0],
-                         textowner.text.get_fragment_by_index(2)[0])
-        self.assertEqual(textowner.text._rendered_list[1],
-                         textowner.text.get_fragment_by_index(3)[0])
-        self.assertEqual(textowner.text._rendered_list[1],
-                         textowner.text.get_fragment_by_index(5)[0])
-        self.assertEqual(0, textowner.text.get_fragment_by_index(0)[1])
-        self.assertEqual(0, textowner.text.get_fragment_by_index(2)[1])
-        self.assertEqual(1, textowner.text.get_fragment_by_index(3)[1])
-        self.assertEqual(1, textowner.text.get_fragment_by_index(5)[1])"""
-
-        assert False
+        self.assertEqual(2, test2.text.get_fragment_by_index(6)[1])
+        self.assertEqual(2, test2.text.get_fragment_by_index(8)[1])
