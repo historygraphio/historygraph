@@ -36,7 +36,7 @@ class AddTextEditFragment(Edge):
             for n in flImpl._listnodes:
                 # Test if this listnode is a duplicate of a existing one and don't add it if it is
                 if n.parent == added_node.parent and n.timestamp == added_node.timestamp and \
-                   n.data == added_node.data and n.obj == added_node.obj:
+                   n.data == added_node.data:
                     return
 
             if hasattr(flImpl, "_rendered_list"):
