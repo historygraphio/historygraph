@@ -310,11 +310,17 @@ class TextEditTestReplication(unittest.TestCase):
 
         test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__, textowner.id)
         test2.text.render()
+        self.dc2.freeze_dc_comms()
+        textowner.text.insert(3, "ghi")
         test2.text.insert(3, "def")
+        self.dc2.unfreeze_dc_comms()
+
         test2.text.render()
 
-        self.assertEqual(test2.text.get_text(), "abcdef")
-        self.assertEqual(len(test2.text._rendered_list), 2)
+        self.assertTrue(test2.text.get_text() == "abcdefghi" or test2.text.get_text() == "abcghidef")
+        self.assertEqual(test2.text.get_text(), textowner.text.get_text())
+
+        """self.assertEqual(len(test2.text._rendered_list), 2)
         self.assertEqual(test2.text._rendered_list[0].starts_at, 0)
         self.assertEqual(test2.text._rendered_list[0].data, "abc")
         self.assertEqual(test2.text._rendered_list[1].starts_at, 3)
@@ -353,4 +359,6 @@ class TextEditTestReplication(unittest.TestCase):
         self.assertEqual(0, textowner.text.get_fragment_by_index(0)[1])
         self.assertEqual(0, textowner.text.get_fragment_by_index(2)[1])
         self.assertEqual(1, textowner.text.get_fragment_by_index(3)[1])
-        self.assertEqual(1, textowner.text.get_fragment_by_index(5)[1])
+        self.assertEqual(1, textowner.text.get_fragment_by_index(5)[1])"""
+
+        assert False
