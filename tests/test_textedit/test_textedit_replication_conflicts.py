@@ -129,6 +129,7 @@ class TextEditTestReplication(unittest.TestCase):
 
         test2.text.render()
 
+        self.assertEqual(test2.text.get_text(), textowner.text.get_text())
         self.assertEqual(test2.text.get_text(), "abchi")
         self.assertEqual(textowner.text.get_text(), "abchi")
 
