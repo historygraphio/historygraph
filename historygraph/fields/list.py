@@ -3,6 +3,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 # An ordered list of sub objects in HistoryGraph
 # From work by Marek Zawirski https://twitter.com/zzzawir/status/757635463536578560
+# Available in this repo as documents/research_papers/Zawirski_lists.pdf
+# Full title "Specification and Complexity of Collaborative Text Editing"
 from . import Field
 from ..changetype import ChangeType
 import uuid
