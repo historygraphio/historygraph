@@ -8,8 +8,8 @@ import six
 
 class AddChild(Edge):
     def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue,
-                 propertytype, documentid, documentclassname, nonce='', transaction_hash=''):
-        super(AddChild, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_hash)
+                 propertytype, documentid, documentclassname, userid, transaction_hash=''):
+        super(AddChild, self).__init__(startnodes, documentid, documentclassname, userid, transaction_hash)
         assert isinstance(propertyownerid, six.string_types)
         assert isinstance(propertytype, six.string_types)
         assert isinstance(propertyvalue, six.string_types)
@@ -40,7 +40,7 @@ class AddChild(Edge):
         return AddChild(self._start_hashes,
             self.propertyownerid, self.propertyname, self.propertyvalue,
             self.propertytype, self.documentid, self.documentclassname,
-            self.nonce, self.transaction_hash)
+            self.userid, self.transaction_hash)
 
     def get_conflict_winner(self, edge2, doc_obj_heirachy):
         return 0 #There can never be a conflict because all edges are new

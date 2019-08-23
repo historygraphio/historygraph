@@ -7,9 +7,9 @@ import uuid
 
 class IntCounterTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(CounterTestContainer)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(CounterTestContainer)
 
     def test_parallel_int_counters_of_the_same_value(self):

@@ -10,8 +10,9 @@ import six
 class SimpleProperty(Edge):
     def __init__(self, startnodes, propertyownerid,
                  propertyname, propertyvalue, propertytype, documentid,
-                 documentclassname, nonce='', transaction_hash=''):
-        super(SimpleProperty, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_hash)
+                 documentclassname, userid, transaction_hash=''):
+        super(SimpleProperty, self).__init__(startnodes, documentid,
+            documentclassname, userid, transaction_hash)
         assert isinstance(propertyownerid, six.string_types)
         assert isinstance(propertytype, six.string_types)
         assert propertytype == 'int' or propertytype == 'basestring' or \
@@ -36,7 +37,7 @@ class SimpleProperty(Edge):
         return SimpleProperty(self._start_hashes,
                 self.propertyownerid, self.propertyname, self.propertyvalue,
                 self.propertytype, self.documentid, self.documentclassname,
-                self.nonce, self.transaction_hash)
+                self.userid, self.transaction_hash)
 
     def get_conflict_winner(self, edge2, doc_obj_heirachy):
         # TODO: Do these comparisions in a more OOP way

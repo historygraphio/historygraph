@@ -15,9 +15,9 @@ class DecimalRegisterClass(Document):
 
 class DecimalRegisterTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(DecimalRegisterClass)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(DecimalRegisterClass)
 
     def test_covers_with_single_edge(self):

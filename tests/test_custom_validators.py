@@ -31,7 +31,7 @@ class SimpleCustomValidationTestCase(unittest.TestCase):
             return int_value >= 1 and int_value <= 5
 
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4(), has_standard_validators=False)
+        self.dc1 = DocumentCollection(str(uuid.uuid4()), has_standard_validators=False)
         self.dc1.register(Covers)
 
     def test_success(self):
@@ -105,7 +105,8 @@ class SimpleCustomValidationTestCase(unittest.TestCase):
                               test1.id,
                               'covers', 9,
                               'int', last_edge.documentid,
-                              last_edge.documentclassname, last_edge.nonce, last_edge.transaction_hash)
+                              last_edge.documentclassname, last_edge.userid,
+                              last_edge.transaction_hash)
 
         edges = [last_edge, edge]
         transaction_hash = get_transaction_hash(edges)
@@ -151,7 +152,7 @@ class ValueDependentValidationTestCase(unittest.TestCase):
             return int_value > doc.covers
 
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4(), has_standard_validators=False)
+        self.dc1 = DocumentCollection(str(uuid.uuid4()), has_standard_validators=False)
         self.dc1.register(Covers)
 
     def test_success_on_real_validation_test(self):
@@ -200,7 +201,7 @@ class ValueDependentValidationTestCase(unittest.TestCase):
                               test1.id,
                               'covers', 1,
                               'int', last_edge.documentid,
-                              last_edge.documentclassname, last_edge.nonce,
+                              last_edge.documentclassname, last_edge.userid,
                               last_edge.transaction_hash)
 
         edges = [last_edge, edge]

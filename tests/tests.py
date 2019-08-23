@@ -19,9 +19,9 @@ from collections import defaultdict
 
 class SimpleCoversTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(Covers)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(Covers)
 
     def test_covers_with_single_edge(self):
@@ -37,6 +37,8 @@ class SimpleCoversTestCase(unittest.TestCase):
         #Test these are not just the same document but it was actually copied
         assert test is not test2
         assert test.history is not test2.history
+        assert test.history.get_edges_by_end_node(test._clockhash).userid == self.dc1.userid
+        assert test2.history.get_edges_by_end_node(test._clockhash).userid == self.dc1.userid
 
     def test_covers_with_two_edges(self):
         test = Covers()
@@ -76,9 +78,9 @@ class SimpleCoversTestCase(unittest.TestCase):
 
 class MergeHistoryCoverTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(Covers)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(Covers)
 
     def runTest(self):
@@ -102,9 +104,9 @@ class MergeHistoryCoverTestCase(unittest.TestCase):
 
 class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(Covers)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(Covers)
 
         self.test = Covers()
@@ -146,7 +148,7 @@ class MergeHistorySendEdgeCoverTestCase(unittest.TestCase):
 
 class ListItemChangeHistoryTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection(uuid.uuid4())
+        self.dc = DocumentCollection(str(uuid.uuid4()))
         self.dc.register(TestPropertyOwner1)
         self.dc.register(TestPropertyOwner2)
 
@@ -169,10 +171,10 @@ class ListItemChangeHistoryTestCase(unittest.TestCase):
 
 class SimpleItemTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(TestPropertyOwner1)
         self.dc1.register(TestPropertyOwner2)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(TestPropertyOwner1)
         self.dc2.register(TestPropertyOwner2)
 
@@ -214,10 +216,10 @@ class SimpleItemTestCase(unittest.TestCase):
 
 class AdvancedItemTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(TestPropertyOwner1)
         self.dc1.register(TestPropertyOwner2)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(TestPropertyOwner1)
         self.dc2.register(TestPropertyOwner2)
 
@@ -333,9 +335,9 @@ class Comments(Document):
 
 class MergeHistoryCommentTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(Comments)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(Comments)
 
     def test_merge_text_register_objects(self):
@@ -370,10 +372,10 @@ class MergeHistoryCommentTestCase(unittest.TestCase):
 
 class StoreObjectsInJSONTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(TestPropertyOwner1)
         self.dc1.register(TestPropertyOwner2)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(TestPropertyOwner1)
         self.dc2.register(TestPropertyOwner2)
 
@@ -405,7 +407,7 @@ class StoreObjectsInJSONTestCase(unittest.TestCase):
         self.assertEqual(testitem1.quantity, 3)
 
         jsontext = self.dc1.as_json()
-        dc3 = DocumentCollection(uuid.uuid4())
+        dc3 = DocumentCollection(str(uuid.uuid4()))
         dc3.register(TestPropertyOwner1)
         dc3.register(TestPropertyOwner2)
         dc3.load_from_json(jsontext)
@@ -422,10 +424,10 @@ class StoreObjectsInJSONTestCase(unittest.TestCase):
 
 class MergeChangesMadeInJSONTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(TestPropertyOwner1)
         self.dc1.register(TestPropertyOwner2)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(TestPropertyOwner1)
         self.dc2.register(TestPropertyOwner2)
 
@@ -457,7 +459,7 @@ class MergeChangesMadeInJSONTestCase(unittest.TestCase):
         self.assertEqual(testitem1.quantity, 3)
 
         jsontext = self.dc1.as_json()
-        dc3 = DocumentCollection(uuid.uuid4())
+        dc3 = DocumentCollection(str(uuid.uuid4()))
         dc3.register(TestPropertyOwner1)
         dc3.register(TestPropertyOwner2)
         dc3.load_from_json(jsontext)
@@ -486,7 +488,7 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
     #Similar to merge changes test but testing things such as out of order reception of edges
     #Orphaned edges and partially orphaned merge edges
     def setUp(self):
-        self.dc = DocumentCollection(uuid.uuid4())
+        self.dc = DocumentCollection(str(uuid.uuid4()))
         self.dc.register(TestPropertyOwner1)
         self.dc.register(TestPropertyOwner2)
 
@@ -509,7 +511,7 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
         jsontext = self.dc.as_json()
 
         #Simulate the other user (who received the email with the edges) getting the document and loading it into memory
-        self.dc = DocumentCollection(uuid.uuid4())
+        self.dc = DocumentCollection(str(uuid.uuid4()))
         self.dc.register(TestPropertyOwner1)
         self.dc.register(TestPropertyOwner2)
         self.dc.load_from_json(jsontext)
@@ -589,9 +591,9 @@ class MergeAdvancedChangesMadeInJSONTestCase(unittest.TestCase):
 
 class LargeMergeTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(Covers)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(Covers)
 
     def runTest(self):
@@ -620,7 +622,7 @@ class MessageTest(ImmutableObject):
 
 class ImmutableClassTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection(uuid.uuid4())
+        self.dc = DocumentCollection(str(uuid.uuid4()))
         self.dc.register(MessageTest)
 
     def test_cant_mutate(self):
@@ -654,7 +656,7 @@ class ImmutableClassTestCase(unittest.TestCase):
 
 class StoreImmutableObjectsInJSONTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection(uuid.uuid4())
+        self.dc = DocumentCollection(str(uuid.uuid4()))
         self.dc.register(MessageTest)
 
     def runTest(self):
@@ -669,7 +671,7 @@ class StoreImmutableObjectsInJSONTestCase(unittest.TestCase):
 
         jsontext = self.dc.as_json()
 
-        self.dc = DocumentCollection(uuid.uuid4())
+        self.dc = DocumentCollection(str(uuid.uuid4()))
         self.dc.register(MessageTest)
         self.dc.load_from_json(jsontext)
         test1s = self.dc.get_by_class(MessageTest)
@@ -685,7 +687,7 @@ class TestUpdateHandler(object):
 
 class SimpleCoversUpdateTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection(uuid.uuid4())
+        self.dc = DocumentCollection(str(uuid.uuid4()))
         self.dc.register(Covers)
 
     def runTest(self):
@@ -706,7 +708,7 @@ class SimpleCoversUpdateTestCase(unittest.TestCase):
 
 class SimpleCounterTestCase(unittest.TestCase):
     def runTest(self):
-        dc1 = DocumentCollection(uuid.uuid4())
+        dc1 = DocumentCollection(str(uuid.uuid4()))
         dc1.register(CounterTestContainer)
         #Test merging together simple counter documents
         test = CounterTestContainer()
@@ -723,9 +725,9 @@ class SimpleCounterTestCase(unittest.TestCase):
 
 class MergeCounterTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(CounterTestContainer)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(CounterTestContainer)
 
     def runTest(self):
@@ -745,7 +747,7 @@ class MergeCounterTestCase(unittest.TestCase):
 
 class UncleanReplayCounterTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection(uuid.uuid4())
+        self.dc = DocumentCollection(str(uuid.uuid4()))
 
     def runTest(self):
         #Test merge together two simple covers objects
@@ -760,7 +762,7 @@ class UncleanReplayCounterTestCase(unittest.TestCase):
 
 class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc = DocumentCollection(uuid.uuid4())
+        self.dc = DocumentCollection(str(uuid.uuid4()))
         self.dc.register(CounterTestContainer)
 
     def runTest(self):
@@ -783,7 +785,7 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
         self.assertEqual(test1.testcounter.get(), 0)
 
         #Simulate the other user (who received the email with the edges) getting the document and loading it into memory
-        self.dc = DocumentCollection(uuid.uuid4())
+        self.dc = DocumentCollection(str(uuid.uuid4()))
         self.dc.register(CounterTestContainer)
         self.dc.load_from_json(jsontext)
         self.assertEqual(jsontext, self.dc.as_json())
@@ -811,9 +813,9 @@ class MergeCounterChangesMadeInJSONTestCase(unittest.TestCase):
 
 class HistoryGraphDepthTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(Covers)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(Covers)
 
     def test_depth_simple_case(self):
@@ -884,7 +886,7 @@ class HistoryGraphDepthTestCase(unittest.TestCase):
 class FieldListFunctionsTestCase(unittest.TestCase):
     # Test each individual function in the fields.List and FieldListImpl classes
     def runTest(self):
-        dc1 = DocumentCollection(uuid.uuid4())
+        dc1 = DocumentCollection(str(uuid.uuid4()))
         dc1.register(TestPropertyOwner1)
 
         fl = fields.List(TestPropertyOwner1)
@@ -952,7 +954,7 @@ class FieldListFunctionsTestCase(unittest.TestCase):
 class FieldListMergeTestCase(unittest.TestCase):
     # Test each individual function in the fields.List and FieldListImpl classes
     def runTest(self):
-        dc = DocumentCollection(uuid.uuid4())
+        dc = DocumentCollection(str(uuid.uuid4()))
         dc.register(TestFieldListOwner1)
         dc.register(TestFieldListOwner2)
         test1 = TestFieldListOwner1()
@@ -991,11 +993,11 @@ class TestListofLists1(Document):
 
 class FieldListMergeTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(TestListofLists1)
         self.dc1.register(TestListofLists2)
         self.dc1.register(TestListofLists3)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(TestListofLists1)
         self.dc2.register(TestListofLists2)
         self.dc2.register(TestListofLists3)
@@ -1062,7 +1064,7 @@ class TestColofCol1(Document):
 class FieldCollofCollMergeTestCase(unittest.TestCase):
     # Test each individual function in the fields.List and FieldListImpl classes
     def runTest(self):
-        dc = DocumentCollection(uuid.uuid4())
+        dc = DocumentCollection(str(uuid.uuid4()))
         dc.register(TestColofCol1)
         dc.register(TestColofCol2)
         dc.register(TestColofCols3)
@@ -1084,7 +1086,7 @@ class FieldCollofCollMergeTestCase(unittest.TestCase):
 
         ll0.comment = 'Hello'
 
-        dc2 = DocumentCollection(uuid.uuid4())
+        dc2 = DocumentCollection(str(uuid.uuid4()))
         dc2.register(TestColofCol1)
         dc2.register(TestColofCol2)
         dc2.register(TestColofCols3)
@@ -1102,7 +1104,7 @@ class FieldCollofCollMergeTestCase(unittest.TestCase):
 class DocumentCollectionCompulsoryTestCase(unittest.TestCase):
     # Test that we assert when we change Document or DocumentObject without adding to a DC
     def runTest(self):
-        self.dc = DocumentCollection(uuid.uuid4())
+        self.dc = DocumentCollection(str(uuid.uuid4()))
         self.dc.register(TestPropertyOwner1)
         self.dc.register(TestPropertyOwner2)
 

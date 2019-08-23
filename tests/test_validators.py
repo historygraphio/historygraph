@@ -11,7 +11,7 @@ import uuid
 
 class SimpleValidationTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4(), has_standard_validators=False)
+        self.dc1 = DocumentCollection(str(uuid.uuid4()), has_standard_validators=False)
         self.dc1.register(Covers)
 
     def test_success(self):
@@ -32,7 +32,7 @@ class SimpleValidationTestCase(unittest.TestCase):
                               last_edge.propertyownerid,
                               last_edge.propertyname, 2,
                               last_edge.propertytype, last_edge.documentid,
-                              last_edge.documentclassname, last_edge.nonce)
+                              last_edge.documentclassname, last_edge.userid)
 
         test.full_replay([edge])
 
@@ -59,7 +59,7 @@ class SimpleValidationTestCase(unittest.TestCase):
                               last_edge.propertyownerid,
                               last_edge.propertyname, 2,
                               last_edge.propertytype, last_edge.documentid,
-                              last_edge.documentclassname, last_edge.nonce)
+                              last_edge.documentclassname, last_edge.userid)
 
         test.full_replay([edge])
 
@@ -71,7 +71,7 @@ class StandardValidationTestCase(unittest.TestCase):
     # The standard validators should only allow ints to be applied to
     # intcounter fields
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4(),has_standard_validators=True)
+        self.dc1 = DocumentCollection(str(uuid.uuid4()),has_standard_validators=True)
         self.dc1.register(CounterTestContainer)
 
     def test_success(self):
@@ -85,7 +85,7 @@ class StandardValidationTestCase(unittest.TestCase):
                               last_edge.propertyownerid,
                               last_edge.propertyname, 1,
                               last_edge.propertytype, last_edge.documentid,
-                              last_edge.documentclassname, last_edge.nonce)
+                              last_edge.documentclassname, last_edge.userid)
 
         test.full_replay([edge])
 
@@ -102,7 +102,7 @@ class StandardValidationTestCase(unittest.TestCase):
                               last_edge.propertyownerid,
                               last_edge.propertyname, "hello",
                               last_edge.propertytype, last_edge.documentid,
-                              last_edge.documentclassname, last_edge.nonce)
+                              last_edge.documentclassname, last_edge.userid)
 
         test.full_replay([edge])
 
@@ -113,7 +113,7 @@ class StandardTransactionValidationTestCase(unittest.TestCase):
     # The standard validators should only allow ints to be applied to
     # intcounter fields
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4(), has_standard_validators=True)
+        self.dc1 = DocumentCollection(str(uuid.uuid4()), has_standard_validators=True)
         self.dc1.register(CounterTestContainer)
 
     def test_success(self):
@@ -127,12 +127,12 @@ class StandardTransactionValidationTestCase(unittest.TestCase):
                               last_edge.propertyownerid,
                               last_edge.propertyname, 1,
                               last_edge.propertytype, last_edge.documentid,
-                              last_edge.documentclassname, last_edge.nonce)
+                              last_edge.documentclassname, last_edge.userid)
         edge2 = AddIntCounter({edge1.get_end_node()},
                               last_edge.propertyownerid,
                               last_edge.propertyname, 1,
                               last_edge.propertytype, last_edge.documentid,
-                              last_edge.documentclassname, last_edge.nonce)
+                              last_edge.documentclassname, last_edge.userid)
         edges = [ edge1, edge2 ]
 
         transaction_hash = get_transaction_hash(edges)

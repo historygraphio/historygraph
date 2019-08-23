@@ -11,10 +11,10 @@ import uuid
 
 class StoreObjectsInJSONEdgeReceivedOutofOrderTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(TestPropertyOwner1)
         self.dc1.register(TestPropertyOwner2)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(TestPropertyOwner1)
         self.dc2.register(TestPropertyOwner2)
 
@@ -53,7 +53,7 @@ class StoreObjectsInJSONEdgeReceivedOutofOrderTestCase(unittest.TestCase):
         #print('first_edges=', first_edges)
         #print('later_edges=', later_edges)
 
-        dc3 = DocumentCollection(uuid.uuid4())
+        dc3 = DocumentCollection(str(uuid.uuid4()))
         dc3.register(TestPropertyOwner1)
         dc3.register(TestPropertyOwner2)
         ##dc3.load_from_json(jsontext)
@@ -89,7 +89,7 @@ class StoreObjectsInJSONEdgeReceivedOutofOrderSpreadsheetTestCase(unittest.TestC
             shares = fields.Collection(SpreadsheetShare)
 
         def CreateNewDocumentCollection(master=None):
-            dc = DocumentCollection(uuid.uuid4(), master=master)
+            dc = DocumentCollection(str(uuid.uuid4()), master=master)
             dc.register(Spreadsheet)
             dc.register(SpreadsheetColumn)
             dc.register(SpreadsheetCell)

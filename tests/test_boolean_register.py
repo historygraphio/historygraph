@@ -14,9 +14,9 @@ class BooleanRegisterClass(Document):
 
 class BooleanRegisterTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(uuid.uuid4())
+        self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(BooleanRegisterClass)
-        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
+        self.dc2 = DocumentCollection(str(uuid.uuid4()), master=self.dc1)
         self.dc2.register(BooleanRegisterClass)
 
     def test_boolean_register_with_single_edge(self):
