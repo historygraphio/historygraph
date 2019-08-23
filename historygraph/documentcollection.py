@@ -18,7 +18,7 @@ class DocumentCollection(object):
 
     standard_validators = [validators.int_counter_integer_value]
 
-    def __init__(self, has_standard_validators=True):
+    def __init__(self, userid, has_standard_validators=True):
         self.id = str(uuid.uuid4())
         self.objects = defaultdict(dict)
         self.classes = dict()
@@ -31,6 +31,7 @@ class DocumentCollection(object):
         else:
             self._validators = list()
         self._custom_validators = list()
+        self.userid = userid
 
     def register(self, theclass):
         self.classes[theclass.__name__] = theclass

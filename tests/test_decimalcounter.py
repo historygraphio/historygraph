@@ -4,6 +4,7 @@ import unittest
 from .common import DocumentCollection, Document
 from historygraph import fields
 from decimal import Decimal
+import uuid
 
 
 class DecimalCounterTestContainer(Document):
@@ -11,9 +12,9 @@ class DecimalCounterTestContainer(Document):
 
 class DecimalCounterTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection()
+        self.dc1 = DocumentCollection(uuid.uuid4())
         self.dc1.register(DecimalCounterTestContainer)
-        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
         self.dc2.register(DecimalCounterTestContainer)
 
     def test_parallel_float_counters_of_the_same_value(self):

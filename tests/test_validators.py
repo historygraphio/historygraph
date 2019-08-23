@@ -11,7 +11,7 @@ import uuid
 
 class SimpleValidationTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection(has_standard_validators=False)
+        self.dc1 = DocumentCollection(uuid.uuid4(), has_standard_validators=False)
         self.dc1.register(Covers)
 
     def test_success(self):
@@ -71,7 +71,7 @@ class StandardValidationTestCase(unittest.TestCase):
     # The standard validators should only allow ints to be applied to
     # intcounter fields
     def setUp(self):
-        self.dc1 = DocumentCollection(has_standard_validators=True)
+        self.dc1 = DocumentCollection(uuid.uuid4(),has_standard_validators=True)
         self.dc1.register(CounterTestContainer)
 
     def test_success(self):
@@ -113,7 +113,7 @@ class StandardTransactionValidationTestCase(unittest.TestCase):
     # The standard validators should only allow ints to be applied to
     # intcounter fields
     def setUp(self):
-        self.dc1 = DocumentCollection(has_standard_validators=True)
+        self.dc1 = DocumentCollection(uuid.uuid4(), has_standard_validators=True)
         self.dc1.register(CounterTestContainer)
 
     def test_success(self):

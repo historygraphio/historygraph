@@ -2,13 +2,14 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 import unittest
 from .common import DocumentCollection, Covers, TestPropertyOwner2, TestPropertyOwner1
+import uuid
 
 
 class TransactionTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection()
+        self.dc1 = DocumentCollection(uuid.uuid4())
         self.dc1.register(Covers)
-        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
         self.dc2.register(Covers)
 
     def test_frozen_function_basic(self):

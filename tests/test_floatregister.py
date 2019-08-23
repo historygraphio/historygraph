@@ -5,6 +5,7 @@ import unittest
 from .common import DocumentCollection
 from historygraph import Document
 from historygraph import fields
+import uuid
 
 
 class FloatRegisterClass(Document):
@@ -13,9 +14,9 @@ class FloatRegisterClass(Document):
 
 class FloatRegisterTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection()
+        self.dc1 = DocumentCollection(uuid.uuid4())
         self.dc1.register(FloatRegisterClass)
-        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
         self.dc2.register(FloatRegisterClass)
 
     def test_covers_with_single_edge(self):
@@ -31,7 +32,7 @@ class FloatRegisterTestCase(unittest.TestCase):
         #Test these are not just the same document but it was actually copied
         assert test is not test2
         assert test.history is not test2.history
-                
+
     def test_covers_with_two_edges(self):
         test = FloatRegisterClass()
         self.dc1.add_document_object(test)
@@ -60,4 +61,3 @@ class FloatRegisterTestCase(unittest.TestCase):
         self.assertEqual(test2.test_float, 3, 'test.covers={} test2.covers={} edges={}'.format(test.test_float, test2.test_float, edges))
         edges = [e.as_tuple() for e in test.history.get_all_edges()]
         self.assertEqual(test.test_float, 3, 'test.covers={} test2.covers={} edges={}'.format(test.test_float, test2.test_float, edges))
-

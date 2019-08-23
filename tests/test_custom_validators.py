@@ -31,7 +31,7 @@ class SimpleCustomValidationTestCase(unittest.TestCase):
             return int_value >= 1 and int_value <= 5
 
     def setUp(self):
-        self.dc1 = DocumentCollection(has_standard_validators=False)
+        self.dc1 = DocumentCollection(uuid.uuid4(), has_standard_validators=False)
         self.dc1.register(Covers)
 
     def test_success(self):
@@ -151,7 +151,7 @@ class ValueDependentValidationTestCase(unittest.TestCase):
             return int_value > doc.covers
 
     def setUp(self):
-        self.dc1 = DocumentCollection(has_standard_validators=False)
+        self.dc1 = DocumentCollection(uuid.uuid4(), has_standard_validators=False)
         self.dc1.register(Covers)
 
     def test_success_on_real_validation_test(self):

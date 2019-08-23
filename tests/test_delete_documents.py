@@ -6,16 +6,17 @@ import unittest
 from .common import (DocumentCollection, TestPropertyOwner2,
                      TestPropertyOwner1, TestFieldListOwner2,
                      TestFieldListOwner1)
+import uuid
 
 
 class TestDeletion(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection()
+        self.dc1 = DocumentCollection(uuid.uuid4())
         self.dc1.register(TestPropertyOwner1)
         self.dc1.register(TestPropertyOwner2)
         self.dc1.register(TestFieldListOwner2)
         self.dc1.register(TestFieldListOwner1)
-        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
         self.dc2.register(TestPropertyOwner1)
         self.dc2.register(TestPropertyOwner2)
         self.dc2.register(TestFieldListOwner2)

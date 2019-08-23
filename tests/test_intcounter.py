@@ -2,13 +2,14 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 import unittest
 from .common import DocumentCollection, CounterTestContainer
+import uuid
 
 
 class IntCounterTestCase(unittest.TestCase):
     def setUp(self):
-        self.dc1 = DocumentCollection()
+        self.dc1 = DocumentCollection(uuid.uuid4())
         self.dc1.register(CounterTestContainer)
-        self.dc2 = DocumentCollection(master=self.dc1)
+        self.dc2 = DocumentCollection(uuid.uuid4(), master=self.dc1)
         self.dc2.register(CounterTestContainer)
 
     def test_parallel_int_counters_of_the_same_value(self):
@@ -27,7 +28,7 @@ class IntCounterTestCase(unittest.TestCase):
         self.assertEqual(test1.testcounter.get(), 3)
         self.assertEqual(test2.testcounter.get(), 3)
 
-# Code that is useful for running tests inside IDLE        
+# Code that is useful for running tests inside IDLE
 #if __name__ == '__main__':
 #    suite = unittest.TestLoader().loadTestsFromName( 'test_intcounter.IntCounterTestCase.test_parallel_int_counters_of_the_same_value' )
 #    unittest.TextTestRunner(verbosity=2).run( suite )

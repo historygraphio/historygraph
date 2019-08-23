@@ -13,7 +13,7 @@ class SingletonDocumentTest(unittest.TestCase):
             is_singleton = True
             nothing = fields.CharRegister()
 
-        dc1 = DocumentCollection()
+        dc1 = DocumentCollection(uuid.uuid4())
         dc1.register(TestSingleton)
         docs = dc1.get_by_class(TestSingleton)
         # Test the document is created
