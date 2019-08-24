@@ -37,22 +37,29 @@ class TextEdit(Field):
 
         def removerange(self, start, end):
             fragment_start_index = self.get_fragment_at_index(start)
-            fragment_end_index = self.get_fragment_at_index(end)
-            assert fragment_start_index == fragment_end_index
-            fragment = self._listfragments[fragment_start_index]
-            fragment_start_pos = self.get_fragment_start_position(fragment_start_index)
-            if start == fragment_start_pos:
-                # We are deleting at the start there is no new fragment just chop characters off
-                fragment.text = fragment.text[end - fragment_start_pos:]
-                fragment.internal_start_pos = fragment.internal_start_pos + end - fragment_start_pos
+            fragment_end_index = self.get_fragment_to_append_to_by_index(end)
+            if fragment_start_index == fragment_end_index:
+                # If this deletion is inside a single fragment
+                fragment = self._listfragments[fragment_start_index]
+                fragment_start_pos = self.get_fragment_start_position(fragment_start_index)
+                if start == fragment_start_pos:
+                    # We are deleting at the start there is no new fragment just chop characters off
+                    fragment.text = fragment.text[end - fragment_start_pos:]
+                    fragment.internal_start_pos = fragment.internal_start_pos + end - fragment_start_pos
+                elif end == fragment_start_pos + len(fragment.text):
+                    # We are deleting to the end of an existing fragment so just chop characters off
+                    fragment.text = fragment.text[:start - fragment_start_pos]
+                    fragment.has_been_split = True
+                else:
+                    # We are deleting somewhere in the middle
+                    new_split_frag = TextEdit._Fragment(fragment.id, fragment.text[end - fragment_start_pos:],
+                        end - fragment_start_pos,
+                        fragment.relative_to, fragment.relative_start_pos, False)
+                    fragment.has_been_split = True
+                    fragment.text = fragment.text[:start - fragment_start_pos]
+                    self._listfragments.insert(fragment_start_pos + 1, new_split_frag)
             else:
-                # We are deleting somewhere in the middle
-                new_split_frag = TextEdit._Fragment(fragment.id, fragment.text[end - fragment_start_pos:],
-                    end - fragment_start_pos,
-                    fragment.relative_to, fragment.relative_start_pos, False)
-                fragment.has_been_split = True
-                fragment.text = fragment.text[:start - fragment_start_pos]
-                self._listfragments.insert(fragment_start_pos + 1, new_split_frag)
+                assert False
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             # TODO: Possible balloonian function
