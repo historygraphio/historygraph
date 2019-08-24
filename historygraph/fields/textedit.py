@@ -42,7 +42,10 @@ class TextEdit(Field):
                 # If this deletion is inside a single fragment
                 fragment = self._listfragments[fragment_start_index]
                 fragment_start_pos = self.get_fragment_start_position(fragment_start_index)
-                if start == fragment_start_pos:
+                if start == fragment_start_pos and end == fragment_start_pos + len(fragment.text):
+                    # We are deleting an entrie fragment just remove it
+                    self._listfragments.remove(fragment)
+                elif start == fragment_start_pos:
                     # We are deleting at the start there is no new fragment just chop characters off
                     fragment.text = fragment.text[end - fragment_start_pos:]
                     fragment.internal_start_pos = fragment.internal_start_pos + end - fragment_start_pos
