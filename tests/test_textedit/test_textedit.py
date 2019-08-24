@@ -80,11 +80,13 @@ class TextEditTest(unittest.TestCase):
         assert fragments[0].relative_start_pos == 0
         assert fragments[0].has_been_split == True
 
+        assert fragments[1].id != fragments[0].id
         assert fragments[1].text == "z"
         assert fragments[1].relative_to == fragments[0].id
         assert fragments[1].relative_start_pos == 3
         assert fragments[1].has_been_split == False
 
+        assert fragments[2].id == fragments[0].id
         assert fragments[2].text == "def"
         assert fragments[2].relative_to == ""
         assert fragments[2].relative_start_pos == 0
@@ -111,7 +113,40 @@ class TextEditTest(unittest.TestCase):
         fragments = textowner.text._listfragments
 
         assert fragments[0].text == "z"
-        assert fragments[0].relative_to == fragments[0].id
+        assert fragments[0].relative_to == fragments[1].id
+        assert fragments[0].relative_start_pos == 0
+        assert fragments[0].has_been_split == False
+
+        assert fragments[0].id != fragments[1].id
+        assert fragments[1].text == "abcdef"
+        assert fragments[1].relative_to == ""
+        assert fragments[1].relative_start_pos == 0
+        assert fragments[1].has_been_split == False
+
+        assert textowner.text.get_fragment_by_index(0) == 0
+        assert textowner.text.get_fragment_by_index(1) == 0
+        assert textowner.text.get_fragment_by_index(2) == 1
+        assert textowner.text.get_fragment_by_index(5) == 1
+        assert textowner.text.get_fragment_by_index(7) == 1
+
+    """
+    def test_delete_text_from_single_fragment(self):
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection(str(uuid.uuid4()))
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+        textowner.text.removerange(3,4)
+
+        self.assertEqual(textowner.text.get_text(), "abcef")
+        self.assertEqual(len(textowner.text._listfragments), 2)
+        fragment = textowner.text._listfragments[0]
+        fragments = textowner.text._listfragments
+
+        assert fragments[0].text == "abc"
+        assert fragments[0].relative_to == ""
         assert fragments[0].relative_start_pos == 0
         assert fragments[0].has_been_split == False
 
@@ -125,3 +160,4 @@ class TextEditTest(unittest.TestCase):
         assert textowner.text.get_fragment_by_index(2) == 1
         assert textowner.text.get_fragment_by_index(5) == 1
         assert textowner.text.get_fragment_by_index(7) == 1
+"""

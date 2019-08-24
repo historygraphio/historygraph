@@ -86,7 +86,7 @@ class TextEdit(Field):
             else:
                 internal_start_pos = index - fragment_start_pos
                 if internal_start_pos == 0:
-                    new_inserted_frag = TextEdit._Fragment(fragment.id, text, 0,
+                    new_inserted_frag = TextEdit._Fragment(str(uuid.uuid4()), text, 0,
                         fragment.id, 0, False)
                     self._listfragments.insert(fragment_start_pos, new_inserted_frag)
                     return
@@ -95,7 +95,7 @@ class TextEdit(Field):
                         fragment.relative_to, fragment.relative_start_pos, False)
                     fragment.has_been_split = True
                     fragment.text = fragment.text[:internal_start_pos]
-                    new_inserted_frag = TextEdit._Fragment(fragment.id, text, 0,
+                    new_inserted_frag = TextEdit._Fragment(str(uuid.uuid4()), text, 0,
                         fragment.id, internal_start_pos, False)
                     self._listfragments.insert(fragment_start_pos + 1, new_split_frag)
                     self._listfragments.insert(fragment_start_pos + 1, new_inserted_frag)
