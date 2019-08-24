@@ -76,7 +76,7 @@ class TextEdit(Field):
                     return
                 else:
                     assert False, "We can only insert at position zero if there are no fragments"
-            fragment_index = self.get_fragment_by_index(index)
+            fragment_index = self.get_fragment_to_append_to_by_index(index)
             fragment_start_pos = self.get_fragment_start_position(fragment_index)
             fragment = self._listfragments[fragment_index]
             if index == fragment_start_pos + len(fragment.text):
@@ -109,7 +109,7 @@ class TextEdit(Field):
             # Return the full version of the string
             return ''.join(f.text for f in self._listfragments)
 
-        def get_fragment_by_index(self, index):
+        def get_fragment_to_append_to_by_index(self, index):
             # Return the index into the fragment list of the current index position
             pos = 0
             for i in range(len(self._listfragments)):
@@ -123,6 +123,17 @@ class TextEdit(Field):
         def get_fragment_start_position(self, fragment_index):
             # Return the number of characters before the given fragment_index
             return sum(self._listfragments[:fragment_index])
+
+        def get_fragment_at_index(self, index):
+            # Return the index into the fragment list of the current index position
+            pos = 0
+            for i in range(len(self._listfragments)):
+                f = self._listfragments[i]
+                if index >= pos and index < pos + len(f.text):
+                    return i
+                else:
+                    pos += len(f.text)
+            assert False, "Read past end of string"
 
 
     def __init__(self):
