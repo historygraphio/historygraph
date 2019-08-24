@@ -12,13 +12,15 @@ class TextEdit(Field):
         # Fields
         # id = a uuid cast to a string uniquely identifying this fragment. It is set upon it's creation
         # text = the text of this fragment
+        # internal_start_pos = the internal position in the string of this fragment
         # relative_to = the uuid of the fragment this is relative to.
         # relative_start_pos the string position this fragment starts relative to another
         # has_been_split True iff this string is been split by another operation.
         # Is_tombstone this fragment is a tombstone and
-        def __init__(self, id, text, relative_to, relative_start_pos, has_been_split):
+        def __init__(self, id, text, internal_start_pos, relative_to, relative_start_pos, has_been_split):
             self.id = id
             self.text = text
+            self.internal_start_pos = internal_start_pos
             self.relative_to = relative_to
             self.relative_start_pos = relative_start_pos
             self.has_been_split = has_been_split
@@ -69,11 +71,11 @@ class TextEdit(Field):
                 if index == 0:
                     # This always goes at the start
                     assert len(self._listfragments) == 0 # The below only works for empty lists
-                    self._listfragments.append(TextEdit._Fragment(str(uuid.uuid4()), text,
+                    self._listfragments.append(TextEdit._Fragment(str(uuid.uuid4()), text, 0,
                         "", 0, False))
                     return
                 else:
-                    assert False # We can only insert at position zero if there are no fragments
+                    assert False, "We can only insert at position zero if there are no fragments"
             fragment_index = self.get_fragment_by_index(index)
             fragment_start_pos = self.get_fragment_start_position(fragment_index)
             fragment = self._listfragments[fragment_index]
@@ -82,7 +84,22 @@ class TextEdit(Field):
                 fragment.text += text
                 return
             else:
-                assert False
+                internal_start_pos = index - fragment_start_pos
+                if internal_start_pos == 0:
+                    new_inserted_frag = TextEdit._Fragment(fragment.id, text, 0,
+                        fragment.id, 0, False)
+                    self._listfragments.insert(fragment_start_pos, new_inserted_frag)
+                    return
+                else:
+                    new_split_frag = TextEdit._Fragment(fragment.id, fragment.text[internal_start_pos:], internal_start_pos,
+                        fragment.relative_to, fragment.relative_start_pos, False)
+                    fragment.has_been_split = True
+                    fragment.text = fragment.text[:internal_start_pos]
+                    new_inserted_frag = TextEdit._Fragment(fragment.id, text, 0,
+                        fragment.id, internal_start_pos, False)
+                    self._listfragments.insert(fragment_start_pos + 1, new_split_frag)
+                    self._listfragments.insert(fragment_start_pos + 1, new_inserted_frag)
+                    return
 
 
             assert False
