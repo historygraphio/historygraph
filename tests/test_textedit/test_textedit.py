@@ -147,7 +147,6 @@ class TextEditTest(unittest.TestCase):
         assert textowner.text.get_fragment_at_index(5) == 1
         assert textowner.text.get_fragment_at_index(6) == 1
 
-    """
     def test_delete_text_from_single_fragment(self):
         textowner = TestFieldTextEditOwner1()
 
@@ -177,4 +176,3 @@ class TextEditTest(unittest.TestCase):
         assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(3) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(4) == 1
-    """

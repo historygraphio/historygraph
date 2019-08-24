@@ -35,9 +35,18 @@ class TextEdit(Field):
             self.name = name
             self._listfragments = list()
 
-
         def removerange(self, start, end):
-            assert False
+            fragment_start_index = self.get_fragment_at_index(start)
+            fragment_end_index = self.get_fragment_at_index(end)
+            assert fragment_start_index == fragment_end_index
+            fragment = self._listfragments[fragment_start_index]
+            fragment_start_pos = self.get_fragment_start_position(fragment_start_index)
+            new_split_frag = TextEdit._Fragment(fragment.id, fragment.text[end - fragment_start_pos:],
+                end - fragment_start_pos,
+                fragment.relative_to, fragment.relative_start_pos, False)
+            fragment.has_been_split = True
+            fragment.text = fragment.text[:start - fragment_start_pos]
+            self._listfragments.insert(fragment_start_pos + 1, new_split_frag)
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             # TODO: Possible balloonian function
