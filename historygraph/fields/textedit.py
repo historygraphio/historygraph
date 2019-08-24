@@ -44,8 +44,9 @@ class TextEdit(Field):
             if start == fragment_start_pos:
                 # We are deleting at the start there is no new fragment just chop characters off
                 fragment.text = fragment.text[end - fragment_start_pos:]
-                fragment.internal_start_pos = end - fragment_start_pos
+                fragment.internal_start_pos = fragment.internal_start_pos + end - fragment_start_pos
             else:
+                # We are deleting somewhere in the middle
                 new_split_frag = TextEdit._Fragment(fragment.id, fragment.text[end - fragment_start_pos:],
                     end - fragment_start_pos,
                     fragment.relative_to, fragment.relative_start_pos, False)

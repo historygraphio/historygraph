@@ -221,3 +221,25 @@ class TextEditTest(unittest.TestCase):
         assert textowner.text.get_fragment_at_index(2) == 0
         assert textowner.text.get_fragment_at_index(1) == 0
         assert textowner.text.get_fragment_at_index(4) == 0
+
+        # Delete another bit from the fragment
+        textowner.text.removerange(0,1)
+
+        self.assertEqual(textowner.text.get_text(), "cdef")
+        self.assertEqual(len(textowner.text._listfragments), 1)
+        fragment = textowner.text._listfragments[0]
+        fragments = textowner.text._listfragments
+
+        assert fragments[0].text == "cdef"
+        assert fragments[0].relative_to == ""
+        assert fragments[0].relative_start_pos == 0
+        assert fragments[0].has_been_split == False
+        assert fragments[0].internal_start_pos == 2
+
+        assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(3) == 0
+
+        assert textowner.text.get_fragment_at_index(0) == 0
+        assert textowner.text.get_fragment_at_index(2) == 0
+        assert textowner.text.get_fragment_at_index(1) == 0
