@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals, print_function
 
-# An ordered list of sub objects in HistoryGraph
-# From work by Marek Zawirski https://twitter.com/zzzawir/status/757635463536578560
 from . import Field
 from ..changetype import ChangeType
 import uuid
