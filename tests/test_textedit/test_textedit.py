@@ -574,3 +574,41 @@ class TextEditTest(unittest.TestCase):
         assert textowner.text.get_fragment_at_index(5) == 2
         assert textowner.text.get_fragment_at_index(6) == 2
         assert textowner.text.get_fragment_at_index(9) == 2
+
+    def test_append_to_broken_fragment_caused_by_deletion(self):
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection(str(uuid.uuid4()))
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+        textowner.text.removerange(3,4)
+        textowner.text.insert(5, "ghi")
+
+        self.assertEqual(textowner.text.get_text(), "abcefghi")
+        self.assertEqual(len(textowner.text._listfragments), 2)
+        fragment = textowner.text._listfragments[0]
+        fragments = textowner.text._listfragments
+
+        assert fragments[0].text == "abc"
+        assert fragments[0].relative_to == ""
+        assert fragments[0].relative_start_pos == 0
+        assert fragments[0].has_been_split == True
+        assert fragments[0].internal_start_pos == 0
+
+        assert fragments[1].text == "efghi"
+        assert fragments[1].relative_to == ""
+        assert fragments[1].relative_start_pos == 0
+        assert fragments[1].has_been_split == False
+        assert fragments[1].internal_start_pos == 4
+
+        assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(3) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(4) == 1
+
+        assert textowner.text.get_fragment_at_index(0) == 0
+        assert textowner.text.get_fragment_at_index(2) == 0
+        assert textowner.text.get_fragment_at_index(1) == 0
+        assert textowner.text.get_fragment_at_index(4) == 1
