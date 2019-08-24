@@ -62,7 +62,13 @@ class TextEdit(Field):
                     fragment.text = fragment.text[:start - fragment_start_pos]
                     self._listfragments.insert(fragment_start_pos + 1, new_split_frag)
             else:
-                assert False
+                # Delete the first fragment we match
+                fragment = self._listfragments[fragment_start_index]
+                fragment_start_pos = self.get_fragment_start_position(fragment_start_index)
+                fragment_end = fragment_start_pos + len(fragment.text)
+                self.removerange(start, fragment_end)
+                # Delete the rest
+                self.removerange(start, end - (fragment_end - start))
 
         def was_changed(self, changetype, propertyownerid, propertyname, propertyvalue, propertytype):
             # TODO: Possible balloonian function
