@@ -498,3 +498,28 @@ class TextEditTest(unittest.TestCase):
         assert textowner.text.get_fragment_at_index(1) == 0
         assert textowner.text.get_fragment_at_index(2) == 1
         assert textowner.text.get_fragment_at_index(3) == 1
+
+    def test_delete_at_end_of_single_fragment(self):
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection(str(uuid.uuid4()))
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+        textowner.text.removerange(4, 6)
+
+        self.assertEqual(textowner.text.get_text(), "abcd")
+        self.assertEqual(len(textowner.text._listfragments), 1)
+        fragment = textowner.text._listfragments[0]
+        assert fragment.text == "abcd"
+        assert fragment.relative_to == ""
+        assert fragment.relative_start_pos == 0
+        assert fragment.internal_start_pos == 0
+        assert fragment.has_been_split == True
+        assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(3) == 0
+        assert textowner.text.get_fragment_at_index(0) == 0
+        assert textowner.text.get_fragment_at_index(2) == 0
+        assert textowner.text.get_fragment_at_index(3) == 0
