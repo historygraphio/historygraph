@@ -18,7 +18,7 @@ class DocumentCollection(object):
 
     standard_validators = [validators.int_counter_integer_value]
 
-    def __init__(self, userid, has_standard_validators=True):
+    def __init__(self, sessionid, has_standard_validators=True):
         self.id = str(uuid.uuid4())
         self.objects = defaultdict(dict)
         self.classes = dict()
@@ -31,8 +31,8 @@ class DocumentCollection(object):
         else:
             self._validators = list()
         self._custom_validators = list()
-        assert isinstance(userid, six.string_types)
-        self.userid = userid
+        assert isinstance(sessionid, six.string_types)
+        self.sessionid = sessionid
 
     def register(self, theclass):
         self.classes[theclass.__name__] = theclass
@@ -102,7 +102,7 @@ class DocumentCollection(object):
             propertyname = str(row[7])
             propertyvaluestr = str(row[8])
             propertytypestr = str(row[9])
-            userid = str(row[10])
+            sessionid = str(row[10])
             transaction_id = str(row[11])
 
             if documentid in historygraphdict:
@@ -133,7 +133,7 @@ class DocumentCollection(object):
                 start_hashes = {start_hash_1, start_hash_2}
             edge = self.historyedgeclasses[edgeclassname](start_hashes, propertyownerid, propertyname,
                                                           propertyvalue, propertytype, documentid,
-                                                          documentclassname, userid, transaction_id)
+                                                          documentclassname, sessionid, transaction_id)
             history = historygraphdict[documentid]
             history.dc = self
             history.add_edges([edge])

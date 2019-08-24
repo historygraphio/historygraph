@@ -612,7 +612,7 @@ class TextEditTest(unittest.TestCase):
         assert textowner.text.get_fragment_at_index(1) == 0
         assert textowner.text.get_fragment_at_index(4) == 1
 
-    def test_do_not_append_to_the_end_of_a_fragment_created_by_another_user(self):
+    def test_do_not_append_to_the_end_of_a_fragment_created_by_another_session(self):
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection(str(uuid.uuid4()))
@@ -620,7 +620,7 @@ class TextEditTest(unittest.TestCase):
         dc1.add_document_object(textowner)
 
         textowner.text.insert(0, "abcdef")
-        textowner.text._listfragments[0].userid = str(uuid.uuid4())
+        textowner.text._listfragments[0].sessionid = str(uuid.uuid4())
         textowner.text.insert(6, "ghi")
 
         self.assertEqual(textowner.text.get_text(), "abcdefghi")

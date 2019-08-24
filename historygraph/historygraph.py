@@ -92,7 +92,7 @@ class HistoryGraph(object):
     def is_valid_custom_transaction(self, edges_list):
         begin_edge = edges_list[0]
         validator = [v for v in self.dc.get_customer_validators() if
-                     v.__name__ == begin_edge.userid][0]
+                     v.__name__ == begin_edge.sessionid][0]
         return validator.is_valid(edges_list, self)
 
     def is_custom_transaction(self, edges_list):

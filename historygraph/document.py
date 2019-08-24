@@ -35,23 +35,23 @@ class Document(DocumentObject):
         nodeset = set()
         nodeset.add(self._clockhash)
         if changetype == ChangeType.SET_PROPERTY_VALUE:
-            edge = edges.SimpleProperty(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.userid)
+            edge = edges.SimpleProperty(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.sessionid)
         elif changetype == ChangeType.ADD_CHILD:
-            edge = edges.AddChild(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.userid)
+            edge = edges.AddChild(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.sessionid)
         elif changetype == ChangeType.REMOVE_CHILD:
-            edge = edges.RemoveChild(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.userid)
+            edge = edges.RemoveChild(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.sessionid)
         elif changetype == ChangeType.ADD_INT_COUNTER:
-            edge = edges.AddIntCounter(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.userid)
+            edge = edges.AddIntCounter(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.sessionid)
         elif changetype == ChangeType.ADD_LISTITEM:
-            edge = edges.AddListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.userid)
+            edge = edges.AddListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.sessionid)
         elif changetype == ChangeType.REMOVE_LISTITEM:
-            edge = edges.RemoveListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.userid)
+            edge = edges.RemoveListItem(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.sessionid)
         elif changetype == ChangeType.DELETE_DOCUMENT_OBJECT:
-            edge = edges.DeleteDocumentObject(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.userid)
+            edge = edges.DeleteDocumentObject(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.sessionid)
         elif changetype == ChangeType.ADD_FLOAT_COUNTER:
-            edge = edges.AddFloatCounter(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.userid)
+            edge = edges.AddFloatCounter(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.sessionid)
         elif changetype == ChangeType.ADD_DECIMAL_COUNTER:
-            edge = edges.AddDecimalCounter(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.userid)
+            edge = edges.AddDecimalCounter(nodeset, propertyownerid, propertyname, propertyvalue, propertytype, self.id, self.__class__.__name__, self.dc.sessionid)
         else:
             assert False
         self.history.dc = self.dc

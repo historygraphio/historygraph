@@ -8,7 +8,7 @@ import six
 
 class Merge(Edge):
     def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue,
-                 propertytype, documentid, documentclassname, userid='', transaction_hash=''):
+                 propertytype, documentid, documentclassname, sessionid='', transaction_hash=''):
         super(Merge, self).__init__(startnodes, documentid, documentclassname,
                                     '', transaction_hash)
         assert isinstance(propertyownerid, six.string_types)
@@ -22,7 +22,7 @@ class Merge(Edge):
     def clone(self):
         return Merge(self._start_hashes, self.propertyownerid, self.propertyname,
                      self.propertyvalue, self.propertytype, self.documentid,
-                     self.documentclassname, self.userid)
+                     self.documentclassname, self.sessionid)
 
     def replay(self, doc):
         pass

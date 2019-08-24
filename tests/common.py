@@ -41,9 +41,9 @@ class DocumentCollection(_DocumentCollection):
 
     # This class is an inmemory simulation of two document collections which are
     # linked by exchanging edges
-    def __init__(self, userid, master=None, has_standard_validators=True):
+    def __init__(self, sessionid, master=None, has_standard_validators=True):
         super(DocumentCollection, self).__init__(
-              userid, has_standard_validators=has_standard_validators)
+              sessionid, has_standard_validators=has_standard_validators)
         if master is not None:
             master.slave = self
             self.master = master

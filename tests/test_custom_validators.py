@@ -105,7 +105,7 @@ class SimpleCustomValidationTestCase(unittest.TestCase):
                               test1.id,
                               'covers', 9,
                               'int', last_edge.documentid,
-                              last_edge.documentclassname, last_edge.userid,
+                              last_edge.documentclassname, last_edge.sessionid,
                               last_edge.transaction_hash)
 
         edges = [last_edge, edge]
@@ -201,7 +201,7 @@ class ValueDependentValidationTestCase(unittest.TestCase):
                               test1.id,
                               'covers', 1,
                               'int', last_edge.documentid,
-                              last_edge.documentclassname, last_edge.userid,
+                              last_edge.documentclassname, last_edge.sessionid,
                               last_edge.transaction_hash)
 
         edges = [last_edge, edge]

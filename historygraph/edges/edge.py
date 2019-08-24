@@ -5,14 +5,14 @@ from __future__ import absolute_import, unicode_literals, print_function
 import hashlib
 
 class Edge(object):
-    def __init__(self, start_hashes, documentid, documentclassname, userid,
+    def __init__(self, start_hashes, documentid, documentclassname, sessionid,
                  transaction_hash):
         assert len(start_hashes) <= 2
         self._start_hashes = sorted(start_hashes)
         self.inactive = False
         self.documentid = documentid
         self.documentclassname = documentclassname
-        self.userid = userid
+        self.sessionid = sessionid
         self.transaction_hash = transaction_hash
 
     def record_past_edges(self, pastedges, graph):
@@ -70,7 +70,7 @@ class Edge(object):
             "propertytype":self.propertytype,
             "documentid":self.documentid,
             "documentclassname":self.documentclassname,
-            "userid":self.userid,
+            "sessionid":self.sessionid,
             "transaction_hash": self.transaction_hash,
          }
 
@@ -97,7 +97,7 @@ class Edge(object):
             "propertytype",str(self.propertytype),
             "documentid",str(self.documentid),
             "documentclassname",str(self.documentclassname),
-            "userid",str(self.userid),
+            "sessionid",str(self.sessionid),
             "transaction_hash", str(self.transaction_hash)
          )
         self._end_node = hashlib.sha256(str(s).encode('utf-8')).hexdigest()
@@ -121,7 +121,7 @@ class Edge(object):
                 str(self.propertyname),
                 str(self.propertyvalue),
                 str(self.propertytype),
-                str(self.userid),
+                str(self.sessionid),
                 str(self.transaction_hash))
 
     def depth(self, historygraph):
@@ -153,7 +153,7 @@ class Edge(object):
             "propertytype",str(self.propertytype),
             "documentid",str(self.documentid),
             "documentclassname",str(self.documentclassname),
-            "userid",str(self.userid),
+            "sessionid",str(self.sessionid),
          )
         return hashlib.sha256(str(s).encode('utf-8')).hexdigest()
 

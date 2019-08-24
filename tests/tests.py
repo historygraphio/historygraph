@@ -37,8 +37,8 @@ class SimpleCoversTestCase(unittest.TestCase):
         #Test these are not just the same document but it was actually copied
         assert test is not test2
         assert test.history is not test2.history
-        assert test.history.get_edges_by_end_node(test._clockhash).userid == self.dc1.userid
-        assert test2.history.get_edges_by_end_node(test._clockhash).userid == self.dc1.userid
+        assert test.history.get_edges_by_end_node(test._clockhash).sessionid == self.dc1.sessionid
+        assert test2.history.get_edges_by_end_node(test._clockhash).sessionid == self.dc1.sessionid
 
     def test_covers_with_two_edges(self):
         test = Covers()

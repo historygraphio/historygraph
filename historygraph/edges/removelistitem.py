@@ -10,9 +10,9 @@ import six
 class RemoveListItem(Edge):
     def __init__(self, startnodes, propertyownerid,
                  propertyname, propertyvalue, propertytype, documentid,
-                 documentclassname, userid, transaction_hash=''):
+                 documentclassname, sessionid, transaction_hash=''):
         super(RemoveListItem, self).__init__(startnodes, documentid,
-            documentclassname, userid, transaction_hash)
+            documentclassname, sessionid, transaction_hash)
         assert isinstance(propertyownerid, six.string_types)
         assert isinstance(propertytype, six.string_types)
         assert isinstance(propertyvalue, six.string_types)
@@ -31,7 +31,7 @@ class RemoveListItem(Edge):
         return RemoveListItem(self._start_hashes,
             self.propertyownerid, self.propertyname, self.propertyvalue,
             self.propertytype, self.documentid, self.documentclassname,
-            self.userid, self.transaction_hash)
+            self.sessionid, self.transaction_hash)
 
     def get_conflict_winner(self, edge2, doc_obj_heirachy):
         return 0

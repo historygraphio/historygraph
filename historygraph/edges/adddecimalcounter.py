@@ -10,8 +10,8 @@ import six
 class AddDecimalCounter(Edge):
     def __init__(self, startnodes, propertyownerid,
                  propertyname, propertyvalue, propertytype, documentid,
-                 documentclassname, userid, transaction_hash=''):
-        super(AddDecimalCounter, self).__init__(startnodes, documentid, documentclassname, userid, transaction_hash)
+                 documentclassname, sessionid, transaction_hash=''):
+        super(AddDecimalCounter, self).__init__(startnodes, documentid, documentclassname, sessionid, transaction_hash)
         assert isinstance(propertyownerid, six.string_types)
         assert isinstance(propertytype, six.string_types), "propertytype should be a string but it actually is " + str(type(propertytype))
         assert propertytype == 'DecimalCounter', "Unexpected property type, actually got " + propertytype
@@ -34,7 +34,7 @@ class AddDecimalCounter(Edge):
         return AddDecimalCounter(self._start_hashes,
                 self.propertyownerid, self.propertyname, self.propertyvalue,
                 self.propertytype, self.documentid, self.documentclassname,
-                self.userid, self.transaction_hash)
+                self.sessionid, self.transaction_hash)
 
     def get_conflict_winner(self, edge2, doc_obj_heirachy):
         return 0 # Counter CRDT edges can never conflict
