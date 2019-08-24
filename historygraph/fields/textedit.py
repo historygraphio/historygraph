@@ -137,7 +137,7 @@ class TextEdit(Field):
 
         def get_fragment_start_position(self, fragment_index):
             # Return the number of characters before the given fragment_index
-            return sum(self._listfragments[:fragment_index])
+            return sum([len(f.text) for f in self._listfragments[:fragment_index]])
 
         def get_fragment_at_index(self, index):
             # Return the index into the fragment list of the current index position
