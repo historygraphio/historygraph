@@ -67,16 +67,47 @@ class TextEdit(Field):
 
         def insert(self, index, text):
             # Get insert text at position index
-            if index == 0:
-                # This always goes at the start
-                assert len(self._listfragments) == 0 # The below only works for empty lists
-                self._listfragments.append(TextEdit._Fragment(str(uuid.uuid4()), text,
-                    "", 0, False))
+            if len(self._listfragments) == 0:
+                if index == 0:
+                    # This always goes at the start
+                    assert len(self._listfragments) == 0 # The below only works for empty lists
+                    self._listfragments.append(TextEdit._Fragment(str(uuid.uuid4()), text,
+                        "", 0, False))
+                    return
+                else:
+                    assert False # We can only insert at position zero if there are no fragments
+            fragment_index = self.get_fragment_by_index(index)
+            fragment_start_pos = self.get_fragment_start_position(fragment_index)
+            fragment = self._listfragments[fragment_index]
+            if index == fragment_start_pos + len(fragment.text):
+                # We are inserting at the end of a fragment so we can append
+                fragment.text += text
+                return
+            else:
+                assert False
+
+
+            assert False
 
 
         def get_text(self):
             # Return the full version of the string
             return ''.join(f.text for f in self._listfragments)
+
+        def get_fragment_by_index(self, index):
+            # Return the index into the fragment list of the current index position
+            pos = 0
+            for i in range(len(self._listfragments)):
+                f = self._listfragments[i]
+                if index >= pos and index <= pos + len(f.text):
+                    return i
+                else:
+                    pos += len(f.text)
+            assert False, "Read past end of string"
+
+        def get_fragment_start_position(self, fragment_index):
+            # Return the number of characters before the given fragment_index
+            return sum(self._listfragments[:fragment_index])
 
 
     def __init__(self):

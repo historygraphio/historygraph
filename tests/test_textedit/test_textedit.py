@@ -34,3 +34,29 @@ class TextEditTest(unittest.TestCase):
         assert fragment.relative_to == ""
         assert fragment.relative_start_pos == 0
         assert fragment.has_been_split == False
+        assert textowner.text.get_fragment_by_index(0) == 0
+        assert textowner.text.get_fragment_by_index(2) == 0
+        assert textowner.text.get_fragment_by_index(5) == 0
+
+    def test_append_text_to_single_fragment_extends_the_fragment(self):
+        textowner = TestFieldTextEditOwner1()
+
+        dc1 = DocumentCollection(str(uuid.uuid4()))
+        dc1.register(TestFieldTextEditOwner1)
+        dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+        textowner.text.insert(6, "ghi")
+
+        self.assertEqual(textowner.text.get_text(), "abcdefghi")
+        self.assertEqual(len(textowner.text._listfragments), 1)
+        fragment = textowner.text._listfragments[0]
+        assert fragment.text == "abcdefghi"
+        assert fragment.relative_to == ""
+        assert fragment.relative_start_pos == 0
+        assert fragment.has_been_split == False
+        assert textowner.text.get_fragment_by_index(0) == 0
+        assert textowner.text.get_fragment_by_index(2) == 0
+        assert textowner.text.get_fragment_by_index(5) == 0
+        assert textowner.text.get_fragment_by_index(7) == 0
+        assert textowner.text.get_fragment_by_index(9) == 0
