@@ -132,6 +132,10 @@ class TextEdit(Field):
             if index == fragment_start_pos + len(fragment.text) and \
                fragment.sessionid == sessionid:
                 # We are inserting at the end of a fragment so we can append
+                self.was_changed(ChangeType.ADD_TEXTEDIT_APPEND_TO_FRAGMENT, self.parent.id,
+                                 self.name, JSONEncoder().encode((fragment.id,
+                                     text, len(fragment.text))),
+                                 "string")
                 fragment.text += text
                 return
             elif index == fragment_start_pos + len(fragment.text) and \
