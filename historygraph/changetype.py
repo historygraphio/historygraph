@@ -13,4 +13,5 @@ class ChangeType(object):
     DELETE_DOCUMENT_OBJECT = 6
     ADD_FLOAT_COUNTER = 7
     ADD_DECIMAL_COUNTER = 8
+    ADD_TEXTEDIT_FRAGMENT = 9
     

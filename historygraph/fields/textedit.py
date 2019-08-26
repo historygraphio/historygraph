@@ -37,6 +37,14 @@ class TextEdit(Field):
             self.name = name
             self._listfragments = list()
 
+        def _get_add_fragment_json(self, id, text, sessionid,
+                internal_start_pos, relative_to, relative_start_pos,
+                has_been_split):
+            # Return the JSON representing an add fragment event
+            return JSONEncoder().encode((id, text, sessionid, internal_start_pos,
+                relative_to, relative_start_pos, has_been_split))
+
+
         def removerange(self, start, end):
             sessionid = self.get_document().dc.sessionid
             fragment_start_index = self.get_fragment_at_index(start)
@@ -107,8 +115,14 @@ class TextEdit(Field):
                 if index == 0:
                     # This always goes at the start
                     assert len(self._listfragments) == 0 # The below only works for empty lists
-                    self._listfragments.append(TextEdit._Fragment(str(uuid.uuid4()),
+                    fragment_id = str(uuid.uuid4())
+                    self._listfragments.append(TextEdit._Fragment(fragment_id,
                         text, sessionid, 0, "", 0, False))
+                    self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
+                                     self.name, self._get_add_fragment_json(fragment_id,
+                                         text, sessionid, 0, "", 0, False),
+                                     "string")
+
                     return
                 else:
                     assert False, "We can only insert at position zero if there are no fragments"
