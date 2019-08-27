@@ -73,8 +73,9 @@ class TextEditTest(unittest.TestCase):
         dc1.register(TestFieldTextEditOwner1)
         dc1.add_document_object(textowner)
 
-        textowner.text.insert(0, "abcdef")
+        textowner.text.insert(0, "abcdefghi")
         textowner.text.insert(3, "z")
+        textowner.text.insert(6, "y")
 
         self.assertEqual(textowner.text.get_text(), "abczdef")
         self.assertEqual(len(textowner.text._listfragments), 3)

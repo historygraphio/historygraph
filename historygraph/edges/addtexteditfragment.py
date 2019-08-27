@@ -35,8 +35,38 @@ class AddTextEditFragment(Edge):
             parent = doc.get_document_object(self.propertyownerid)
             flImpl = getattr(parent, self.propertyname)
 
-            assert len(flImpl._listfragments) == 0
-            flImpl._listfragments.append(added_fragment)
+            if added_fragment.relative_to == "":
+                # This is the first fragment it does immediately after the start
+                # of the list
+                assert len(flImpl._listfragments) == 0
+                flImpl._listfragments.append(added_fragment)
+            else:
+                fragment_index = 0
+                was_found = False
+                for fragment in flImpl._listfragments:
+                    if fragment.id == added_fragment.relative_to:
+                        if relative_start_pos >= fragment.internal_start_pos and \
+                           relative_start_pos <= fragment.internal_start_pos + len(fragment.text):
+                            was_found = True
+                    if was_found == False:
+                        fragment_index += 1
+                assert was_found, "A matching fragment was not found"
+                fragment = flImpl._listfragments[fragment_index]
+                if relative_start_pos < fragment.internal_start_pos + len(fragment.text):
+                    #We need to break this fragment apart
+                    # TODO: COde shared with textedit.py move to a library
+                    fragment_break_pos = relative_start_pos - fragment.internal_start_pos
+                    new_split_frag = fields.TextEdit._Fragment(fragment.id,
+                        fragment.text[fragment_break_pos:],
+                        sessionid, fragment_break_pos,
+                        fragment.relative_to, fragment.relative_start_pos, False)
+                    fragment.has_been_split = True
+                    fragment.text = fragment.text[:fragment_break_pos]
+                    flImpl._listfragments.insert(fragment_index + 1, new_split_frag)
+                    flImpl._listfragments.insert(fragment_index + 1, added_fragment)
+                elif relative_start_pos == fragment.internal_start_pos + len(fragment.text):
+                    assert False, "New fragment goes exactly at the end of an existing one not yet handled"
+                #assert False
 
     def clone(self):
         return AddTextEditFragment(self._start_hashes,
