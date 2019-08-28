@@ -148,9 +148,15 @@ class TextEdit(Field):
             else:
                 internal_start_pos = index - fragment_start_pos
                 if internal_start_pos == 0:
-                    new_inserted_frag = TextEdit._Fragment(str(uuid.uuid4()), text, sessionid, 0,
+                    inserted_fragment_id = str(uuid.uuid4())
+                    new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
                         fragment.id, 0, False)
                     self._listfragments.insert(fragment_start_pos, new_inserted_frag)
+                    self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
+                                     self.name, self._get_add_fragment_json(inserted_fragment_id,
+                                         text, sessionid, 0,
+                                         fragment.id, fragment.internal_start_pos + internal_start_pos, False),
+                                     "string")
                     return
                 else:
                     # TODO: COde shared with addtexteditfragment.py move to a library

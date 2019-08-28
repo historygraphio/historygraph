@@ -56,14 +56,17 @@ class AddTextEditFragment(Edge):
                     #We need to break this fragment apart
                     # TODO: COde shared with textedit.py move to a library
                     fragment_break_pos = relative_start_pos - fragment.internal_start_pos
-                    new_split_frag = fields.TextEdit._Fragment(fragment.id,
-                        fragment.text[fragment_break_pos:],
-                        sessionid, fragment.internal_start_pos + fragment_break_pos,
-                        fragment.relative_to, fragment.relative_start_pos, False)
-                    fragment.has_been_split = True
-                    fragment.text = fragment.text[:fragment_break_pos]
-                    flImpl._listfragments.insert(fragment_index + 1, new_split_frag)
-                    flImpl._listfragments.insert(fragment_index + 1, added_fragment)
+                    if fragment_break_pos > 0:
+                        new_split_frag = fields.TextEdit._Fragment(fragment.id,
+                            fragment.text[fragment_break_pos:],
+                            sessionid, fragment.internal_start_pos + fragment_break_pos,
+                            fragment.relative_to, fragment.relative_start_pos, False)
+                        fragment.has_been_split = True
+                        fragment.text = fragment.text[:fragment_break_pos]
+                        flImpl._listfragments.insert(fragment_index + 1, new_split_frag)
+                        flImpl._listfragments.insert(fragment_index + 1, added_fragment)
+                    else:
+                        flImpl._listfragments.insert(fragment_index, added_fragment)
                 elif relative_start_pos == fragment.internal_start_pos + len(fragment.text):
                     assert False, "New fragment goes exactly at the end of an existing one not yet handled"
                 #assert False

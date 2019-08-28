@@ -134,3 +134,45 @@ class TextEditTestReplication(unittest.TestCase):
         assert test2.text.get_fragment_at_index(7) == 4
         assert test2.text.get_fragment_at_index(8) == 4
         assert test2.text.get_fragment_at_index(10) == 4
+
+    def test_insert_at_start_of_fragment(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+        textowner.text.insert(0, "z")
+
+        test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__,
+                                          textowner.id)
+
+        self.assertEqual(test2.text.get_text(), "zabcdef")
+        self.assertEqual(len(test2.text._listfragments), 2)
+        fragments = test2.text._listfragments
+
+        assert fragments[0].text == "z"
+        assert fragments[0].relative_to == fragments[1].id
+        assert fragments[0].relative_start_pos == 0
+        assert fragments[0].has_been_split == False
+        assert fragments[0].internal_start_pos == 0
+
+        assert fragments[0].id != fragments[1].id
+        assert fragments[1].text == "abcdef"
+        assert fragments[1].relative_to == ""
+        assert fragments[1].relative_start_pos == 0
+        assert fragments[1].has_been_split == False
+        assert fragments[1].internal_start_pos == 0
+
+        assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(1) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(2) == 1
+        assert textowner.text.get_fragment_to_append_to_by_index(5) == 1
+        assert textowner.text.get_fragment_to_append_to_by_index(7) == 1
+
+        assert textowner.text.get_fragment_at_index(0) == 0
+        assert textowner.text.get_fragment_at_index(1) == 1
+        assert textowner.text.get_fragment_at_index(2) == 1
+        assert textowner.text.get_fragment_at_index(3) == 1
+        assert textowner.text.get_fragment_at_index(5) == 1
+        assert textowner.text.get_fragment_at_index(6) == 1
