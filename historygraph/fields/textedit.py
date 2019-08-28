@@ -167,7 +167,7 @@ class TextEdit(Field):
                     self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                                      self.name, self._get_add_fragment_json(inserted_fragment_id,
                                          text, sessionid, 0,
-                                         fragment.id, internal_start_pos, False),
+                                         fragment.id, fragment.internal_start_pos + internal_start_pos, False),
                                      "string")
                     return
 

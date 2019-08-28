@@ -70,14 +70,15 @@ class TextEditTestReplication(unittest.TestCase):
         self.dc1.register(TestFieldTextEditOwner1)
         self.dc1.add_document_object(textowner)
 
-        textowner.text.insert(0, "abcdef")
+        textowner.text.insert(0, "abcdefghi")
         textowner.text.insert(3, "z")
+        textowner.text.insert(6, "y")
 
         test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__,
                                           textowner.id)
 
-        self.assertEqual(test2.text.get_text(), "abczdef")
-        self.assertEqual(len(test2.text._listfragments), 3)
+        self.assertEqual(test2.text.get_text(), "abczdeyfghi")
+        self.assertEqual(len(test2.text._listfragments), 5)
         fragments = test2.text._listfragments
 
         assert fragments[0].text == "abc"
@@ -94,22 +95,42 @@ class TextEditTestReplication(unittest.TestCase):
         assert fragments[1].internal_start_pos == 0
 
         assert fragments[2].id == fragments[0].id
-        assert fragments[2].text == "def"
+        assert fragments[2].text == "de"
         assert fragments[2].relative_to == ""
         assert fragments[2].relative_start_pos == 0
-        assert fragments[2].has_been_split == False
+        assert fragments[2].has_been_split == True
         assert fragments[2].internal_start_pos == 3
+
+        assert fragments[3].id != fragments[0].id
+        assert fragments[3].text == "y"
+        assert fragments[3].relative_to == fragments[0].id
+        assert fragments[3].relative_start_pos == 5
+        assert fragments[3].has_been_split == False
+        assert fragments[3].internal_start_pos == 0
+
+        assert fragments[4].id == fragments[0].id
+        assert fragments[4].text == "fghi"
+        assert fragments[4].relative_to == ""
+        assert fragments[4].relative_start_pos == 0
+        assert fragments[4].has_been_split == False
+        assert fragments[4].internal_start_pos == 5
 
         assert test2.text.get_fragment_to_append_to_by_index(0) == 0
         assert test2.text.get_fragment_to_append_to_by_index(2) == 0
         assert test2.text.get_fragment_to_append_to_by_index(3) == 0
         assert test2.text.get_fragment_to_append_to_by_index(4) == 1
         assert test2.text.get_fragment_to_append_to_by_index(5) == 2
-        assert test2.text.get_fragment_to_append_to_by_index(7) == 2
+        assert test2.text.get_fragment_to_append_to_by_index(6) == 2
+        assert test2.text.get_fragment_to_append_to_by_index(7) == 3
+        assert test2.text.get_fragment_to_append_to_by_index(8) == 4
+        assert test2.text.get_fragment_to_append_to_by_index(10) == 4
 
         assert test2.text.get_fragment_at_index(0) == 0
         assert test2.text.get_fragment_at_index(2) == 0
         assert test2.text.get_fragment_at_index(3) == 1
         assert test2.text.get_fragment_at_index(4) == 2
         assert test2.text.get_fragment_at_index(5) == 2
-        assert test2.text.get_fragment_at_index(6) == 2
+        assert test2.text.get_fragment_at_index(6) == 3
+        assert test2.text.get_fragment_at_index(7) == 4
+        assert test2.text.get_fragment_at_index(8) == 4
+        assert test2.text.get_fragment_at_index(10) == 4

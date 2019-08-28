@@ -58,7 +58,7 @@ class AddTextEditFragment(Edge):
                     fragment_break_pos = relative_start_pos - fragment.internal_start_pos
                     new_split_frag = fields.TextEdit._Fragment(fragment.id,
                         fragment.text[fragment_break_pos:],
-                        sessionid, fragment_break_pos,
+                        sessionid, fragment.internal_start_pos + fragment_break_pos,
                         fragment.relative_to, fragment.relative_start_pos, False)
                     fragment.has_been_split = True
                     fragment.text = fragment.text[:fragment_break_pos]
