@@ -155,15 +155,15 @@ class TextEdit(Field):
                 else:
                     # TODO: COde shared with addtexteditfragment.py move to a library
                     new_split_frag = TextEdit._Fragment(fragment.id, fragment.text[internal_start_pos:],
-                        sessionid, internal_start_pos,
+                        sessionid, fragment.internal_start_pos + internal_start_pos,
                         fragment.relative_to, fragment.relative_start_pos, False)
                     fragment.has_been_split = True
                     fragment.text = fragment.text[:internal_start_pos]
                     inserted_fragment_id = str(uuid.uuid4())
                     new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text,
-                        sessionid, 0, fragment.id, internal_start_pos, False)
-                    self._listfragments.insert(fragment_start_pos + 1, new_split_frag)
-                    self._listfragments.insert(fragment_start_pos + 1, new_inserted_frag)
+                        sessionid, 0, fragment.id, fragment.internal_start_pos + internal_start_pos, False)
+                    self._listfragments.insert(fragment_index + 1, new_split_frag)
+                    self._listfragments.insert(fragment_index + 1, new_inserted_frag)
                     self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                                      self.name, self._get_add_fragment_json(inserted_fragment_id,
                                          text, sessionid, 0,
