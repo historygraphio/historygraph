@@ -9,8 +9,9 @@ import six
 
 class AddTextEditFragment(Edge):
     def __init__(self, startnodes, propertyownerid, propertyname, propertyvalue,
-                 propertytype, documentid, documentclassname, nonce='', transaction_hash=''):
-        super(AddTextEditFragment, self).__init__(startnodes, documentid, documentclassname, nonce, transaction_hash)
+                 propertytype, documentid, documentclassname, sessionid, transaction_hash=''):
+        super(AddTextEditFragment, self).__init__(startnodes, documentid, documentclassname,
+            sessionid, transaction_hash)
         assert isinstance(propertyownerid, six.string_types)
         assert isinstance(propertytype, six.string_types)
         assert isinstance(propertyvalue, six.string_types)

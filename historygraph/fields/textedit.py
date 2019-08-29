@@ -53,6 +53,13 @@ class TextEdit(Field):
                 # If this deletion is inside a single fragment
                 fragment = self._listfragments[fragment_start_index]
                 fragment_start_pos = self.get_fragment_start_position(fragment_start_index)
+
+                self.was_changed(ChangeType.ADD_TEXTEDIT_REMOVE, self.parent.id,
+                     self.name, JSONEncoder().encode((fragment.id,
+                         start - fragment_start_pos + fragment.internal_start_pos,
+                          end - fragment_start_pos + fragment.internal_start_pos, sessionid)),
+                     "string")
+
                 if start == fragment_start_pos and end == fragment_start_pos + len(fragment.text):
                     # We are deleting an entrie fragment just remove it
                     self._listfragments.remove(fragment)
@@ -73,6 +80,7 @@ class TextEdit(Field):
                     fragment.has_been_split = True
                     fragment.text = fragment.text[:start - fragment_start_pos]
                     self._listfragments.insert(fragment_start_pos + 1, new_split_frag)
+
             else:
                 # Delete the first fragment we match
                 fragment = self._listfragments[fragment_start_index]

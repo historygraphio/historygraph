@@ -176,3 +176,72 @@ class TextEditTestReplication(unittest.TestCase):
         assert textowner.text.get_fragment_at_index(3) == 1
         assert textowner.text.get_fragment_at_index(5) == 1
         assert textowner.text.get_fragment_at_index(6) == 1
+
+    def test_delete_text_from_single_fragment(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+        textowner.text.removerange(3,4)
+
+        test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__,
+                                          textowner.id)
+
+        self.assertEqual(test2.text.get_text(), "abcef")
+        self.assertEqual(len(test2.text._listfragments), 2)
+        fragment = test2.text._listfragments[0]
+        fragments = test2.text._listfragments
+
+        assert fragments[0].text == "abc"
+        assert fragments[0].relative_to == ""
+        assert fragments[0].relative_start_pos == 0
+        assert fragments[0].has_been_split == True
+        assert fragments[0].internal_start_pos == 0
+
+        assert fragments[1].text == "ef"
+        assert fragments[1].relative_to == ""
+        assert fragments[1].relative_start_pos == 0
+        assert fragments[1].has_been_split == False
+        assert fragments[1].internal_start_pos == 4
+
+        assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(3) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(4) == 1
+
+        assert textowner.text.get_fragment_at_index(0) == 0
+        assert textowner.text.get_fragment_at_index(2) == 0
+        assert textowner.text.get_fragment_at_index(1) == 0
+        assert textowner.text.get_fragment_at_index(4) == 1
+
+        # Delete a seoncd fragment
+        textowner.text.removerange(3,4)
+
+        self.assertEqual(test2.text.get_text(), "abcf")
+        self.assertEqual(len(test2.text._listfragments), 2)
+        fragment = test2.text._listfragments[0]
+        fragments = test2.text._listfragments
+
+        assert fragments[0].text == "abc"
+        assert fragments[0].relative_to == ""
+        assert fragments[0].relative_start_pos == 0
+        assert fragments[0].has_been_split == True
+        assert fragments[0].internal_start_pos == 0
+
+        assert fragments[1].text == "f"
+        assert fragments[1].relative_to == ""
+        assert fragments[1].relative_start_pos == 0
+        assert fragments[1].has_been_split == False
+        assert fragments[1].internal_start_pos == 5
+
+        assert test2.text.get_fragment_to_append_to_by_index(0) == 0
+        assert test2.text.get_fragment_to_append_to_by_index(2) == 0
+        assert test2.text.get_fragment_to_append_to_by_index(3) == 0
+        assert test2.text.get_fragment_to_append_to_by_index(4) == 1
+
+        assert test2.text.get_fragment_at_index(0) == 0
+        assert test2.text.get_fragment_at_index(2) == 0
+        assert test2.text.get_fragment_at_index(1) == 0
+        assert test2.text.get_fragment_at_index(3) == 1

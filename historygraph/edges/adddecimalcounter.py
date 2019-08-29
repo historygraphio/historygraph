@@ -11,7 +11,8 @@ class AddDecimalCounter(Edge):
     def __init__(self, startnodes, propertyownerid,
                  propertyname, propertyvalue, propertytype, documentid,
                  documentclassname, sessionid, transaction_hash=''):
-        super(AddDecimalCounter, self).__init__(startnodes, documentid, documentclassname, sessionid, transaction_hash)
+        super(AddDecimalCounter, self).__init__(startnodes, documentid, documentclassname,
+            sessionid, transaction_hash)
         assert isinstance(propertyownerid, six.string_types)
         assert isinstance(propertytype, six.string_types), "propertytype should be a string but it actually is " + str(type(propertytype))
         assert propertytype == 'DecimalCounter', "Unexpected property type, actually got " + propertytype

@@ -15,3 +15,4 @@ from .addfloatcounter import AddFloatCounter
 from .adddecimalcounter import AddDecimalCounter
 from .addtexteditfragment import AddTextEditFragment
 from .addtexteditappendtofragment import AddTextEditAppendToFragment
+from .addtexteditremove import AddTextEditRemove
