@@ -191,7 +191,6 @@ class TextEditTestReplication(unittest.TestCase):
 
         self.assertEqual(test2.text.get_text(), "abcef")
         self.assertEqual(len(test2.text._listfragments), 2)
-        fragment = test2.text._listfragments[0]
         fragments = test2.text._listfragments
 
         assert fragments[0].text == "abc"
