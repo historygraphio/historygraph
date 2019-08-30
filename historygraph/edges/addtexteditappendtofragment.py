@@ -30,13 +30,20 @@ class AddTextEditAppendToFragment(Edge):
         else:
             parent = doc.get_document_object(self.propertyownerid)
             flImpl = getattr(parent, self.propertyname)
+            # Get the last fragment and append to it
+            fragments = [f for f in flImpl._listfragments if f.id == fragment_id]
+            last_fragment = fragments[-1]
+            assert last_fragment.internal_start_pos + len(last_fragment.text) <= fragment_text_len
+            last_fragment.text += text
 
+            """
             was_found = False
             for f in flImpl._listfragments:
                 if f.id == fragment_id and f.internal_start_pos + len(f.text) == fragment_text_len:
                     f.text += text
                     was_found = True
             assert was_found, "No matching fragment found"
+            """
 
     def clone(self):
         return AddTextEditAppendToFragment(self._start_hashes,
