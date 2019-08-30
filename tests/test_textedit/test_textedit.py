@@ -653,7 +653,7 @@ class TextEditTest(unittest.TestCase):
 
         assert fragments[1].text == "ghi"
         assert fragments[1].relative_to == fragments[0].id
-        assert fragments[1].relative_start_pos == 0
+        assert fragments[1].relative_start_pos == 6
         assert fragments[1].has_been_split == False
         assert fragments[1].internal_start_pos == 0
 

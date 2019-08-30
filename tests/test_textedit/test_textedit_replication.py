@@ -646,3 +646,76 @@ class TextEditTestReplication(unittest.TestCase):
         assert test2.text.get_fragment_at_index(2) == 0
         assert test2.text.get_fragment_at_index(1) == 0
         assert test2.text.get_fragment_at_index(4) == 1
+
+    def test_do_not_append_to_the_end_of_a_fragment_created_by_another_session(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+
+        test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__,
+                                          textowner.id)
+
+        test2.text.insert(6, "ghi")
+
+        self.assertEqual(textowner.text.get_text(), "abcdefghi")
+        self.assertEqual(len(textowner.text._listfragments), 2)
+        fragments = textowner.text._listfragments
+
+        assert fragments[0].text == "abcdef"
+        assert fragments[0].relative_to == ""
+        assert fragments[0].relative_start_pos == 0
+        assert fragments[0].has_been_split == False
+        assert fragments[0].internal_start_pos == 0
+
+        assert fragments[1].text == "ghi"
+        assert fragments[1].relative_to == fragments[0].id
+        assert fragments[1].relative_start_pos == 6
+        assert fragments[1].has_been_split == False
+        assert fragments[1].internal_start_pos == 0
+
+        assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(5) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(6) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(8) == 1
+        assert textowner.text.get_fragment_to_append_to_by_index(9) == 1
+
+        assert textowner.text.get_fragment_at_index(0) == 0
+        assert textowner.text.get_fragment_at_index(1) == 0
+        assert textowner.text.get_fragment_at_index(2) == 0
+        assert textowner.text.get_fragment_at_index(5) == 0
+        assert textowner.text.get_fragment_at_index(7) == 1
+        assert textowner.text.get_fragment_at_index(8) == 1
+
+        self.assertEqual(test2.text.get_text(), "abcdefghi")
+        self.assertEqual(len(test2.text._listfragments), 2)
+        fragments = test2.text._listfragments
+
+        assert fragments[0].text == "abcdef"
+        assert fragments[0].relative_to == ""
+        assert fragments[0].relative_start_pos == 0
+        assert fragments[0].has_been_split == False
+        assert fragments[0].internal_start_pos == 0
+
+        assert fragments[1].text == "ghi"
+        assert fragments[1].relative_to == fragments[0].id
+        assert fragments[1].relative_start_pos == 6
+        assert fragments[1].has_been_split == False
+        assert fragments[1].internal_start_pos == 0
+
+        assert test2.text.get_fragment_to_append_to_by_index(0) == 0
+        assert test2.text.get_fragment_to_append_to_by_index(2) == 0
+        assert test2.text.get_fragment_to_append_to_by_index(5) == 0
+        assert test2.text.get_fragment_to_append_to_by_index(6) == 0
+        assert test2.text.get_fragment_to_append_to_by_index(8) == 1
+        assert test2.text.get_fragment_to_append_to_by_index(9) == 1
+
+        assert test2.text.get_fragment_at_index(0) == 0
+        assert test2.text.get_fragment_at_index(1) == 0
+        assert test2.text.get_fragment_at_index(2) == 0
+        assert test2.text.get_fragment_at_index(5) == 0
+        assert test2.text.get_fragment_at_index(7) == 1
+        assert test2.text.get_fragment_at_index(8) == 1

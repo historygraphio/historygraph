@@ -149,9 +149,15 @@ class TextEdit(Field):
             elif index == fragment_start_pos + len(fragment.text) and \
                fragment.sessionid != sessionid:
                 # We are inserting at the end of another sessions's fragment so create a new fragment and insert it
-                new_inserted_frag = TextEdit._Fragment(str(uuid.uuid4()), text, sessionid, 0,
-                    fragment.id, 0, False)
+                inserted_fragment_id = str(uuid.uuid4())
+                new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
+                    fragment.id, len(fragment.text), False)
                 self._listfragments.insert(fragment_index + 1, new_inserted_frag)
+                self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
+                                 self.name, self._get_add_fragment_json(inserted_fragment_id,
+                                     text, sessionid, 0,
+                                     fragment.id, len(fragment.text), False),
+                                 "string")
                 return
             else:
                 internal_start_pos = index - fragment_start_pos

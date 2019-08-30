@@ -69,8 +69,7 @@ class AddTextEditFragment(Edge):
                     else:
                         flImpl._listfragments.insert(fragment_index, added_fragment)
                 elif relative_start_pos == fragment.internal_start_pos + len(fragment.text):
-                    assert False, "New fragment goes exactly at the end of an existing one not yet handled"
-                #assert False
+                    flImpl._listfragments.insert(fragment_index + 1, added_fragment)
 
     def clone(self):
         return AddTextEditFragment(self._start_hashes,

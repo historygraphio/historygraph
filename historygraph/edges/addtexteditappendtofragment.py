@@ -36,15 +36,6 @@ class AddTextEditAppendToFragment(Edge):
             assert last_fragment.internal_start_pos + len(last_fragment.text) <= fragment_text_len
             last_fragment.text += text
 
-            """
-            was_found = False
-            for f in flImpl._listfragments:
-                if f.id == fragment_id and f.internal_start_pos + len(f.text) == fragment_text_len:
-                    f.text += text
-                    was_found = True
-            assert was_found, "No matching fragment found"
-            """
-
     def clone(self):
         return AddTextEditAppendToFragment(self._start_hashes,
             self.propertyownerid, self.propertyname, self.propertyvalue, self.propertytype,
