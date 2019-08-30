@@ -359,7 +359,7 @@ class TextEditTest(unittest.TestCase):
         assert textowner.text.get_fragment_at_index(2) == 0
         assert textowner.text.get_fragment_at_index(1) == 0
 
-    def test_whole_fragment_from_middle(self):
+    def test_delete_whole_fragment_from_middle(self):
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection(str(uuid.uuid4()))
@@ -439,7 +439,7 @@ class TextEditTest(unittest.TestCase):
         assert textowner.text.get_fragment_at_index(4) == 1
         assert textowner.text.get_fragment_at_index(5) == 1
 
-    def test_whole_fragment_plus_more_from_middle(self):
+    def test_delete_whole_fragment_plus_more_from_middle(self):
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection(str(uuid.uuid4()))
