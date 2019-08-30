@@ -343,7 +343,6 @@ class TextEditTest(unittest.TestCase):
 
         self.assertEqual(textowner.text.get_text(), "cdef")
         self.assertEqual(len(textowner.text._listfragments), 1)
-        fragment = textowner.text._listfragments[0]
         fragments = textowner.text._listfragments
 
         assert fragments[0].text == "cdef"
