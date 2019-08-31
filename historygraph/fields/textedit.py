@@ -139,13 +139,27 @@ class TextEdit(Field):
             fragment = self._listfragments[fragment_index]
             if index == fragment_start_pos + len(fragment.text) and \
                fragment.sessionid == sessionid:
-                # We are inserting at the end of a fragment so we can append
-                self.was_changed(ChangeType.ADD_TEXTEDIT_APPEND_TO_FRAGMENT, self.parent.id,
-                                 self.name, JSONEncoder().encode((fragment.id,
-                                     text, fragment.internal_start_pos + len(fragment.text))),
-                                 "string")
-                fragment.text += text
-                return
+                if fragment.has_been_split == False:
+                    # We are inserting at the end of a fragment then  so we can append
+                    self.was_changed(ChangeType.ADD_TEXTEDIT_APPEND_TO_FRAGMENT, self.parent.id,
+                                     self.name, JSONEncoder().encode((fragment.id,
+                                         text, fragment.internal_start_pos + len(fragment.text))),
+                                     "string")
+                    fragment.text += text
+                    return
+                else:
+                    # If the fragment was split aways make a new one don't try to append
+                    inserted_fragment_id = str(uuid.uuid4())
+                    new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
+                        fragment.id, len(fragment.text), False)
+                    self._listfragments.insert(fragment_index + 1, new_inserted_frag)
+                    self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
+                                     self.name, self._get_add_fragment_json(inserted_fragment_id,
+                                         text, sessionid, 0,
+                                         fragment.id, len(fragment.text), False),
+                                     "string")
+                    return
+
             elif index == fragment_start_pos + len(fragment.text) and \
                fragment.sessionid != sessionid:
                 # We are inserting at the end of another sessions's fragment so create a new fragment and insert it
