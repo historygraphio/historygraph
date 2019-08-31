@@ -21,6 +21,7 @@ class AddTextEditFragment(Edge):
         self.propertytype = propertytype
 
     def replay(self, doc):
+        print("AddTextEditFragment.REplay called")
         # Extract the fragment values from the JSON payload
         (id, text, sessionid,
                 internal_start_pos, relative_to, relative_start_pos,
@@ -34,6 +35,7 @@ class AddTextEditFragment(Edge):
             assert False # We can never create stand alone object this way
         else:
             parent = doc.get_document_object(self.propertyownerid)
+            print("AddTextEditFragment.REplay parent.dc.id=", parent.dc.id)
             flImpl = getattr(parent, self.propertyname)
 
             if added_fragment.relative_to == "":
@@ -55,7 +57,7 @@ class AddTextEditFragment(Edge):
                 fragment = flImpl._listfragments[fragment_index]
                 if relative_start_pos < fragment.internal_start_pos + len(fragment.text):
                     #We need to break this fragment apart
-                    # TODO: COde shared with textedit.py move to a library
+                    # TODO: Code shared with textedit.py move to a library
                     fragment_break_pos = relative_start_pos - fragment.internal_start_pos
                     if fragment_break_pos > 0:
                         new_split_frag = fields.TextEdit._Fragment(fragment.id,
@@ -69,7 +71,25 @@ class AddTextEditFragment(Edge):
                     else:
                         flImpl._listfragments.insert(fragment_index, added_fragment)
                 elif relative_start_pos == fragment.internal_start_pos + len(fragment.text):
-                    flImpl._listfragments.insert(fragment_index + 1, added_fragment)
+                    print("AddTextEditFragment.REplay add fragment at end of existing fragment")
+                    fragment_index2 = fragment_index + 1
+                    do_insert = False
+                    while not do_insert and fragment_index2 < len(flImpl._listfragments):
+                        fragment2 = flImpl._listfragments[fragment_index2]
+                        if fragment2.relative_to == added_fragment.relative_to and \
+                           fragment2.relative_start_pos == added_fragment.relative_start_pos:
+                            # Test should we insert before this fragment or not
+                            print("AddTextEditFragment.REplay added_fragment.id=", added_fragment.id)
+                            print("AddTextEditFragment.REplay fragment2.id=", fragment2.id)
+                            if added_fragment.id > fragment2.id:
+                                # Use the order of the fragment ID's as a tie break
+                                # The id's should be in ascending order
+                                fragment_index2 += 1
+                            else:
+                                do_insert = True
+                        else:
+                            do_insert = True
+                    flImpl._listfragments.insert(fragment_index2, added_fragment)
 
     def clone(self):
         return AddTextEditFragment(self._start_hashes,
