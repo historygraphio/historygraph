@@ -43,3 +43,30 @@ class TextEditTestReplication(unittest.TestCase):
 
         self.assertEqual(len(textowner.text._listfragments), 3)
         self.assertEqual(len(test2.text._listfragments), 3)
+
+    def test_insert_multi_conflicting_fragments(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+
+        test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__,
+                                          textowner.id)
+
+        self.dc2.freeze_dc_comms()
+
+        textowner.text.insert(3, "ghi")
+
+        test2.text.insert(3, "xyz")
+
+        self.dc2.unfreeze_dc_comms()
+
+        self.assertTrue(test2.text.get_text() == "abcghixyzdef" or
+                        test2.text.get_text() == "abcxyzghidef")
+
+        self.assertEqual(textowner.text.get_text(), test2.text.get_text())
+
+        self.assertEqual(len(textowner.text._listfragments), 4)
+        self.assertEqual(len(test2.text._listfragments), 4)
