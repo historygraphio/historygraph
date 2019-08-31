@@ -22,7 +22,8 @@ class TextEditTestReplication(unittest.TestCase):
         self.dc1.register(TestFieldTextEditOwner1)
         self.dc1.add_document_object(textowner)
 
-        textowner.text.insert(0, "abc")
+        textowner.text.insert(0, "abcd")
+        textowner.text.removerange(3,4)
 
         test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__,
                                           textowner.id)
@@ -39,3 +40,6 @@ class TextEditTestReplication(unittest.TestCase):
                         test2.text.get_text() == "abcxyzdef")
 
         self.assertEqual(textowner.text.get_text(), test2.text.get_text())
+
+        self.assertEqual(len(textowner.text._listfragments), 3)
+        self.assertEqual(len(test2.text._listfragments), 3)
