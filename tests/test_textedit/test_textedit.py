@@ -35,6 +35,8 @@ class TextEditTest(unittest.TestCase):
         assert fragment.relative_start_pos == 0
         assert fragment.internal_start_pos == 0
         assert fragment.has_been_split == False
+        assert fragment.before_frag_id == ""
+        assert fragment.before_frag_start_pos == 0
         assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(5) == 0
@@ -60,6 +62,8 @@ class TextEditTest(unittest.TestCase):
         assert fragment.relative_start_pos == 0
         assert fragment.internal_start_pos == 0
         assert fragment.has_been_split == False
+        assert fragment.before_frag_id == ""
+        assert fragment.before_frag_start_pos == 0
         assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(5) == 0
@@ -86,6 +90,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[0].relative_start_pos == 0
         assert fragments[0].has_been_split == True
         assert fragments[0].internal_start_pos == 0
+        assert fragments[0].before_frag_id == ""
+        assert fragments[0].before_frag_start_pos == 0
 
         assert fragments[1].id != fragments[0].id
         assert fragments[1].text == "z"
@@ -93,6 +99,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[1].relative_start_pos == 3
         assert fragments[1].has_been_split == False
         assert fragments[1].internal_start_pos == 0
+        assert fragments[1].before_frag_id == fragments[2].id
+        assert fragments[1].before_frag_start_pos == fragments[2].internal_start_pos
 
         assert fragments[2].id == fragments[0].id
         assert fragments[2].text == "de"
@@ -100,6 +108,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[2].relative_start_pos == 0
         assert fragments[2].has_been_split == True
         assert fragments[2].internal_start_pos == 3
+        assert fragments[2].before_frag_id == ""
+        assert fragments[2].before_frag_start_pos == 0
 
         assert fragments[3].id != fragments[0].id
         assert fragments[3].text == "y"
@@ -107,6 +117,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[3].relative_start_pos == 5
         assert fragments[3].has_been_split == False
         assert fragments[3].internal_start_pos == 0
+        assert fragments[3].before_frag_id == fragments[4].id
+        assert fragments[3].before_frag_start_pos == fragments[4].internal_start_pos
 
         assert fragments[4].id == fragments[0].id
         assert fragments[4].text == "fghi"
@@ -114,6 +126,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[4].relative_start_pos == 0
         assert fragments[4].has_been_split == False
         assert fragments[4].internal_start_pos == 5
+        assert fragments[4].before_frag_id == ""
+        assert fragments[4].before_frag_start_pos == 0
 
         assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
@@ -155,6 +169,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[0].relative_start_pos == 0
         assert fragments[0].has_been_split == True
         assert fragments[0].internal_start_pos == 0
+        assert fragments[0].before_frag_id == ""
+        assert fragments[0].before_frag_start_pos == 0
 
         assert fragments[1].id != fragments[0].id
         assert fragments[1].text == "y"
@@ -162,6 +178,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[1].relative_start_pos == 3
         assert fragments[1].has_been_split == False
         assert fragments[1].internal_start_pos == 0
+        assert fragments[1].before_frag_id == fragments[2].id
+        assert fragments[1].before_frag_start_pos == fragments[2].internal_start_pos
 
         assert fragments[2].id != fragments[0].id
         assert fragments[2].text == "z"
@@ -169,6 +187,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[2].relative_start_pos == 3
         assert fragments[2].has_been_split == False
         assert fragments[2].internal_start_pos == 0
+        assert fragments[2].before_frag_id == fragments[3].id
+        assert fragments[2].before_frag_start_pos == fragments[3].internal_start_pos
 
         assert fragments[3].id == fragments[0].id
         assert fragments[3].text == "def"
@@ -176,6 +196,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[3].relative_start_pos == 0
         assert fragments[3].has_been_split == False
         assert fragments[3].internal_start_pos == 3
+        assert fragments[3].before_frag_id == ""
+        assert fragments[3].before_frag_start_pos == 0
 
         assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
@@ -213,6 +235,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[0].relative_start_pos == 0
         assert fragments[0].has_been_split == False
         assert fragments[0].internal_start_pos == 0
+        assert fragments[0].before_frag_id == fragments[1].id
+        assert fragments[0].before_frag_start_pos == fragments[1].internal_start_pos
 
         assert fragments[0].id != fragments[1].id
         assert fragments[1].text == "abcdef"
@@ -220,6 +244,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[1].relative_start_pos == 0
         assert fragments[1].has_been_split == False
         assert fragments[1].internal_start_pos == 0
+        assert fragments[1].before_frag_id == ""
+        assert fragments[1].before_frag_start_pos == 0
 
         assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(1) == 0

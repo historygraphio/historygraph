@@ -190,15 +190,23 @@ class TextEdit(Field):
             else:
                 internal_start_pos = index - fragment_start_pos
                 if internal_start_pos == 0:
+                    # This fragment is being inserted before the very first fragment in the list
                     inserted_fragment_id = str(uuid.uuid4())
+                    before_frag_id = ""
+                    before_frag_start_pos = 0
+                    if fragment_start_pos < len(self._listfragments):
+                        # Set this fragment to be before the next fragment we know of
+                        after_frag = self._listfragments[fragment_start_pos]
+                        before_frag_id = after_frag.id
+                        before_frag_start_pos = after_frag.internal_start_pos
                     new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
-                        fragment.id, 0, "", 0, False)
+                        fragment.id, 0, before_frag_id, before_frag_start_pos, False)
                     self._listfragments.insert(fragment_start_pos, new_inserted_frag)
                     self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                                      self.name, self._get_add_fragment_json(inserted_fragment_id,
                                          text, sessionid, 0,
                                          fragment.id, fragment.internal_start_pos + internal_start_pos,
-                                         "", 0, False),
+                                         before_frag_id, before_frag_start_pos, False),
                                      "string")
                     return
                 else:
