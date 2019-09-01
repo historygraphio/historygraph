@@ -719,3 +719,115 @@ class TextEditTestReplication(unittest.TestCase):
         assert test2.text.get_fragment_at_index(5) == 0
         assert test2.text.get_fragment_at_index(7) == 1
         assert test2.text.get_fragment_at_index(8) == 1
+
+    def test_append_multi_fragments_before(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcd")
+        textowner.text.removerange(3,4)
+
+        test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__,
+                                          textowner.id)
+
+        self.dc2.freeze_dc_comms()
+
+        textowner.text.insert(3, "ghi")
+
+        textowner.text.insert(3, "xyz")
+
+        self.dc2.unfreeze_dc_comms()
+
+        self.assertEqual(textowner.text.get_text(), "abcxyzghi")
+        self.assertEqual(test2.text.get_text(), "abcxyzghi")
+
+        self.assertEqual(len(textowner.text._listfragments), 3)
+        self.assertEqual(len(test2.text._listfragments), 3)
+
+        fragments = textowner.text._listfragments
+        assert fragments[0].text == "abc"
+        assert fragments[0].relative_to == ""
+        assert fragments[0].relative_start_pos == 0
+        assert fragments[0].has_been_split == True
+        assert fragments[0].internal_start_pos == 0
+        assert fragments[0].before_frag_id == ""
+        assert fragments[0].before_frag_start_pos == 0
+
+        assert fragments[1].text == "xyz"
+        assert fragments[1].relative_to == fragments[0].id
+        assert fragments[1].relative_start_pos == 3
+        assert fragments[1].has_been_split == False
+        assert fragments[1].internal_start_pos == 0
+        assert fragments[1].before_frag_id == fragments[2].id, \
+            "fragments[1].before_frag_id={} fragments[2].id={}".format(fragments[1].before_frag_id, fragments[2].id)
+        assert fragments[1].before_frag_start_pos == 0
+
+        assert fragments[2].text == "ghi"
+        assert fragments[2].relative_to == fragments[0].id
+        assert fragments[2].relative_start_pos == 3
+        assert fragments[2].has_been_split == False
+        assert fragments[2].internal_start_pos == 0
+        assert fragments[2].before_frag_id == ""
+        assert fragments[2].before_frag_start_pos == 0
+
+        assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(3) == 0
+        assert textowner.text.get_fragment_to_append_to_by_index(4) == 1
+        assert textowner.text.get_fragment_to_append_to_by_index(6) == 1
+        assert textowner.text.get_fragment_to_append_to_by_index(7) == 2
+        assert textowner.text.get_fragment_to_append_to_by_index(8) == 2
+        assert textowner.text.get_fragment_to_append_to_by_index(9) == 2
+
+        assert textowner.text.get_fragment_at_index(0) == 0
+        assert textowner.text.get_fragment_at_index(1) == 0
+        assert textowner.text.get_fragment_at_index(2) == 0
+        assert textowner.text.get_fragment_at_index(3) == 1
+        assert textowner.text.get_fragment_at_index(5) == 1
+        assert textowner.text.get_fragment_at_index(6) == 2
+        assert textowner.text.get_fragment_at_index(8) == 2
+
+        fragments = test2.text._listfragments
+        assert fragments[0].text == "abc"
+        assert fragments[0].relative_to == ""
+        assert fragments[0].relative_start_pos == 0
+        assert fragments[0].has_been_split == True
+        assert fragments[0].internal_start_pos == 0
+        assert fragments[0].before_frag_id == ""
+        assert fragments[0].before_frag_start_pos == 0
+
+        assert fragments[1].text == "xyz"
+        assert fragments[1].relative_to == fragments[0].id
+        assert fragments[1].relative_start_pos == 3
+        assert fragments[1].has_been_split == False
+        assert fragments[1].internal_start_pos == 0
+        assert fragments[1].before_frag_id == fragments[2].id, \
+            "fragments[1].before_frag_id={} fragments[2].id={}".format(fragments[1].before_frag_id, fragments[2].id)
+        assert fragments[1].before_frag_start_pos == 0
+
+        assert fragments[2].text == "ghi"
+        assert fragments[2].relative_to == fragments[0].id
+        assert fragments[2].relative_start_pos == 3
+        assert fragments[2].has_been_split == False
+        assert fragments[2].internal_start_pos == 0
+        assert fragments[2].before_frag_id == ""
+        assert fragments[2].before_frag_start_pos == 0
+
+        assert test2.text.get_fragment_to_append_to_by_index(0) == 0
+        assert test2.text.get_fragment_to_append_to_by_index(2) == 0
+        assert test2.text.get_fragment_to_append_to_by_index(3) == 0
+        assert test2.text.get_fragment_to_append_to_by_index(4) == 1
+        assert test2.text.get_fragment_to_append_to_by_index(6) == 1
+        assert test2.text.get_fragment_to_append_to_by_index(7) == 2
+        assert test2.text.get_fragment_to_append_to_by_index(8) == 2
+        assert test2.text.get_fragment_to_append_to_by_index(9) == 2
+
+        assert test2.text.get_fragment_at_index(0) == 0
+        assert test2.text.get_fragment_at_index(1) == 0
+        assert test2.text.get_fragment_at_index(2) == 0
+        assert test2.text.get_fragment_at_index(3) == 1
+        assert test2.text.get_fragment_at_index(5) == 1
+        assert test2.text.get_fragment_at_index(6) == 2
+        assert test2.text.get_fragment_at_index(8) == 2

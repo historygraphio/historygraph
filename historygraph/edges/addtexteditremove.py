@@ -51,7 +51,7 @@ class AddTextEditRemove(Edge):
                     fragment.text[fragment_break_pos:],
                     sessionid, fragment.internal_start_pos + fragment_break_pos,
                     fragment.relative_to, fragment.relative_start_pos,
-                    fragment.has_been_split)
+                    "", 0, fragment.has_been_split)
             if fragment.internal_start_pos < remove_start and \
                fragment.internal_start_pos + len(fragment.text) <= remove_end:
                 # The end of this fragment should be removed
@@ -60,6 +60,7 @@ class AddTextEditRemove(Edge):
                     fragment.text[:fragment_break_pos],
                     sessionid, fragment.internal_start_pos,
                     fragment.relative_to, fragment.relative_start_pos,
+                    "", 0,
                     True)
             if fragment.internal_start_pos < remove_start and \
                fragment.internal_start_pos + len(fragment.text) > remove_end:
@@ -70,12 +71,12 @@ class AddTextEditRemove(Edge):
                         fragment.text[:start_fragment_break_pos],
                         sessionid, fragment.internal_start_pos,
                         fragment.relative_to, fragment.relative_start_pos,
-                        True),
+                        "", 0, True),
                     fields.TextEdit._Fragment(fragment.id,
                         fragment.text[end_fragment_break_pos:],
                         sessionid, fragment.internal_start_pos + end_fragment_break_pos,
                         fragment.relative_to, fragment.relative_start_pos,
-                        fragment.has_been_split)]
+                        "", 0, fragment.has_been_split)]
             assert False, "There should be no other possible combination"
 
         # Process all of the fragments

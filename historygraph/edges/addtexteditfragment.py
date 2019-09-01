@@ -24,12 +24,12 @@ class AddTextEditFragment(Edge):
         # Extract the fragment values from the JSON payload
         (fragment_id, text, sessionid,
                 internal_start_pos, relative_to, relative_start_pos,
-                has_been_split) = \
+                before_frag_id, before_frag_start_pos, has_been_split) = \
                     JSONDecoder().decode(self.propertyvalue)
         # Create the document object if it doesn't already exist
         added_fragment = fields.TextEdit._Fragment(fragment_id, text, sessionid,
                 internal_start_pos, relative_to, relative_start_pos,
-                has_been_split)
+                before_frag_id, before_frag_start_pos, has_been_split)
         if self.propertyownerid == "" and self.propertyname == "":
             assert False # We can never create stand alone object this way
         else:
@@ -61,7 +61,8 @@ class AddTextEditFragment(Edge):
                         new_split_frag = fields.TextEdit._Fragment(fragment.id,
                             fragment.text[fragment_break_pos:],
                             sessionid, fragment.internal_start_pos + fragment_break_pos,
-                            fragment.relative_to, fragment.relative_start_pos, False)
+                            fragment.relative_to, fragment.relative_start_pos,
+                            "", 0, False)
                         fragment.has_been_split = True
                         fragment.text = fragment.text[:fragment_break_pos]
                         flImpl._listfragments.insert(fragment_index + 1, new_split_frag)
@@ -76,7 +77,11 @@ class AddTextEditFragment(Edge):
                         if fragment2.relative_to == added_fragment.relative_to and \
                            fragment2.relative_start_pos == added_fragment.relative_start_pos:
                             # Test should we insert before this fragment or not
-                            if added_fragment.id > fragment2.id:
+                            if added_fragment.id > fragment2.id and \
+                                (added_fragment.before_frag_id != fragment2.id or \
+                                 added_fragment.before_frag_start_pos < fragment2.internal_start_pos):
+                                # Always insert before a fragment if the original user coudl see
+                                # the fragment
                                 # Use the order of the fragment ID's as a tie break
                                 # The id's should be in ascending order
                                 fragment_index2 += 1

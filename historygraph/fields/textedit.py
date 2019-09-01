@@ -18,7 +18,8 @@ class TextEdit(Field):
         # has_been_split True iff this string is been split by another operation.
         # Is_tombstone this fragment is a tombstone and
         def __init__(self, id, text, sessionid, internal_start_pos, relative_to,
-                     relative_start_pos, has_been_split):
+                     relative_start_pos, before_frag_id, before_frag_start_pos,
+                     has_been_split):
             self.id = id
             self.text = text
             self.sessionid = sessionid
@@ -26,6 +27,8 @@ class TextEdit(Field):
             self.relative_to = relative_to
             self.relative_start_pos = relative_start_pos
             self.has_been_split = has_been_split
+            self.before_frag_id = before_frag_id
+            self.before_frag_start_pos = before_frag_start_pos
 
 
     class _TextEditImpl(object):
@@ -39,10 +42,11 @@ class TextEdit(Field):
 
         def _get_add_fragment_json(self, id, text, sessionid,
                 internal_start_pos, relative_to, relative_start_pos,
-                has_been_split):
+                before_frag_id, before_frag_start_pos, has_been_split):
             # Return the JSON representing an add fragment event
             return JSONEncoder().encode((id, text, sessionid, internal_start_pos,
-                relative_to, relative_start_pos, has_been_split))
+                relative_to, relative_start_pos, before_frag_id,
+                before_frag_start_pos, has_been_split))
 
 
         def removerange(self, start, end):
@@ -76,7 +80,8 @@ class TextEdit(Field):
                     new_split_frag = TextEdit._Fragment(fragment.id,
                         fragment.text[end - fragment_start_pos:], sessionid,
                         end - fragment_start_pos,
-                        fragment.relative_to, fragment.relative_start_pos, False)
+                        fragment.relative_to, fragment.relative_start_pos,
+                        "", 0, False)
                     fragment.has_been_split = True
                     fragment.text = fragment.text[:start - fragment_start_pos]
                     self._listfragments.insert(fragment_start_pos + 1, new_split_frag)
@@ -125,10 +130,10 @@ class TextEdit(Field):
                     assert len(self._listfragments) == 0 # The below only works for empty lists
                     fragment_id = str(uuid.uuid4())
                     self._listfragments.append(TextEdit._Fragment(fragment_id,
-                        text, sessionid, 0, "", 0, False))
+                        text, sessionid, 0, "", 0, "", 0, False))
                     self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                                      self.name, self._get_add_fragment_json(fragment_id,
-                                         text, sessionid, 0, "", 0, False),
+                                         text, sessionid, 0, "", 0, "", 0, False),
                                      "string")
 
                     return
@@ -150,13 +155,21 @@ class TextEdit(Field):
                 else:
                     # If the fragment was split aways make a new one don't try to append
                     inserted_fragment_id = str(uuid.uuid4())
+                    before_frag_id = ""
+                    before_frag_start_pos = 0
+                    if fragment_index + 1 < len(self._listfragments):
+                        # Set this fragment to be before the next fragment we know of
+                        after_frag = self._listfragments[fragment_index + 1]
+                        before_frag_id = after_frag.id
+                        before_frag_start_pos = after_frag.internal_start_pos
                     new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
-                        fragment.id, len(fragment.text), False)
+                        fragment.id, len(fragment.text), before_frag_id, before_frag_start_pos, False)
                     self._listfragments.insert(fragment_index + 1, new_inserted_frag)
                     self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                                      self.name, self._get_add_fragment_json(inserted_fragment_id,
                                          text, sessionid, 0,
-                                         fragment.id, len(fragment.text), False),
+                                         fragment.id, len(fragment.text),
+                                         before_frag_id, before_frag_start_pos, False),
                                      "string")
                     return
 
@@ -165,12 +178,13 @@ class TextEdit(Field):
                 # We are inserting at the end of another sessions's fragment so create a new fragment and insert it
                 inserted_fragment_id = str(uuid.uuid4())
                 new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
-                    fragment.id, len(fragment.text), False)
+                    fragment.id, len(fragment.text), "", 0, False)
                 self._listfragments.insert(fragment_index + 1, new_inserted_frag)
                 self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                                  self.name, self._get_add_fragment_json(inserted_fragment_id,
                                      text, sessionid, 0,
-                                     fragment.id, len(fragment.text), False),
+                                     fragment.id, len(fragment.text), "", 0,
+                                     False),
                                  "string")
                 return
             else:
@@ -178,30 +192,34 @@ class TextEdit(Field):
                 if internal_start_pos == 0:
                     inserted_fragment_id = str(uuid.uuid4())
                     new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
-                        fragment.id, 0, False)
+                        fragment.id, 0, "", 0, False)
                     self._listfragments.insert(fragment_start_pos, new_inserted_frag)
                     self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                                      self.name, self._get_add_fragment_json(inserted_fragment_id,
                                          text, sessionid, 0,
-                                         fragment.id, fragment.internal_start_pos + internal_start_pos, False),
+                                         fragment.id, fragment.internal_start_pos + internal_start_pos,
+                                         "", 0, False),
                                      "string")
                     return
                 else:
                     # TODO: COde shared with addtexteditfragment.py move to a library
                     new_split_frag = TextEdit._Fragment(fragment.id, fragment.text[internal_start_pos:],
                         sessionid, fragment.internal_start_pos + internal_start_pos,
-                        fragment.relative_to, fragment.relative_start_pos, False)
+                        fragment.relative_to, fragment.relative_start_pos, "", 0, False)
                     fragment.has_been_split = True
                     fragment.text = fragment.text[:internal_start_pos]
                     inserted_fragment_id = str(uuid.uuid4())
                     new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text,
-                        sessionid, 0, fragment.id, fragment.internal_start_pos + internal_start_pos, False)
+                        sessionid, 0, fragment.id,
+                        fragment.internal_start_pos + internal_start_pos,
+                        new_split_frag.id, new_split_frag.internal_start_pos, False)
                     self._listfragments.insert(fragment_index + 1, new_split_frag)
                     self._listfragments.insert(fragment_index + 1, new_inserted_frag)
                     self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                                      self.name, self._get_add_fragment_json(inserted_fragment_id,
                                          text, sessionid, 0,
-                                         fragment.id, fragment.internal_start_pos + internal_start_pos, False),
+                                         fragment.id, fragment.internal_start_pos + internal_start_pos,
+                                         new_split_frag.id, new_split_frag.internal_start_pos, False),
                                      "string")
                     return
 
