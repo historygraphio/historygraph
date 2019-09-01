@@ -17,8 +17,6 @@ class TextEditTestReplication(unittest.TestCase):
         self.dc2.register(TestFieldTextEditOwner1)
 
     def test_append_multi_conflicting_fragments(self):
-        print("test_append_multi_conflicting_fragments self.dc1.id=", self.dc1.id)
-        print("test_append_multi_conflicting_fragments self.dc2.id=", self.dc2.id)
         textowner = TestFieldTextEditOwner1()
 
         self.dc1.register(TestFieldTextEditOwner1)
@@ -34,17 +32,13 @@ class TextEditTestReplication(unittest.TestCase):
 
         textowner.text.insert(3, "def")
 
-        textowner.text.insert(3, "xyz")
+        test2.text.insert(3, "xyz")
 
         self.dc2.unfreeze_dc_comms()
 
         self.assertTrue(test2.text.get_text() == "abcdefxyz" or
                         test2.text.get_text() == "abcxyzdef")
 
-        print("test_append_multi_conflicting_fragments textowner.text=", [f.text for f in textowner.text._listfragments])
-        print("test_append_multi_conflicting_fragments textowner.text=", [f.id for f in textowner.text._listfragments])
-        print("test_append_multi_conflicting_fragments test2.text=", [f.text for f in test2.text._listfragments])
-        print("test_append_multi_conflicting_fragments test2.text=", [f.id for f in test2.text._listfragments])
         self.assertEqual(textowner.text.get_text(), test2.text.get_text())
 
         self.assertEqual(len(textowner.text._listfragments), 3)

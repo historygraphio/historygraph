@@ -21,21 +21,19 @@ class AddTextEditFragment(Edge):
         self.propertytype = propertytype
 
     def replay(self, doc):
-        print("AddTextEditFragment.REplay called")
         # Extract the fragment values from the JSON payload
-        (id, text, sessionid,
+        (fragment_id, text, sessionid,
                 internal_start_pos, relative_to, relative_start_pos,
                 has_been_split) = \
                     JSONDecoder().decode(self.propertyvalue)
         # Create the document object if it doesn't already exist
-        added_fragment = fields.TextEdit._Fragment(id, text, sessionid,
+        added_fragment = fields.TextEdit._Fragment(fragment_id, text, sessionid,
                 internal_start_pos, relative_to, relative_start_pos,
                 has_been_split)
         if self.propertyownerid == "" and self.propertyname == "":
             assert False # We can never create stand alone object this way
         else:
             parent = doc.get_document_object(self.propertyownerid)
-            print("AddTextEditFragment.REplay parent.dc.id=", parent.dc.id)
             flImpl = getattr(parent, self.propertyname)
 
             if added_fragment.relative_to == "":
@@ -71,7 +69,6 @@ class AddTextEditFragment(Edge):
                     else:
                         flImpl._listfragments.insert(fragment_index, added_fragment)
                 elif relative_start_pos == fragment.internal_start_pos + len(fragment.text):
-                    print("AddTextEditFragment.REplay add fragment at end of existing fragment")
                     fragment_index2 = fragment_index + 1
                     do_insert = False
                     while not do_insert and fragment_index2 < len(flImpl._listfragments):
@@ -79,8 +76,6 @@ class AddTextEditFragment(Edge):
                         if fragment2.relative_to == added_fragment.relative_to and \
                            fragment2.relative_start_pos == added_fragment.relative_start_pos:
                             # Test should we insert before this fragment or not
-                            print("AddTextEditFragment.REplay added_fragment.id=", added_fragment.id)
-                            print("AddTextEditFragment.REplay fragment2.id=", fragment2.id)
                             if added_fragment.id > fragment2.id:
                                 # Use the order of the fragment ID's as a tie break
                                 # The id's should be in ascending order
