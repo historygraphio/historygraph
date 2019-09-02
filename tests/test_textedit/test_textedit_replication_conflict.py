@@ -158,3 +158,25 @@ class TextEditTestReplication(unittest.TestCase):
         assert textowner.text.get_fragment_at_index(3) == 1
         assert textowner.text.get_fragment_at_index(4) == 1
         assert textowner.text.get_fragment_at_index(5) == 1
+
+    def test_inserts_at_start_of_fragment(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+
+        test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__,
+                                          textowner.id)
+
+        self.dc2.freeze_dc_comms()
+        textowner.text.insert(0, "z")
+        test2.text.insert(0, "y")
+
+        self.dc2.unfreeze_dc_comms()
+
+        self.assertTrue(textowner.text.get_text() == "zyabcdef" or
+                        textowner.text.get_text() == "yzabcdef")
+        self.assertEqual(textowner.text.get_text(), test2.text.get_text())
+        self.assertEqual(len(textowner.text._listfragments), 3)
