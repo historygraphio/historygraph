@@ -36,22 +36,42 @@ class AddTextEditFragment(Edge):
             parent = doc.get_document_object(self.propertyownerid)
             flImpl = getattr(parent, self.propertyname)
 
-            if added_fragment.relative_to == "":
+            if added_fragment.relative_to == "" and len(flImpl._listfragments) == 0:
                 # This is the first fragment it does immediately after the start
                 # of the list
-                assert len(flImpl._listfragments) == 0
                 flImpl._listfragments.append(added_fragment)
             else:
                 fragment_index = 0
                 was_found = False
-                for fragment in flImpl._listfragments:
-                    if fragment.id == added_fragment.relative_to:
-                        if relative_start_pos >= fragment.internal_start_pos and \
-                           relative_start_pos <= fragment.internal_start_pos + len(fragment.text):
-                            was_found = True
-                    if was_found == False:
-                        fragment_index += 1
-                assert was_found, "A matching fragment was not found"
+                if added_fragment.relative_to != "":
+                    # Look for a fragment we can insert inside of
+                    fragments_with_index = zip(range(len(flImpl._listfragments)),
+                                               flImpl._listfragments)
+                    # Look for all fragments belong to the one we are relative to
+                    fragments_with_index = filter(lambda f: f[1].id ==
+                                                  added_fragment.relative_to,
+                                                  fragments_with_index)
+                    # Look for all fragments we are inside
+                    fragments_with_index = list(filter(lambda f: added_fragment.relative_start_pos >= f[1].internal_start_pos and \
+                                                  added_fragment.relative_start_pos <= f[1].internal_start_pos + len(f[1].text),
+                                                  fragments_with_index))
+                    if len(fragments_with_index) > 0:
+                        # There is one insert relative to it
+                        fragment_index = fragments_with_index[0][0]
+                    else:
+                        # Otherwise find a fragment we are insered after
+                        #assert len(fragments_with_index) == 0, "fragments_with_index = {}".format([(f[0], f[1].text) for f in fragments_with_index])
+                        fragments_with_index = zip(range(len(flImpl._listfragments)),
+                                                   flImpl._listfragments)
+                        # Look for all fragments belong to the one we are relative to
+                        fragments_with_index = filter(lambda f: f[1].id ==
+                                                      added_fragment.relative_to,
+                                                      fragments_with_index)
+                        # Look for all fragments we are after
+                        fragments_with_index = list(filter(lambda f: added_fragment.relative_start_pos > f[1].internal_start_pos + len(f[1].text),
+                                                      fragments_with_index))
+                        fragment_index = fragments_with_index[-1][0]
+
                 fragment = flImpl._listfragments[fragment_index]
                 if relative_start_pos < fragment.internal_start_pos + len(fragment.text):
                     #We need to break this fragment apart
@@ -68,8 +88,27 @@ class AddTextEditFragment(Edge):
                         flImpl._listfragments.insert(fragment_index + 1, new_split_frag)
                         flImpl._listfragments.insert(fragment_index + 1, added_fragment)
                     else:
-                        flImpl._listfragments.insert(fragment_index, added_fragment)
-                elif relative_start_pos == fragment.internal_start_pos + len(fragment.text):
+                        fragment_index2 = fragment_index
+                        do_insert = False
+                        while not do_insert and fragment_index2 < len(flImpl._listfragments):
+                            fragment2 = flImpl._listfragments[fragment_index2]
+                            if fragment2.relative_to == added_fragment.relative_to and \
+                               fragment2.relative_start_pos == added_fragment.relative_start_pos:
+                                # Test should we insert before this fragment or not
+                                if added_fragment.id > fragment2.id and \
+                                    (added_fragment.before_frag_id != fragment2.id or \
+                                     added_fragment.before_frag_start_pos < fragment2.internal_start_pos):
+                                    # Always insert before a fragment if the original user coudl see
+                                    # the fragment
+                                    # Use the order of the fragment ID's as a tie break
+                                    # The id's should be in ascending order
+                                    fragment_index2 += 1
+                                else:
+                                    do_insert = True
+                            else:
+                                do_insert = True
+                        flImpl._listfragments.insert(fragment_index2, added_fragment)
+                elif relative_start_pos >= fragment.internal_start_pos + len(fragment.text):
                     fragment_index2 = fragment_index + 1
                     do_insert = False
                     while not do_insert and fragment_index2 < len(flImpl._listfragments):
@@ -90,6 +129,8 @@ class AddTextEditFragment(Edge):
                         else:
                             do_insert = True
                     flImpl._listfragments.insert(fragment_index2, added_fragment)
+                else:
+                    assert False, "Should never be reached"
 
     def clone(self):
         return AddTextEditFragment(self._start_hashes,

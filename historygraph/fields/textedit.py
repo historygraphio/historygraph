@@ -200,12 +200,12 @@ class TextEdit(Field):
                         before_frag_id = after_frag.id
                         before_frag_start_pos = after_frag.internal_start_pos
                     new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
-                        fragment.id, 0, before_frag_id, before_frag_start_pos, False)
+                        "", 0, before_frag_id, before_frag_start_pos, False)
                     self._listfragments.insert(fragment_start_pos, new_inserted_frag)
                     self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                                      self.name, self._get_add_fragment_json(inserted_fragment_id,
                                          text, sessionid, 0,
-                                         fragment.id, fragment.internal_start_pos + internal_start_pos,
+                                         "", 0,
                                          before_frag_id, before_frag_start_pos, False),
                                      "string")
                     return

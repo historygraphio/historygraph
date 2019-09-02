@@ -231,7 +231,7 @@ class TextEditTest(unittest.TestCase):
         fragments = textowner.text._listfragments
 
         assert fragments[0].text == "z"
-        assert fragments[0].relative_to == fragments[1].id
+        assert fragments[0].relative_to == ""
         assert fragments[0].relative_start_pos == 0
         assert fragments[0].has_been_split == False
         assert fragments[0].internal_start_pos == 0
