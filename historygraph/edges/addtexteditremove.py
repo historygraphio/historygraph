@@ -41,8 +41,13 @@ class AddTextEditRemove(Edge):
                 return fragment
             if fragment.internal_start_pos >= remove_start and \
                fragment.internal_start_pos + len(fragment.text) <= remove_end:
-                # This entire fragment should be deleted so return None (is filtered out in the next function)
-                return None
+                # This entire fragment should be deleted just return the same fragment with the text removed and has_been_split set
+                return fields.TextEdit._Fragment(fragment.id,
+                    "",
+                    sessionid, fragment.internal_start_pos,
+                    fragment.relative_to, fragment.relative_start_pos,
+                    "", 0,
+                    True)
             if fragment.internal_start_pos >= remove_start and \
                fragment.internal_start_pos + len(fragment.text) > remove_end:
                 # The start of this fragment should be removed

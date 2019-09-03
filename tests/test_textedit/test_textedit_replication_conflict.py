@@ -272,3 +272,81 @@ class TextEditTestReplication(unittest.TestCase):
         assert test2.text.get_fragment_at_index(5) == 1
         assert test2.text.get_fragment_at_index(6) == 2
         assert test2.text.get_fragment_at_index(8) == 2
+
+    def test_deleting_entire_fragment_conflicts_with_insert_from_single_fragment(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        # Make a text string of three fragments
+        textowner.text.insert(0, "abcghi")
+        textowner.text.insert(3, "def")
+        self.assertEqual(textowner.text.get_text(), "abcdefghi")
+        self.assertEqual(len(textowner.text._listfragments), 3)
+
+        deleted_middle_fragment = textowner.text._listfragments[1]
+
+        test2 = self.dc2.get_object_by_id(TestFieldTextEditOwner1.__name__,
+                                          textowner.id)
+
+        self.dc2.freeze_dc_comms()
+        textowner.text.removerange(3,6)
+        test2.text.insert(5,"xyz")
+        self.dc2.unfreeze_dc_comms()
+
+        self.assertEqual(textowner.text.get_text(), "abcxyzghi")
+        non_deleted_list_fragments = [f for f in textowner.text._listfragments if f.text != ""]
+        deleted_list_fragments = [f for f in textowner.text._listfragments if f.id == deleted_middle_fragment.id]
+        # There can be either one or two fragments because of the ordering of events
+        self.assertTrue(len(deleted_list_fragments) == 1 or len(deleted_list_fragments) == 2)
+        # Check they really were deleted
+        self.assertTrue(all([f.text == "" for f in deleted_list_fragments]))
+        self.assertEqual(len(non_deleted_list_fragments), 3)
+        fragments = non_deleted_list_fragments
+
+        assert fragments[0].text == "abc"
+        assert fragments[0].relative_to == ""
+        assert fragments[0].relative_start_pos == 0
+        assert fragments[0].has_been_split == True
+        assert fragments[0].internal_start_pos == 0
+
+        assert fragments[1].text == "xyz"
+        assert fragments[1].relative_to == deleted_middle_fragment.id
+        assert fragments[1].relative_start_pos == 2
+        assert fragments[1].has_been_split == False
+        assert fragments[1].internal_start_pos == 0
+
+        assert fragments[2].text == "ghi"
+        assert fragments[2].relative_to == ""
+        assert fragments[2].relative_start_pos == 0
+        assert fragments[2].has_been_split == False
+        assert fragments[2].internal_start_pos == 3
+
+        self.assertEqual(test2.text.get_text(), "abcxyzghi")
+        non_deleted_list_fragments = [f for f in textowner.text._listfragments if f.text != ""]
+        deleted_list_fragments = [f for f in textowner.text._listfragments if f.id == deleted_middle_fragment.id]
+        # There can be either one or two fragments because of the ordering of events
+        self.assertTrue(len(deleted_list_fragments) == 1 or len(deleted_list_fragments) == 2)
+        # Check they really were deleted
+        self.assertTrue(all([f.text == "" for f in deleted_list_fragments]))
+        self.assertEqual(len(non_deleted_list_fragments), 3)
+        fragments = non_deleted_list_fragments
+
+        assert fragments[0].text == "abc"
+        assert fragments[0].relative_to == ""
+        assert fragments[0].relative_start_pos == 0
+        assert fragments[0].has_been_split == True
+        assert fragments[0].internal_start_pos == 0
+
+        assert fragments[1].text == "xyz"
+        assert fragments[1].relative_to == deleted_middle_fragment.id
+        assert fragments[1].relative_start_pos == 2
+        assert fragments[1].has_been_split == False
+        assert fragments[1].internal_start_pos == 0
+
+        assert fragments[2].text == "ghi"
+        assert fragments[2].relative_to == ""
+        assert fragments[2].relative_start_pos == 0
+        assert fragments[2].has_been_split == False
+        assert fragments[2].internal_start_pos == 3

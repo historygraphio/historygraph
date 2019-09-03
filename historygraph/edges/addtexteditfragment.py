@@ -60,7 +60,6 @@ class AddTextEditFragment(Edge):
                         fragment_index = fragments_with_index[0][0]
                     else:
                         # Otherwise find a fragment we are insered after
-                        #assert len(fragments_with_index) == 0, "fragments_with_index = {}".format([(f[0], f[1].text) for f in fragments_with_index])
                         fragments_with_index = zip(range(len(flImpl._listfragments)),
                                                    flImpl._listfragments)
                         # Look for all fragments belong to the one we are relative to

@@ -66,7 +66,8 @@ class TextEdit(Field):
 
                 if start == fragment_start_pos and end == fragment_start_pos + len(fragment.text):
                     # We are deleting an entrie fragment just remove it
-                    self._listfragments.remove(fragment)
+                    fragment.text = ""
+                    fragment.has_been_split = True
                 elif start == fragment_start_pos:
                     # We are deleting at the start there is no new fragment just chop characters off
                     fragment.text = fragment.text[end - fragment_start_pos:]

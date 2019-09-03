@@ -522,7 +522,7 @@ class TextEditTest(unittest.TestCase):
 
         textowner.text.removerange(3, 5)
         self.assertEqual(textowner.text.get_text(), "abcdef")
-        self.assertEqual(len(textowner.text._listfragments), 2)
+        self.assertEqual(len(textowner.text._listfragments), 3)
         fragments = textowner.text._listfragments
 
         assert fragments[0].text == "abc"
@@ -533,26 +533,35 @@ class TextEditTest(unittest.TestCase):
         assert fragments[0].before_frag_id == ""
         assert fragments[0].before_frag_start_pos == 0
 
-        assert fragments[1].id == fragments[0].id
-        assert fragments[1].text == "def"
-        assert fragments[1].relative_to == ""
-        assert fragments[1].relative_start_pos == 0
-        assert fragments[1].has_been_split == False
-        assert fragments[1].internal_start_pos == 3
-        assert fragments[1].before_frag_id == ""
-        assert fragments[1].before_frag_start_pos == 0
+        assert fragments[1].id != fragments[0].id
+        assert fragments[1].text == ""
+        assert fragments[1].relative_to == fragments[0].id
+        assert fragments[1].relative_start_pos == 3
+        assert fragments[1].has_been_split == True
+        assert fragments[1].internal_start_pos == 0
+        assert fragments[1].before_frag_id == fragments[2].id
+        assert fragments[1].before_frag_start_pos == fragments[2].internal_start_pos
+
+        assert fragments[2].id == fragments[0].id
+        assert fragments[2].text == "def"
+        assert fragments[2].relative_to == ""
+        assert fragments[2].relative_start_pos == 0
+        assert fragments[2].has_been_split == False
+        assert fragments[2].internal_start_pos == 3
+        assert fragments[2].before_frag_id == ""
+        assert fragments[2].before_frag_start_pos == 0
 
         assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(3) == 0
-        assert textowner.text.get_fragment_to_append_to_by_index(4) == 1
-        assert textowner.text.get_fragment_to_append_to_by_index(6) == 1
+        assert textowner.text.get_fragment_to_append_to_by_index(4) == 2
+        assert textowner.text.get_fragment_to_append_to_by_index(6) == 2
 
         assert textowner.text.get_fragment_at_index(0) == 0
         assert textowner.text.get_fragment_at_index(2) == 0
-        assert textowner.text.get_fragment_at_index(3) == 1
-        assert textowner.text.get_fragment_at_index(4) == 1
-        assert textowner.text.get_fragment_at_index(5) == 1
+        assert textowner.text.get_fragment_at_index(3) == 2
+        assert textowner.text.get_fragment_at_index(4) == 2
+        assert textowner.text.get_fragment_at_index(5) == 2
 
     def test_delete_whole_fragment_plus_more_from_middle(self):
         textowner = TestFieldTextEditOwner1()
@@ -612,7 +621,7 @@ class TextEditTest(unittest.TestCase):
 
         textowner.text.removerange(2, 6)
         self.assertEqual(textowner.text.get_text(), "abef")
-        self.assertEqual(len(textowner.text._listfragments), 2)
+        self.assertEqual(len(textowner.text._listfragments), 3)
         fragments = textowner.text._listfragments
 
         assert fragments[0].text == "ab"
@@ -623,24 +632,33 @@ class TextEditTest(unittest.TestCase):
         assert fragments[0].before_frag_id == ""
         assert fragments[0].before_frag_start_pos == 0
 
-        assert fragments[1].id == fragments[0].id
-        assert fragments[1].text == "ef"
-        assert fragments[1].relative_to == ""
-        assert fragments[1].relative_start_pos == 0
-        assert fragments[1].has_been_split == False
-        assert fragments[1].internal_start_pos == 4
-        assert fragments[1].before_frag_id == ""
-        assert fragments[1].before_frag_start_pos == 0
+        assert fragments[1].id != fragments[0].id
+        assert fragments[1].text == ""
+        assert fragments[1].relative_to == fragments[0].id
+        assert fragments[1].relative_start_pos == 3
+        assert fragments[1].has_been_split == True
+        assert fragments[1].internal_start_pos == 0
+        assert fragments[1].before_frag_id == fragments[2].id
+        assert fragments[1].before_frag_start_pos == 3
+
+        assert fragments[2].id == fragments[0].id
+        assert fragments[2].text == "ef"
+        assert fragments[2].relative_to == ""
+        assert fragments[2].relative_start_pos == 0
+        assert fragments[2].has_been_split == False
+        assert fragments[2].internal_start_pos == 4
+        assert fragments[2].before_frag_id == ""
+        assert fragments[2].before_frag_start_pos == 0
 
         assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
-        assert textowner.text.get_fragment_to_append_to_by_index(3) == 1
-        assert textowner.text.get_fragment_to_append_to_by_index(4) == 1
+        assert textowner.text.get_fragment_to_append_to_by_index(3) == 2
+        assert textowner.text.get_fragment_to_append_to_by_index(4) == 2
 
         assert textowner.text.get_fragment_at_index(0) == 0
         assert textowner.text.get_fragment_at_index(1) == 0
-        assert textowner.text.get_fragment_at_index(2) == 1
-        assert textowner.text.get_fragment_at_index(3) == 1
+        assert textowner.text.get_fragment_at_index(2) == 2
+        assert textowner.text.get_fragment_at_index(3) == 2
 
     def test_delete_at_end_of_single_fragment(self):
         textowner = TestFieldTextEditOwner1()
