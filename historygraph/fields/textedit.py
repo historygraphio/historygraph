@@ -39,6 +39,7 @@ class TextEdit(Field):
             assert self.parent is not None
             self.name = name
             self._listfragments = list()
+            self.content = ""
 
         def _get_add_fragment_json(self, id, text, sessionid,
                 internal_start_pos, relative_to, relative_start_pos,
@@ -130,8 +131,12 @@ class TextEdit(Field):
                     # This always goes at the start
                     assert len(self._listfragments) == 0 # The below only works for empty lists
                     fragment_id = str(uuid.uuid4())
-                    self._listfragments.append(TextEdit._Fragment(fragment_id,
-                        text, sessionid, 0, "", 0, "", 0, False))
+                    fragment = TextEdit._Fragment(fragment_id,
+                        text, sessionid, 0, "", 0, "", 0, False)
+                    fragment.absolute_start_pos = 0
+                    fragment.length = len(text)
+                    self._listfragments.append(fragment)
+                    self.content = text
                     self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                                      self.name, self._get_add_fragment_json(fragment_id,
                                          text, sessionid, 0, "", 0, "", 0, False),
@@ -147,14 +152,21 @@ class TextEdit(Field):
                fragment.sessionid == sessionid:
                 if fragment.has_been_split == False:
                     # We are inserting at the end of a fragment then  so we can append
+                    print("e are inserting at the end of a fragment then  so we can append")
                     self.was_changed(ChangeType.ADD_TEXTEDIT_APPEND_TO_FRAGMENT, self.parent.id,
                                      self.name, JSONEncoder().encode((fragment.id,
                                          text, fragment.internal_start_pos + len(fragment.text))),
                                      "string")
+                    self.content = self.content[:fragment.absolute_start_pos + fragment.length] + \
+                        text + self.content[fragment.absolute_start_pos + fragment.length:]
+                    for i in range(fragment_index + 1, len(self._listfragments)):
+                        self._listfragments[i].absolute_start_pos += len(text)
                     fragment.text += text
+                    fragment.length += len(text)
                     return
                 else:
                     # If the fragment was split aways make a new one don't try to append
+                    print("If the fragment was split aways make a new one don't try to append")
                     inserted_fragment_id = str(uuid.uuid4())
                     before_frag_id = ""
                     before_frag_start_pos = 0
@@ -177,6 +189,7 @@ class TextEdit(Field):
             elif index == fragment_start_pos + len(fragment.text) and \
                fragment.sessionid != sessionid:
                 # We are inserting at the end of another sessions's fragment so create a new fragment and insert it
+                print("We are inserting at the end of another sessions's fragment so create a new fragment and insert it")
                 inserted_fragment_id = str(uuid.uuid4())
                 new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
                     fragment.id, len(fragment.text), "", 0, False)
@@ -192,6 +205,7 @@ class TextEdit(Field):
                 internal_start_pos = index - fragment_start_pos
                 if internal_start_pos == 0:
                     # This fragment is being inserted before the very first fragment in the list
+                    print("This fragment is being inserted before the very first fragment in the list")
                     inserted_fragment_id = str(uuid.uuid4())
                     before_frag_id = ""
                     before_frag_start_pos = 0
@@ -212,16 +226,36 @@ class TextEdit(Field):
                     return
                 else:
                     # TODO: COde shared with addtexteditfragment.py move to a library
+                    print("Splitting and inserting text=", text)
+                    print("Splitting and inserting self.content=", self.content)
+                    print("Splitting and inserting internal_start_pos=", internal_start_pos)
+                    print("Splitting and inserting fragment.absolute_start_pos=", fragment.absolute_start_pos)
+                    print("Splitting and inserting fragment.text=", fragment.text)
+                    self.content = self.content[:fragment.absolute_start_pos + internal_start_pos] + \
+                        text + self.content[fragment.absolute_start_pos + internal_start_pos:]
+                    for i in range(fragment_index + 1, len(self._listfragments)):
+                        self._listfragments[i].absolute_start_pos += len(text)
                     new_split_frag = TextEdit._Fragment(fragment.id, fragment.text[internal_start_pos:],
                         sessionid, fragment.internal_start_pos + internal_start_pos,
                         fragment.relative_to, fragment.relative_start_pos, "", 0, False)
+                    new_split_frag.absolute_start_pos = fragment.absolute_start_pos + internal_start_pos +len(text)
+                    new_split_frag.length = len(new_split_frag.text)
+                    print("Splitting and inserting new_split_frag.absolute_start_pos=", new_split_frag.absolute_start_pos)
+                    print("Splitting and inserting new_split_frag.length=", new_split_frag.length)
+                    print("Splitting and inserting new_split_frag.text=", new_split_frag.text)
                     fragment.has_been_split = True
                     fragment.text = fragment.text[:internal_start_pos]
+                    fragment.length = len(fragment.text)
                     inserted_fragment_id = str(uuid.uuid4())
                     new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text,
                         sessionid, 0, fragment.id,
                         fragment.internal_start_pos + internal_start_pos,
                         new_split_frag.id, new_split_frag.internal_start_pos, False)
+                    new_inserted_frag.absolute_start_pos = fragment.absolute_start_pos +internal_start_pos
+                    new_inserted_frag.length = len(new_inserted_frag.text)
+                    print("Splitting and inserting new_inserted_frag.absolute_start_pos=", new_inserted_frag.absolute_start_pos)
+                    print("Splitting and inserting new_inserted_frag.length=", new_inserted_frag.length)
+                    print("Splitting and inserting new_inserted_frag.text=", new_inserted_frag.text)
                     self._listfragments.insert(fragment_index + 1, new_split_frag)
                     self._listfragments.insert(fragment_index + 1, new_inserted_frag)
                     self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
@@ -238,7 +272,8 @@ class TextEdit(Field):
 
         def get_text(self):
             # Return the full version of the string
-            return ''.join(f.text for f in self._listfragments)
+            #return ''.join(f.text for f in self._listfragments)
+            return self.content
 
         def get_fragment_to_append_to_by_index(self, index):
             # Return the index into the fragment list of the current index position

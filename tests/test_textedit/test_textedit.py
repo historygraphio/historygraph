@@ -28,6 +28,7 @@ class TextEditTest(unittest.TestCase):
         textowner.text.insert(0, "abcdef")
 
         self.assertEqual(textowner.text.get_text(), "abcdef")
+        self.assertEqual(textowner.text.content, "abcdef")
         self.assertEqual(len(textowner.text._listfragments), 1)
         fragment = textowner.text._listfragments[0]
         assert fragment.text == "abcdef"
@@ -37,6 +38,8 @@ class TextEditTest(unittest.TestCase):
         assert fragment.has_been_split == False
         assert fragment.before_frag_id == ""
         assert fragment.before_frag_start_pos == 0
+        assert fragment.absolute_start_pos == 0
+        assert fragment.length == 6
         assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(5) == 0
@@ -64,6 +67,8 @@ class TextEditTest(unittest.TestCase):
         assert fragment.has_been_split == False
         assert fragment.before_frag_id == ""
         assert fragment.before_frag_start_pos == 0
+        assert fragment.absolute_start_pos == 0
+        assert fragment.length == 9
         assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(5) == 0
@@ -71,6 +76,7 @@ class TextEditTest(unittest.TestCase):
         assert textowner.text.get_fragment_to_append_to_by_index(9) == 0
 
     def test_insert_in_middle_of_fragment(self):
+        # TODO: Trying to implement this test
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection(str(uuid.uuid4()))
@@ -81,6 +87,7 @@ class TextEditTest(unittest.TestCase):
         textowner.text.insert(3, "z")
         textowner.text.insert(6, "y")
 
+        self.assertEqual(textowner.text.content, "abczdeyfghi")
         self.assertEqual(textowner.text.get_text(), "abczdeyfghi")
         self.assertEqual(len(textowner.text._listfragments), 5)
         fragments = textowner.text._listfragments
@@ -92,6 +99,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[0].internal_start_pos == 0
         assert fragments[0].before_frag_id == ""
         assert fragments[0].before_frag_start_pos == 0
+        assert fragments[0].absolute_start_pos == 0
+        assert fragments[0].length == 3
 
         assert fragments[1].id != fragments[0].id
         assert fragments[1].text == "z"
@@ -101,6 +110,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[1].internal_start_pos == 0
         assert fragments[1].before_frag_id == fragments[2].id
         assert fragments[1].before_frag_start_pos == fragments[2].internal_start_pos
+        assert fragments[1].absolute_start_pos == 3
+        assert fragments[1].length == 1
 
         assert fragments[2].id == fragments[0].id
         assert fragments[2].text == "de"
@@ -110,6 +121,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[2].internal_start_pos == 3
         assert fragments[2].before_frag_id == ""
         assert fragments[2].before_frag_start_pos == 0
+        assert fragments[2].absolute_start_pos == 4
+        assert fragments[2].length == 2
 
         assert fragments[3].id != fragments[0].id
         assert fragments[3].text == "y"
@@ -119,6 +132,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[3].internal_start_pos == 0
         assert fragments[3].before_frag_id == fragments[4].id
         assert fragments[3].before_frag_start_pos == fragments[4].internal_start_pos
+        assert fragments[3].absolute_start_pos == 6
+        assert fragments[3].length == 1
 
         assert fragments[4].id == fragments[0].id
         assert fragments[4].text == "fghi"
@@ -128,6 +143,8 @@ class TextEditTest(unittest.TestCase):
         assert fragments[4].internal_start_pos == 5
         assert fragments[4].before_frag_id == ""
         assert fragments[4].before_frag_start_pos == 0
+        assert fragments[4].absolute_start_pos == 7
+        assert fragments[4].length == 4
 
         assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
         assert textowner.text.get_fragment_to_append_to_by_index(2) == 0
