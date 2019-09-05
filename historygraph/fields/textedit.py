@@ -219,6 +219,9 @@ class TextEdit(Field):
                         after_frag = self._listfragments[fragment_start_pos]
                         before_frag_id = after_frag.id
                         before_frag_start_pos = after_frag.internal_start_pos
+                    self.content = text + self.content
+                    for i in range(0, len(self._listfragments)):
+                        self._listfragments[i].absolute_start_pos += len(text)
                     new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
                         "", 0, before_frag_id, before_frag_start_pos, False)
                     self._listfragments.insert(fragment_start_pos, new_inserted_frag)
