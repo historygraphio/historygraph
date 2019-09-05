@@ -177,6 +177,11 @@ class TextEdit(Field):
                         before_frag_start_pos = after_frag.internal_start_pos
                     new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
                         fragment.id, len(fragment.text), before_frag_id, before_frag_start_pos, False)
+                    before_fragment = self._listfragments[fragment_index]
+                    self.content = self.content[:before_fragment.absolute_start_pos + before_fragment.length] + \
+                        text + self.content[before_fragment.absolute_start_pos + before_fragment.length:]
+                    for i in range(fragment_index + 1, len(self._listfragments)):
+                        self._listfragments[i].absolute_start_pos += len(text)
                     self._listfragments.insert(fragment_index + 1, new_inserted_frag)
                     self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                                      self.name, self._get_add_fragment_json(inserted_fragment_id,
