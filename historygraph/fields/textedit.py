@@ -67,26 +67,42 @@ class TextEdit(Field):
 
                 if start == fragment_start_pos and end == fragment_start_pos + len(fragment.text):
                     # We are deleting an entrie fragment just remove it
+                    print("We are deleting an entrie fragment just remove it")
                     fragment.text = ""
                     fragment.has_been_split = True
                 elif start == fragment_start_pos:
                     # We are deleting at the start there is no new fragment just chop characters off
+                    print("We are deleting at the start there is no new fragment just chop characters off")
                     fragment.text = fragment.text[end - fragment_start_pos:]
                     fragment.internal_start_pos = fragment.internal_start_pos + end - fragment_start_pos
+                    self.content = self.content[:fragment_start_pos] + \
+                        self.content[end:]
+                    for i in range(fragment_start_pos + 1, len(self._listfragments)):
+                        self._listfragments[i].absolute_start_pos -= end - fragment_start_pos
                 elif end == fragment_start_pos + len(fragment.text):
                     # We are deleting to the end of an existing fragment so just chop characters off
+                    print("We are deleting to the end of an existing fragment so just chop characters off")
                     fragment.text = fragment.text[:start - fragment_start_pos]
                     fragment.has_been_split = True
                 else:
                     # We are deleting somewhere in the middle
+                    print("We are deleting somewhere in the middle")
                     new_split_frag = TextEdit._Fragment(fragment.id,
                         fragment.text[end - fragment_start_pos:], sessionid,
                         end - fragment_start_pos,
                         fragment.relative_to, fragment.relative_start_pos,
                         "", 0, False)
+                    new_split_frag.absolute_start_pos = \
+                        fragment.absolute_start_pos + start - fragment_start_pos
+                    new_split_frag.length = len(new_split_frag.text)
                     fragment.has_been_split = True
                     fragment.text = fragment.text[:start - fragment_start_pos]
+                    fragment.length = len(fragment.text)
                     self._listfragments.insert(fragment_start_pos + 1, new_split_frag)
+                    self.content = self.content[:start] + \
+                        self.content[end:]
+                    for i in range(fragment_start_pos + 2, len(self._listfragments)):
+                        self._listfragments[i].absolute_start_pos -= end - start
 
             else:
                 # Delete the first fragment we match
