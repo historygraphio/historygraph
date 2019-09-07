@@ -82,8 +82,20 @@ class TextEdit(Field):
                 elif end == fragment_start_pos + len(fragment.text):
                     # We are deleting to the end of an existing fragment so just chop characters off
                     print("We are deleting to the end of an existing fragment so just chop characters off")
+                    print("Content before fragment.text=", fragment.text)
                     fragment.text = fragment.text[:start - fragment_start_pos]
                     fragment.has_been_split = True
+                    old_length = len(fragment.text)
+                    print("Content before self.content=", self.content)
+                    fragment.length = len(fragment.text)
+                    print("Content before start=", start)
+                    print("Content before fragment_start_pos=", fragment_start_pos)
+                    print("Content before old_length=", old_length)
+                    self.content = self.content[:start] + \
+                        self.content[fragment_start_pos + old_length:]
+                    print("Content after self.content=", self.content)
+                    for i in range(fragment_start_pos + 1, len(self._listfragments)):
+                        self._listfragments[i].absolute_start_pos -= fragment_start_pos + old_length - start
                 else:
                     # We are deleting somewhere in the middle
                     print("We are deleting somewhere in the middle")

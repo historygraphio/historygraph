@@ -351,6 +351,7 @@ class TextEditTest(unittest.TestCase):
         assert textowner.text.get_fragment_at_index(3) == 1
 
     def test_delete_text_from_single_fragment_alt_pattern(self):
+        # TODO: Fixing this unit test
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection(str(uuid.uuid4()))
