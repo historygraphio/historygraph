@@ -151,6 +151,7 @@ class TextEditTestReplication(unittest.TestCase):
         assert test2.text.get_fragment_at_index(10) == 4
 
     def test_insert_at_start_of_fragment(self):
+        # TODO: Fixed up to here
         textowner = TestFieldTextEditOwner1()
 
         self.dc1.register(TestFieldTextEditOwner1)
