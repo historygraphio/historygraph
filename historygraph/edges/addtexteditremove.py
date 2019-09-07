@@ -22,6 +22,7 @@ class AddTextEditRemove(Edge):
         self.propertytype = propertytype
 
     def replay(self, doc):
+        print("AddTextEditRemove.replay called")
         # Extract the fragment values from the JSON payload
         (target_fragment_id, remove_start, remove_end, sessionid) = \
                     JSONDecoder().decode(self.propertyvalue)
@@ -95,78 +96,16 @@ class AddTextEditRemove(Edge):
 
         flImpl._listfragments = list_fragments
 
+        flImpl.content = ''.join([f.text for f in flImpl._listfragments])
+        for f in flImpl._listfragments:
+            f.length = len(f.text)
+        absolute_start_pos = 0
+        for f in flImpl._listfragments:
+            f.absolute_start_pos = absolute_start_pos
+            absolute_start_pos += len(f.text)
+
         return
 
-        """
-        index = 0
-        while index < len(flImpl._listfragments):
-            fragment = flImpl._listfragments[index]
-            if fragment.id == target_fragment_id:
-                if remove_start <= fragment.internal_start_pos and \
-                    remove_end >= fragment.internal_start_pos + len(fragment.text):
-                     # Delete the entire fragment
-                     assert False, "TODO: Build a test that does this"
-                elif remove_start <= fragment.internal_start_pos and \
-                    remove_end > fragment.internal_start_pos:
-                     # Delete at the start of the fragment
-                     assert False, "TODO: Build a test that does this"
-                elif remove_start > fragment.internal_start_pos and \
-                    remove_end >= fragment.internal_start_pos + len(fragment.text):
-                     # Delete at the end of the fragment
-                     assert False, "TODO: Build a test that does this"
-                elif remove_start > fragment.internal_start_pos and \
-                    remove_end >= fragment.internal_start_pos + len(fragment.text):
-                     # Delete at the end of the fragment
-                     assert False, "TODO: Build a test that does this"
-        """
-
-        """
-        # Create the document object if it doesn't already exist
-        added_fragment = fields.TextEdit._Fragment(id, text, sessionid,
-                internal_start_pos, relative_to, relative_start_pos,
-                has_been_split)
-        if self.propertyownerid == "" and self.propertyname == "":
-            assert False # We can never create stand alone object this way
-        else:
-            parent = doc.get_document_object(self.propertyownerid)
-            flImpl = getattr(parent, self.propertyname)
-
-            if added_fragment.relative_to == "":
-                # This is the first fragment it does immediately after the start
-                # of the list
-                assert len(flImpl._listfragments) == 0
-                flImpl._listfragments.append(added_fragment)
-            else:
-                fragment_index = 0
-                was_found = False
-                for fragment in flImpl._listfragments:
-                    if fragment.id == added_fragment.relative_to:
-                        if relative_start_pos >= fragment.internal_start_pos and \
-                           relative_start_pos <= fragment.internal_start_pos + len(fragment.text):
-                            was_found = True
-                    if was_found == False:
-                        fragment_index += 1
-                assert was_found, "A matching fragment was not found"
-                fragment = flImpl._listfragments[fragment_index]
-                if relative_start_pos < fragment.internal_start_pos + len(fragment.text):
-                    #We need to break this fragment apart
-                    # TODO: COde shared with textedit.py move to a library
-                    fragment_break_pos = relative_start_pos - fragment.internal_start_pos
-                    if fragment_break_pos > 0:
-                        new_split_frag = fields.TextEdit._Fragment(fragment.id,
-                            fragment.text[fragment_break_pos:],
-                            sessionid, fragment.internal_start_pos + fragment_break_pos,
-                            fragment.relative_to, fragment.relative_start_pos, False)
-                        fragment.has_been_split = True
-                        fragment.text = fragment.text[:fragment_break_pos]
-                        flImpl._listfragments.insert(fragment_index + 1, new_split_frag)
-                        flImpl._listfragments.insert(fragment_index + 1, added_fragment)
-                    else:
-                        flImpl._listfragments.insert(fragment_index, added_fragment)
-                elif relative_start_pos == fragment.internal_start_pos + len(fragment.text):
-                    assert False, "New fragment goes exactly at the end of an existing one not yet handled"
-                #assert False
-                """
 
     def clone(self):
         return AddTextEditRemove(self._start_hashes,
