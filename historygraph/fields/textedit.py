@@ -83,9 +83,9 @@ class TextEdit(Field):
                     # We are deleting to the end of an existing fragment so just chop characters off
                     print("We are deleting to the end of an existing fragment so just chop characters off")
                     print("Content before fragment.text=", fragment.text)
+                    old_length = len(fragment.text)
                     fragment.text = fragment.text[:start - fragment_start_pos]
                     fragment.has_been_split = True
-                    old_length = len(fragment.text)
                     print("Content before self.content=", self.content)
                     fragment.length = len(fragment.text)
                     print("Content before start=", start)

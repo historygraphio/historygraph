@@ -76,7 +76,6 @@ class TextEditTest(unittest.TestCase):
         assert textowner.text.get_fragment_to_append_to_by_index(9) == 0
 
     def test_insert_in_middle_of_fragment(self):
-        # TODO: Trying to implement this test
         textowner = TestFieldTextEditOwner1()
 
         dc1 = DocumentCollection(str(uuid.uuid4()))
