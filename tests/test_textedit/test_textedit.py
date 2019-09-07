@@ -720,7 +720,7 @@ class TextEditTest(unittest.TestCase):
         assert fragments[2].internal_start_pos == 4
         assert fragments[2].before_frag_id == ""
         assert fragments[2].before_frag_start_pos == 0
-        assert fragments[2].absolute_start_pos == 2, "fragments[2].absolute_start_pos={}".format(fragments[2].absolute_start_pos)
+        assert fragments[2].absolute_start_pos == 2
         assert fragments[2].length == 2
 
         assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
