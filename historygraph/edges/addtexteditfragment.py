@@ -134,6 +134,7 @@ class AddTextEditFragment(Edge):
                         for i in range(fragment_index2 + 1, len(flImpl._listfragments)):
                             flImpl._listfragments[i].absolute_start_pos += added_fragment.length
                 elif relative_start_pos >= fragment.internal_start_pos + len(fragment.text):
+                    print("AddTextEditFragment.replay relative_start_pos >= fragment.internal_start_pos + len(fragment.text)")
                     fragment_index2 = fragment_index + 1
                     do_insert = False
                     while not do_insert and fragment_index2 < len(flImpl._listfragments):
@@ -153,7 +154,19 @@ class AddTextEditFragment(Edge):
                                 do_insert = True
                         else:
                             do_insert = True
+                    before_absolute_pos = 0
+                    before_length = 0
+                    if fragment_index2 > 0:
+                        before_frag = flImpl._listfragments[fragment_index2 - 1]
+                        before_absolute_pos = before_frag.absolute_start_pos
+                        before_length = before_frag.length
+                    flImpl.content = flImpl.content[:before_absolute_pos + before_length] + added_fragment.text + flImpl.content[before_absolute_pos + before_length:]
+                    added_fragment.absolute_start_pos = before_absolute_pos + before_length
+                    added_fragment.length = len(added_fragment.text)
                     flImpl._listfragments.insert(fragment_index2, added_fragment)
+                    # TODO: We don't appear to test moving later elements along
+                    #for i in range(fragment_index2 + 1, len(flImpl._listfragments)):
+                    #    flImpl._listfragments[i].absolute_start_pos += added_fragment.length
                 else:
                     assert False, "Should never be reached"
 

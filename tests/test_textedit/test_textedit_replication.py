@@ -768,7 +768,7 @@ class TextEditTestReplication(unittest.TestCase):
         assert fragments[1].relative_start_pos == 6
         assert fragments[1].has_been_split == False
         assert fragments[1].internal_start_pos == 0
-        assert fragments[1].absolute_start_pos == 6
+        assert fragments[1].absolute_start_pos == 6, "fragments[1].absolute_start_pos={}".format(fragments[1].absolute_start_pos)
         assert fragments[1].length == 3
 
         assert textowner.text.get_fragment_to_append_to_by_index(0) == 0
