@@ -70,15 +70,17 @@ class TextEdit(Field):
                     print("We are deleting an entrie fragment just remove it")
                     fragment.text = ""
                     fragment.has_been_split = True
+                    fragment.length = 0
                     self.content = self.content[:start] + \
                         self.content[end:]
-                    for i in range(fragment_start_pos + 1, len(self._listfragments)):
+                    for i in range(fragment_start_index + 1, len(self._listfragments)):
                         self._listfragments[i].absolute_start_pos -= end - start
                 elif start == fragment_start_pos:
                     # We are deleting at the start there is no new fragment just chop characters off
                     print("We are deleting at the start there is no new fragment just chop characters off")
                     fragment.text = fragment.text[end - fragment_start_pos:]
                     fragment.internal_start_pos = fragment.internal_start_pos + end - fragment_start_pos
+                    fragment.length = len(fragment.text)
                     self.content = self.content[:fragment_start_pos] + \
                         self.content[end:]
                     for i in range(fragment_start_pos + 1, len(self._listfragments)):
@@ -210,6 +212,8 @@ class TextEdit(Field):
                     new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
                         fragment.id, len(fragment.text), before_frag_id, before_frag_start_pos, False)
                     before_fragment = self._listfragments[fragment_index]
+                    new_inserted_frag.absolute_start_pos = before_fragment.absolute_start_pos + before_fragment.length
+                    new_inserted_frag.length = len(new_inserted_frag.text)
                     self.content = self.content[:before_fragment.absolute_start_pos + before_fragment.length] + \
                         text + self.content[before_fragment.absolute_start_pos + before_fragment.length:]
                     for i in range(fragment_index + 1, len(self._listfragments)):
@@ -230,6 +234,8 @@ class TextEdit(Field):
                 inserted_fragment_id = str(uuid.uuid4())
                 new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
                     fragment.id, len(fragment.text), "", 0, False)
+                new_inserted_frag.absolute_start_pos = fragment.absolute_start_pos + fragment.length
+                new_inserted_frag.length = len(new_inserted_frag.text)
                 self.content = self.content[:fragment.absolute_start_pos + fragment.length] + \
                     text + self.content[fragment.absolute_start_pos + fragment.length:]
                 for i in range(fragment_index + 1, len(self._listfragments)):
@@ -260,6 +266,8 @@ class TextEdit(Field):
                         self._listfragments[i].absolute_start_pos += len(text)
                     new_inserted_frag = TextEdit._Fragment(inserted_fragment_id, text, sessionid, 0,
                         "", 0, before_frag_id, before_frag_start_pos, False)
+                    new_inserted_frag.absolute_start_pos = 0
+                    new_inserted_frag.length = len(text)
                     self._listfragments.insert(fragment_start_pos, new_inserted_frag)
                     self.was_changed(ChangeType.ADD_TEXTEDIT_FRAGMENT, self.parent.id,
                                      self.name, self._get_add_fragment_json(inserted_fragment_id,
