@@ -22,6 +22,7 @@ class AddTextEditFragment(Edge):
 
     def replay(self, doc):
         # Extract the fragment values from the JSON payload
+        print("AddTextEditFragment.replay called")
         (fragment_id, text, sessionid,
                 internal_start_pos, relative_to, relative_start_pos,
                 before_frag_id, before_frag_start_pos, has_been_split) = \
@@ -37,9 +38,13 @@ class AddTextEditFragment(Edge):
             flImpl = getattr(parent, self.propertyname)
 
             if added_fragment.relative_to == "" and len(flImpl._listfragments) == 0:
+                print("AddTextEditFragment.replay This is the first fragment it does immediately after the start of the list")
                 # This is the first fragment it does immediately after the start
                 # of the list
                 flImpl._listfragments.append(added_fragment)
+                flImpl.content = added_fragment.text
+                added_fragment.absolute_start_pos = 0
+                added_fragment.length = len(added_fragment.text)
             else:
                 fragment_index = 0
                 was_found = False
