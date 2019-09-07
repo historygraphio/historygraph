@@ -70,6 +70,10 @@ class TextEdit(Field):
                     print("We are deleting an entrie fragment just remove it")
                     fragment.text = ""
                     fragment.has_been_split = True
+                    self.content = self.content[:start] + \
+                        self.content[end:]
+                    for i in range(fragment_start_pos + 1, len(self._listfragments)):
+                        self._listfragments[i].absolute_start_pos -= end - start
                 elif start == fragment_start_pos:
                     # We are deleting at the start there is no new fragment just chop characters off
                     print("We are deleting at the start there is no new fragment just chop characters off")
