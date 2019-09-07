@@ -78,20 +78,31 @@ class AddTextEditFragment(Edge):
 
                 fragment = flImpl._listfragments[fragment_index]
                 if relative_start_pos < fragment.internal_start_pos + len(fragment.text):
-                    #We need to break this fragment apart
+                    print("AddTextEditFragment.replay We need to break this fragment apart")
+                    # We need to break this fragment apart
                     # TODO: Code shared with textedit.py move to a library
                     fragment_break_pos = relative_start_pos - fragment.internal_start_pos
                     if fragment_break_pos > 0:
+                        print("AddTextEditFragment.replay fragment_break_pos > 0")
                         new_split_frag = fields.TextEdit._Fragment(fragment.id,
                             fragment.text[fragment_break_pos:],
                             sessionid, fragment.internal_start_pos + fragment_break_pos,
                             fragment.relative_to, fragment.relative_start_pos,
                             "", 0, False)
+                        added_fragment.absolute_start_pos = fragment.absolute_start_pos + fragment_break_pos
+                        added_fragment.length = len(added_fragment.text)
+                        new_split_frag.absolute_start_pos = fragment.absolute_start_pos + fragment_break_pos + added_fragment.length
+                        new_split_frag.length = len(new_split_frag.text)
                         fragment.has_been_split = True
                         fragment.text = fragment.text[:fragment_break_pos]
+                        fragment.length = fragment_break_pos
+                        absolute_break_pos = fragment_break_pos + fragment.absolute_start_pos
+                        flImpl.content = flImpl.content[:absolute_break_pos] + added_fragment.text + \
+                            flImpl.content[absolute_break_pos:]
                         flImpl._listfragments.insert(fragment_index + 1, new_split_frag)
                         flImpl._listfragments.insert(fragment_index + 1, added_fragment)
                     else:
+                        print("AddTextEditFragment.replay else fragment_break_pos > 0")
                         fragment_index2 = fragment_index
                         do_insert = False
                         while not do_insert and fragment_index2 < len(flImpl._listfragments):

@@ -22,6 +22,7 @@ class AddTextEditAppendToFragment(Edge):
         self.propertytype = propertytype
 
     def replay(self, doc):
+        print("AddTextEditAppendToFragment.replay called")
         # Extract the fragment values from the JSON payload
         (fragment_id, text, fragment_text_len) = \
             JSONDecoder().decode(self.propertyvalue)
@@ -34,7 +35,10 @@ class AddTextEditAppendToFragment(Edge):
             fragments = [f for f in flImpl._listfragments if f.id == fragment_id]
             last_fragment = fragments[-1]
             assert last_fragment.internal_start_pos + len(last_fragment.text) <= fragment_text_len
+            flImpl.content = flImpl.content[:last_fragment.absolute_start_pos + last_fragment.length] + \
+                text + flImpl.content[last_fragment.absolute_start_pos + last_fragment.length:]
             last_fragment.text += text
+            last_fragment.length = len(last_fragment.text)
 
     def clone(self):
         return AddTextEditAppendToFragment(self._start_hashes,

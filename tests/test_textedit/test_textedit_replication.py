@@ -118,7 +118,7 @@ class TextEditTestReplication(unittest.TestCase):
         assert fragments[3].relative_start_pos == 5
         assert fragments[3].has_been_split == False
         assert fragments[3].internal_start_pos == 0
-        assert fragments[3].absolute_start_pos == 5
+        assert fragments[3].absolute_start_pos == 6
         assert fragments[3].length == 1
 
         assert fragments[4].id == fragments[0].id
@@ -127,7 +127,7 @@ class TextEditTestReplication(unittest.TestCase):
         assert fragments[4].relative_start_pos == 0
         assert fragments[4].has_been_split == False
         assert fragments[4].internal_start_pos == 5
-        assert fragments[4].absolute_start_pos == 6
+        assert fragments[4].absolute_start_pos == 7
         assert fragments[4].length == 4
 
         assert test2.text.get_fragment_to_append_to_by_index(0) == 0
