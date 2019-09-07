@@ -39,7 +39,7 @@ class AddTextEditFragment(Edge):
 
             if added_fragment.relative_to == "" and len(flImpl._listfragments) == 0:
                 print("AddTextEditFragment.replay This is the first fragment it does immediately after the start of the list")
-                # This is the first fragment it does immediately after the start
+                # This is the first fragment it goes immediately after the start
                 # of the list
                 flImpl._listfragments.append(added_fragment)
                 flImpl.content = added_fragment.text
@@ -101,6 +101,7 @@ class AddTextEditFragment(Edge):
                             flImpl.content[absolute_break_pos:]
                         flImpl._listfragments.insert(fragment_index + 1, new_split_frag)
                         flImpl._listfragments.insert(fragment_index + 1, added_fragment)
+                        #TODO: We don't shift fragments after these along in terms of absolute position
                     else:
                         print("AddTextEditFragment.replay else fragment_break_pos > 0")
                         fragment_index2 = fragment_index
@@ -122,7 +123,16 @@ class AddTextEditFragment(Edge):
                                     do_insert = True
                             else:
                                 do_insert = True
+                        before_absolute_start_pos = 0
+                        if fragment_index2 > 0:
+                            before_frag = flImpl._listfragments[fragment_index2 - 1]
+                            before_absolute_start_pos = before_frag.absolute_start_pos + before_frag.length
+                        flImpl.content = flImpl.content[:before_absolute_start_pos] + added_fragment.text + flImpl.content[before_absolute_start_pos:]
+                        added_fragment.absolute_start_pos = before_absolute_start_pos
+                        added_fragment.length = len(added_fragment.text)
                         flImpl._listfragments.insert(fragment_index2, added_fragment)
+                        for i in range(fragment_index2 + 1, len(flImpl._listfragments)):
+                            flImpl._listfragments[i].absolute_start_pos += added_fragment.length
                 elif relative_start_pos >= fragment.internal_start_pos + len(fragment.text):
                     fragment_index2 = fragment_index + 1
                     do_insert = False
