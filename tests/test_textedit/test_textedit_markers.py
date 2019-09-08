@@ -131,3 +131,33 @@ class TextEditLinesTest(unittest.TestCase):
 
         self.assertEqual(marker.line, 1)
         self.assertEqual(marker.column, 0)
+
+    def test_marker_inside_a_split_fragment(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+
+        textowner.text.insert(3, "g\nhi")
+
+        marker = textowner.text.get_marker(textowner.text._listfragments[0].id,
+                                           4)
+        self.assertEqual(marker.line, 1)
+        self.assertEqual(marker.column, 3)
+
+    def test_marker_inside_a_split_fragment_alt_pattern(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcd\nef")
+
+        textowner.text.insert(3, "ghi")
+
+        marker = textowner.text.get_marker(textowner.text._listfragments[0].id,
+                                           6)
+        self.assertEqual(marker.line, 1)
+        self.assertEqual(marker.column, 1)
