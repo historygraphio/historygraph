@@ -379,6 +379,24 @@ class TextEdit(Field):
             rawlines.append(lastlineinfo)
             return rawlines
 
+        def get_marker(self, fragment_id, offset):
+            # Retreive the index of the fragment that match fragment_id and offset
+            # That is the last fragment that matches the fragment ID and has an
+            # internal start position before the offset
+            fragment_indexes = [i for i in range(len(self._listfragments)) if
+                         self._listfragments[i].id == fragment_id and
+                         offest >= self._listfragments[i].internal_start_pos]
+            # The last one in the list is the one we are looking for
+            fragment_index = fragment_indexes[-1]
+            # Get the line
+            lines = self.get_lines()
+            # Get all lines that start on or after the given index
+            indexes = [i for i in range(len(lines)) if lines[i].start_fragment >=
+                     fragment_info[1]]
+            # The first one is the one we want
+            first_index = indexes[0]
+
+
 
     def __init__(self):
         pass
