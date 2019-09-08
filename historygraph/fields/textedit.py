@@ -401,25 +401,6 @@ class TextEdit(Field):
             first_index = indexes[-1]
             lineinfo = lines[first_index]
             info_start_fragment = self._listfragments[lineinfo.start_fragment]
-            """
-            if info_start_fragment.id == fragment_id and \
-               info_start_fragment.internal_start_pos <= offset:
-                # This fragment is the one we want
-                print('Calculating no extra_chars')
-                print('first_index=', first_index)
-                print('fragment_index=', fragment_index)
-                print('lineinfo.start_fragment=', lineinfo.start_fragment)
-                return Marker(first_index, offset - self._listfragments[fragment_index].internal_start_pos - lineinfo.start_offset)
-            else:
-                print('Calculating extra_chars')
-                print('fragment_index=', fragment_index)
-                print('lineinfo.start_fragment=', lineinfo.start_fragment)
-                print('lineinfo.start_offset=', lineinfo.start_offset)
-                print('list fragments text=', [f.text for f in self._listfragments])
-                print('offset=',offset)
-                extra_chars = sum([len(self._listfragments[i].text) for i in range(lineinfo.start_fragment, fragment_index)])
-                return Marker(first_index, offset - self._listfragments[fragment_index].internal_start_pos - lineinfo.start_offset + extra_chars)
-            """
             extra_chars = sum([len(self._listfragments[i].text) for i in range(lineinfo.start_fragment, fragment_index)])
             return Marker(first_index, offset - self._listfragments[fragment_index].internal_start_pos - lineinfo.start_offset + extra_chars)
 
