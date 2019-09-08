@@ -22,7 +22,6 @@ class AddTextEditRemove(Edge):
         self.propertytype = propertytype
 
     def replay(self, doc):
-        print("AddTextEditRemove.replay called")
         # Extract the fragment values from the JSON payload
         (target_fragment_id, remove_start, remove_end, sessionid) = \
                     JSONDecoder().decode(self.propertyvalue)

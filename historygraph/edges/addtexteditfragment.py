@@ -22,7 +22,6 @@ class AddTextEditFragment(Edge):
 
     def replay(self, doc):
         # Extract the fragment values from the JSON payload
-        print("AddTextEditFragment.replay called")
         (fragment_id, text, sessionid,
                 internal_start_pos, relative_to, relative_start_pos,
                 before_frag_id, before_frag_start_pos, has_been_split) = \
@@ -38,7 +37,6 @@ class AddTextEditFragment(Edge):
             flImpl = getattr(parent, self.propertyname)
 
             if added_fragment.relative_to == "" and len(flImpl._listfragments) == 0:
-                print("AddTextEditFragment.replay This is the first fragment it does immediately after the start of the list")
                 # This is the first fragment it goes immediately after the start
                 # of the list
                 flImpl._listfragments.append(added_fragment)
@@ -78,12 +76,10 @@ class AddTextEditFragment(Edge):
 
                 fragment = flImpl._listfragments[fragment_index]
                 if relative_start_pos < fragment.internal_start_pos + len(fragment.text):
-                    print("AddTextEditFragment.replay We need to break this fragment apart")
                     # We need to break this fragment apart
                     # TODO: Code shared with textedit.py move to a library
                     fragment_break_pos = relative_start_pos - fragment.internal_start_pos
                     if fragment_break_pos > 0:
-                        print("AddTextEditFragment.replay fragment_break_pos > 0")
                         new_split_frag = fields.TextEdit._Fragment(fragment.id,
                             fragment.text[fragment_break_pos:],
                             sessionid, fragment.internal_start_pos + fragment_break_pos,
@@ -103,7 +99,6 @@ class AddTextEditFragment(Edge):
                         flImpl._listfragments.insert(fragment_index + 1, added_fragment)
                         #TODO: We don't shift fragments after these along in terms of absolute position
                     else:
-                        print("AddTextEditFragment.replay else fragment_break_pos > 0")
                         fragment_index2 = fragment_index
                         do_insert = False
                         while not do_insert and fragment_index2 < len(flImpl._listfragments):
@@ -134,7 +129,6 @@ class AddTextEditFragment(Edge):
                         for i in range(fragment_index2 + 1, len(flImpl._listfragments)):
                             flImpl._listfragments[i].absolute_start_pos += added_fragment.length
                 elif relative_start_pos >= fragment.internal_start_pos + len(fragment.text):
-                    print("AddTextEditFragment.replay relative_start_pos >= fragment.internal_start_pos + len(fragment.text)")
                     fragment_index2 = fragment_index + 1
                     do_insert = False
                     while not do_insert and fragment_index2 < len(flImpl._listfragments):

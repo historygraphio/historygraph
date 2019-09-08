@@ -22,7 +22,6 @@ class AddTextEditAppendToFragment(Edge):
         self.propertytype = propertytype
 
     def replay(self, doc):
-        print("AddTextEditAppendToFragment.replay called")
         # Extract the fragment values from the JSON payload
         (fragment_id, text, fragment_text_len) = \
             JSONDecoder().decode(self.propertyvalue)
