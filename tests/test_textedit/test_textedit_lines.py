@@ -31,9 +31,8 @@ class TextEditTest(unittest.TestCase):
     def test_two_fragment_document_is_one_line(self):
         textowner = TestFieldTextEditOwner1()
 
-        dc1 = DocumentCollection()
-        dc1.register(TestFieldTextEditOwner1)
-        dc1.add_document_object(textowner)
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
 
         textowner.text.insert(0, "abc")
         textowner.text.insert(3, "def")
@@ -48,9 +47,8 @@ class TextEditTest(unittest.TestCase):
     def test_split_fragment_document_is_one_line(self):
         textowner = TestFieldTextEditOwner1()
 
-        dc1 = DocumentCollection()
-        dc1.register(TestFieldTextEditOwner1)
-        dc1.add_document_object(textowner)
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
 
         textowner.text.insert(0, "abc")
         textowner.text.insert(1, "def")
@@ -65,9 +63,8 @@ class TextEditTest(unittest.TestCase):
     def test_simple_document_is_two_lines(self):
         textowner = TestFieldTextEditOwner1()
 
-        dc1 = DocumentCollection()
-        dc1.register(TestFieldTextEditOwner1)
-        dc1.add_document_object(textowner)
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
 
         textowner.text.insert(0, "abc\ndef")
 
@@ -86,9 +83,8 @@ class TextEditTest(unittest.TestCase):
     def test_simple_document_is_two_lines_new_line_at_end(self):
         textowner = TestFieldTextEditOwner1()
 
-        dc1 = DocumentCollection()
-        dc1.register(TestFieldTextEditOwner1)
-        dc1.add_document_object(textowner)
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
 
         textowner.text.insert(0, "abcdef\n")
 
