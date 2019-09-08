@@ -395,15 +395,15 @@ class TextEdit(Field):
             lines = self.get_lines()
             # Get all lines that start on or after the given index
             indexes = [i for i in range(len(lines)) if lines[i].start_fragment >=
-                     fragment_index]
+                     fragment_index and lines[i].start_offset <= offset]
             # The first one is the one we want
-            first_index = indexes[0]
+            first_index = indexes[-1]
             lineinfo = lines[first_index]
             info_start_fragment = self._listfragments[lineinfo.start_fragment]
-            if info_start_fragment.id == fragment_id and info_start_fragment.internal_start_pos <= offset:
+            if info_start_fragment.id == fragment_id and \
+               info_start_fragment.internal_start_pos <= offset:
                 # This fragment is the one we want
-                return Marker(first_index, offset -
-                                       info_start_fragment.internal_start_pos)
+                return Marker(first_index, offset - lineinfo.start_offset)
             else:
                 assert False
 

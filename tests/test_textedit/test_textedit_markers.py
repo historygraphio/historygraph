@@ -38,11 +38,30 @@ class TextEditLinesTest(unittest.TestCase):
         self.assertEqual(marker.line, 0)
         self.assertEqual(marker.column, 3)
 
-        """
-        lines = textowner.text.get_lines()
-        self.assertEqual(len(lines), 1)
-        line = lines[0]
-        self.assertEqual(line.start_offset, 0)
-        self.assertEqual(line.start_fragment, 0)
-        self.assertEqual(line.get_content(), "abcdef")
-        """
+    def test_marker_before_a_simple_linkbreak(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcd\nef")
+
+        marker = textowner.text.get_marker(textowner.text._listfragments[0].id,
+                                           3)
+
+        self.assertEqual(marker.line, 0)
+        self.assertEqual(marker.column, 3)
+
+    def test_marker_after_a_simple_linkbreak(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "ab\ncdef")
+
+        marker = textowner.text.get_marker(textowner.text._listfragments[0].id,
+                                           4)
+
+        self.assertEqual(marker.line, 1)
+        self.assertEqual(marker.column, 1)
