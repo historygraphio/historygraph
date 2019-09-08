@@ -328,6 +328,55 @@ class TextEdit(Field):
                     pos += len(f.text)
             assert False, "Read past end of string"
 
+        def get_lines(self):
+            # Return an array of lines of text from this document
+            # Each line consists of the start point (fragment + offset)
+            # The start of the line is the character after the previous \n
+            # except the frst line always starts at position 0. The end of the
+            # line is the next \n. Except the last line which is the last
+            # character in the textedit
+            class LineInfo(object):
+                def __init__(self, start_fragment, start_offset, rendered_list):
+                    self.start_fragment = start_fragment
+                    self.start_offset = start_offset
+                    self.rendered_list = rendered_list
+
+                def get_content(self):
+                    def _get_content(fragment, start_offset):
+                        if fragment >= len(self.rendered_list):
+                            return ""
+                        text = self.rendered_list[fragment].text
+                        text = text[start_offset:]
+                        pos = text.find('\n')
+                        if pos == -1:
+                            return text + _get_content(fragment + 1, 0)
+                        else:
+                            return text[:pos]
+
+                    return _get_content(self.start_fragment, self.start_offset)
+
+            lastlineinfo = None
+            rawlines = list()
+            for index in range(0, len(self._listfragments)):
+                if lastlineinfo == None:
+                    lastlineinfo = LineInfo(index,0,self._listfragments)
+                fragment = self._listfragments[index]
+                thispos = 0
+                while True:
+                    lastsearch = fragment.text[thispos:].find('\n')
+                    if lastsearch == -1:
+                        break
+                    else:
+                        lastsearch += thispos
+                        thispos = lastsearch + 1
+                        rawlines.append(lastlineinfo)
+                        if thispos < len(fragment.text):
+                            lastlineinfo = LineInfo(index,thispos,self._listfragments)
+                        else:
+                            lastlineinfo = LineInfo(index + 1,0,self._rend_listfragmentsered_list)
+            rawlines.append(lastlineinfo)
+            return rawlines
+
 
     def __init__(self):
         pass
