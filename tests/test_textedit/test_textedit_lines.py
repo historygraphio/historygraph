@@ -7,7 +7,7 @@ from ..common import DocumentCollection, TestFieldTextEditOwner1
 import uuid
 
 
-class TextEditTest(unittest.TestCase):
+class TextEditLinesTest(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(TestFieldTextEditOwner1)
