@@ -83,3 +83,23 @@ class TextEditLinesTest(unittest.TestCase):
 
         self.assertEqual(marker.line, 1)
         self.assertEqual(marker.column, 3)
+
+    def test_marker_in_third_fragment_on_line(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcd\nef")
+        # Fake the first fragment belonging to a different session so we get
+        # two fragments created
+        textowner.text._listfragments[0].sessionid = str(uuid.uuid4())
+        textowner.text.insert(7, "ghi")
+        textowner.text._listfragments[1].sessionid = str(uuid.uuid4())
+        textowner.text.insert(10, "jkl")
+
+        marker = textowner.text.get_marker(textowner.text._listfragments[2].id,
+                                           1)
+
+        self.assertEqual(marker.line, 1)
+        self.assertEqual(marker.column, 6)
