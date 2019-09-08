@@ -394,8 +394,9 @@ class TextEdit(Field):
             # Get the line
             lines = self.get_lines()
             # Get all lines that start on or after the given index
-            indexes = [i for i in range(len(lines)) if lines[i].start_fragment >=
-                     fragment_index and lines[i].start_offset <= offset]
+            indexes = [i for i in range(len(lines)) if (lines[i].start_fragment <=
+                     fragment_index and lines[i].start_offset <= offset)
+                     or lines[i].start_fragment < fragment_index]
             # The first one is the one we want
             first_index = indexes[-1]
             lineinfo = lines[first_index]
@@ -405,7 +406,12 @@ class TextEdit(Field):
                 # This fragment is the one we want
                 return Marker(first_index, offset - lineinfo.start_offset)
             else:
-                assert False
+                #print("get_marker lineinfo.start_fragment=", lineinfo.start_fragment)
+                #print("get_marker fragment_index=", fragment_index)
+                #print("get_marker first_index=", first_index)
+                extra_chars = sum([len(self._listfragments[i].text) for i in range(lineinfo.start_fragment, fragment_index)])
+                return Marker(first_index, offset - lineinfo.start_offset + extra_chars)
+                #assert False
 
 
     def __init__(self):
