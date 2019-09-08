@@ -151,9 +151,8 @@ class TextEditTest(unittest.TestCase):
     def test_simple_document_two_lines_is_one_after_deletion(self):
         textowner = TestFieldTextEditOwner1()
 
-        dc1 = DocumentCollection()
-        dc1.register(TestFieldTextEditOwner1)
-        dc1.add_document_object(textowner)
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
 
         textowner.text.insert(0, "abc\ndef")
 
@@ -181,11 +180,13 @@ class TextEditTest(unittest.TestCase):
     def test_split_fragment_document_two_lines_is_one_after_deletion(self):
         textowner = TestFieldTextEditOwner1()
 
-        dc1 = DocumentCollection()
-        dc1.register(TestFieldTextEditOwner1)
-        dc1.add_document_object(textowner)
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
 
         textowner.text.insert(0, "abc")
+        # Fake the first fragment belonging to a different session so we get
+        # two fragments created
+        textowner.text._listfragments[0].sessionid = str(uuid.uuid4())
         textowner.text.insert(3, "\ndef")
 
         lines = textowner.text.get_lines()
@@ -212,9 +213,8 @@ class TextEditTest(unittest.TestCase):
     def test_simple_document_three_lines_is_two_after_deletion(self):
         textowner = TestFieldTextEditOwner1()
 
-        dc1 = DocumentCollection()
-        dc1.register(TestFieldTextEditOwner1)
-        dc1.add_document_object(textowner)
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
 
         textowner.text.insert(0, "abc\ndef\nghi")
 
@@ -252,12 +252,17 @@ class TextEditTest(unittest.TestCase):
     def test_multi_fragment_document_three_lines_is_two_after_deletion(self):
         textowner = TestFieldTextEditOwner1()
 
-        dc1 = DocumentCollection()
-        dc1.register(TestFieldTextEditOwner1)
-        dc1.add_document_object(textowner)
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
 
         textowner.text.insert(0, "abc\n")
+        # Fake the first fragment belonging to a different session so we get
+        # two fragments created
+        textowner.text._listfragments[0].sessionid = str(uuid.uuid4())
         textowner.text.insert(4, "def\n")
+        # Fake the first fragment belonging to a different session so we get
+        # two fragments created
+        textowner.text._listfragments[1].sessionid = str(uuid.uuid4())
         textowner.text.insert(8, "ghi")
 
         lines = textowner.text.get_lines()
