@@ -371,9 +371,11 @@ class TextEdit(Field):
                         thispos = lastsearch + 1
                         rawlines.append(lastlineinfo)
                         if thispos < len(fragment.text):
-                            lastlineinfo = LineInfo(index,thispos,self._listfragments)
+                            lastlineinfo = LineInfo(index, thispos,
+                                                    self._listfragments)
                         else:
-                            lastlineinfo = LineInfo(index + 1,0,self._listfragments)
+                            lastlineinfo = LineInfo(index + 1, 0,
+                                                    self._listfragments)
             rawlines.append(lastlineinfo)
             return rawlines
 

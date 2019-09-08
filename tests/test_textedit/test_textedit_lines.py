@@ -103,11 +103,13 @@ class TextEditTest(unittest.TestCase):
     def test_split_fragment_document_is_two_lines(self):
         textowner = TestFieldTextEditOwner1()
 
-        dc1 = DocumentCollection()
-        dc1.register(TestFieldTextEditOwner1)
-        dc1.add_document_object(textowner)
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
 
         textowner.text.insert(0, "abc")
+        # Fake the first fragment belonging to a different session so we get
+        # two fragments created
+        textowner.text._listfragments[0].sessionid = str(uuid.uuid4())
         textowner.text.insert(3, "\ndef")
 
         lines = textowner.text.get_lines()
