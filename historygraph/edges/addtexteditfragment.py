@@ -164,9 +164,8 @@ class AddTextEditFragment(Edge):
                     added_fragment.absolute_start_pos = before_absolute_pos + before_length
                     added_fragment.length = len(added_fragment.text)
                     flImpl._listfragments.insert(fragment_index2, added_fragment)
-                    # TODO: We don't appear to test moving later elements along
-                    #for i in range(fragment_index2 + 1, len(flImpl._listfragments)):
-                    #    flImpl._listfragments[i].absolute_start_pos += added_fragment.length
+                    for i in range(fragment_index2 + 1, len(flImpl._listfragments)):
+                        flImpl._listfragments[i].absolute_start_pos += added_fragment.length
                 else:
                     assert False, "Should never be reached"
 

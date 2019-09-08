@@ -921,7 +921,7 @@ class TextEditTestReplication(unittest.TestCase):
         assert fragments[2].internal_start_pos == 0
         assert fragments[2].before_frag_id == ""
         assert fragments[2].before_frag_start_pos == 0
-        assert fragments[2].absolute_start_pos == 6
+        assert fragments[2].absolute_start_pos == 6, "fragments[2].absolute_start_pos={}".format(fragments[2].absolute_start_pos)
         assert fragments[2].length == 3
 
         assert test2.text.get_fragment_to_append_to_by_index(0) == 0
