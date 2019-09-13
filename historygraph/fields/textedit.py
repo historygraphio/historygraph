@@ -401,6 +401,7 @@ class TextEdit(Field):
             first_index = indexes[-1]
             lineinfo = lines[first_index]
             info_start_fragment = self._listfragments[lineinfo.start_fragment]
+            offset = min(offset, len(info_start_fragment.text) + info_start_fragment.internal_start_pos)
             extra_chars = sum([len(self._listfragments[i].text) for i in range(lineinfo.start_fragment, fragment_index)])
             return Marker(first_index, offset - self._listfragments[fragment_index].internal_start_pos - lineinfo.start_offset + extra_chars)
 
