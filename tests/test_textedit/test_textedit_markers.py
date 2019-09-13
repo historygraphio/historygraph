@@ -228,3 +228,21 @@ class TextEditMarkersTest(unittest.TestCase):
                                            1)
         self.assertEqual(marker.line, 0)
         self.assertEqual(marker.column, 3)
+
+    def test_marker_in_start_of_partially_deleted_fragment(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+        textowner.text.insert(3, "xyz")
+
+        fragment_id = textowner.text._listfragments[1].id
+
+        textowner.text.removerange(3, 4)
+
+        marker = textowner.text.get_marker(fragment_id,
+                                           1)
+        self.assertEqual(marker.line, 0)
+        self.assertEqual(marker.column, 3)
