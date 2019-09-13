@@ -401,9 +401,20 @@ class TextEdit(Field):
             first_index = indexes[-1]
             lineinfo = lines[first_index]
             info_start_fragment = self._listfragments[lineinfo.start_fragment]
-            offset = min(offset, len(info_start_fragment.text) + info_start_fragment.internal_start_pos)
-            extra_chars = sum([len(self._listfragments[i].text) for i in range(lineinfo.start_fragment, fragment_index)])
-            return Marker(first_index, offset - self._listfragments[fragment_index].internal_start_pos - lineinfo.start_offset + extra_chars)
+            #print("get_marker offset=", offset)
+            #print("get_marker info_start_fragment.length=", len(info_start_fragment.text))
+            #print("get_marker info_start_fragment.internal_start_pos=",
+            #      info_start_fragment.internal_start_pos)
+            #print("get_marker lineinfo.start_offset=", lineinfo.start_offset)
+            #print("get_marker self._listfragments[fragment_index].internal_start_po=",
+            #      self._listfragments[fragment_index].internal_start_pos)
+            offset = min(offset, len( self._listfragments[fragment_index].text) +
+                          self._listfragments[fragment_index].internal_start_pos)
+            extra_chars = sum([len(self._listfragments[i].text) for i in range(
+                               lineinfo.start_fragment, fragment_index)])
+            return Marker(first_index, offset -
+                          self._listfragments[fragment_index].internal_start_pos -
+                          lineinfo.start_offset + extra_chars)
 
 
     def __init__(self):

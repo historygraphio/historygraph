@@ -163,7 +163,7 @@ class TextEditMarkersTest(unittest.TestCase):
         self.assertEqual(marker.column, 1)
 
     # Test marker inside a simple deleted fragment
-    def test_marker_inside_a_fragment_which_is_partially_deleted(self):
+    def test_marker_inside_a_frqagment_which_is_partially_deleted(self):
         textowner = TestFieldTextEditOwner1()
 
         self.dc1.register(TestFieldTextEditOwner1)
@@ -175,6 +175,38 @@ class TextEditMarkersTest(unittest.TestCase):
 
         marker = textowner.text.get_marker(textowner.text._listfragments[0].id,
                                            3)
+
+        self.assertEqual(marker.line, 0)
+        self.assertEqual(marker.column, 2)
+
+    def test_marker_at_start_of_a_fragment_which_is_partially_deleted(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+
+        textowner.text.removerange(2, 4)
+
+        marker = textowner.text.get_marker(textowner.text._listfragments[0].id,
+                                           2)
+
+        self.assertEqual(marker.line, 0)
+        self.assertEqual(marker.column, 2)
+
+    def test_marker_at_end_of_a_fragment_which_is_partially_deleted(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+
+        textowner.text.removerange(2, 4)
+
+        marker = textowner.text.get_marker(textowner.text._listfragments[0].id,
+                                           4)
 
         self.assertEqual(marker.line, 0)
         self.assertEqual(marker.column, 2)
