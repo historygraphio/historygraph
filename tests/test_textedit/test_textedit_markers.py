@@ -163,7 +163,7 @@ class TextEditMarkersTest(unittest.TestCase):
         self.assertEqual(marker.column, 1)
 
     # Test marker inside a simple deleted fragment
-    def test_marker_inside_a_frqagment_which_is_partially_deleted(self):
+    def test_marker_inside_a_fragment_which_is_partially_deleted(self):
         textowner = TestFieldTextEditOwner1()
 
         self.dc1.register(TestFieldTextEditOwner1)

@@ -414,6 +414,11 @@ class TextEdit(Field):
                           self._listfragments[fragment_index].internal_start_pos -
                           lineinfo.start_offset + extra_chars)
 
+        def is_marker_deleted(self, fragment_id, offset):
+            return False if ([f for f in self._listfragments if f.id == fragment_id
+                        and offset >= f.internal_start_pos
+                        and offset < f.internal_start_pos + f.length]) else True
+
 
     def __init__(self):
         pass
