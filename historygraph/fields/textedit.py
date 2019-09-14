@@ -417,7 +417,7 @@ class TextEdit(Field):
         def is_marker_deleted(self, fragment_id, offset):
             return False if ([f for f in self._listfragments if f.id == fragment_id
                         and offset >= f.internal_start_pos
-                        and offset < f.internal_start_pos + f.length]) else True
+                        and offset <= f.internal_start_pos + f.length]) else True
 
 
     def __init__(self):
