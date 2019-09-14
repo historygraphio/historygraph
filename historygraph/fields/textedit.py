@@ -419,6 +419,12 @@ class TextEdit(Field):
                         and offset >= f.internal_start_pos
                         and offset <= f.internal_start_pos + f.length]) else True
 
+        def is_marker_pair_deleted(self, fragment1_id, offset1, fragment2_id, offset2):
+            marker1 = self.get_marker(fragment1_id, offset1)
+            marker2 = self.get_marker(fragment2_id, offset2)
+            return marker1.line == marker2.line and \
+                   marker1.column == marker2.column
+
 
     def __init__(self):
         pass

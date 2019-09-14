@@ -9,7 +9,7 @@ import uuid
 # Test in this file are used to test feature relating to marker deletion
 # If the user deletes a fragment of text the markers should go with it
 
-class TextEditMarkersTest(unittest.TestCase):
+class TextEditDeleteMarkersTest(unittest.TestCase):
     def setUp(self):
         self.dc1 = DocumentCollection(str(uuid.uuid4()))
         self.dc1.register(TestFieldTextEditOwner1)
