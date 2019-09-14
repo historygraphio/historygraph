@@ -50,3 +50,16 @@ class TextEditMarkersTest(unittest.TestCase):
 
         self.assertFalse(textowner.text.is_marker_deleted(textowner.text._listfragments[0].id,
                                            2))
+
+    def test_marker_at_start_of_fragment_is_not_deleted(self):
+        textowner = TestFieldTextEditOwner1()
+
+        self.dc1.register(TestFieldTextEditOwner1)
+        self.dc1.add_document_object(textowner)
+
+        textowner.text.insert(0, "abcdef")
+
+        textowner.text.removerange(2, 4)
+
+        self.assertFalse(textowner.text.is_marker_deleted(textowner.text._listfragments[0].id,
+                                           4))
