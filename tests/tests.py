@@ -46,7 +46,7 @@ class SimpleCoversTestCase(unittest.TestCase):
         test.covers = 1
         test.covers = 2
         test2 = self.dc2.get_object_by_id(Covers.__name__, test.id)
-        self.assertEqual(test.covers, 2)
+        self.assertEqual(test2.covers, 2)
         assert test.history is not test2.history
         assert test is not test2
 
